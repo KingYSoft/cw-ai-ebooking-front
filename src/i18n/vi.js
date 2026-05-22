@@ -1,0 +1,183 @@
+export default {
+  custom: {
+    unsavedInputData: {
+      title: 'Thay đổi chưa lưu',
+      message: 'Trang này có thay đổi chưa được lưu.',
+    },
+    dataTable: {
+      filter: 'LỌC',
+      menus: {
+        inputLabel: 'Tìm kiếm mục',
+        inputPlaceholder: 'Tìm kiếm mục',
+      },
+      header: {
+        dialog: {
+          title: 'Cột bị ẩn',
+        },
+      },
+    },
+    tableLayout: {
+      headerSettings: 'Cài đặt cột',
+      availableFields: 'Có sẵn',
+      selectedFields: 'Đã chọn',
+    },
+    branchFilter: {
+      menus: {
+        inputLabel: 'Tìm kiếm mục',
+        inputPlaceholder: 'Tìm kiếm mục',
+      },
+      tab0: {
+        title: 'Chọn chi nhánh',
+        subtitle: 'Chọn chi nhánh để lọc dữ liệu.',
+      },
+      tab1: {
+        title: 'Đổi kiểu hiển thị',
+        subtitle: 'Đổi kiểu hiển thị để lọc dữ liệu.',
+        own: {
+          title: 'Chỉ của tôi',
+          subtitle: 'Chỉ xem dữ liệu của tôi.',
+        },
+      },
+    },
+    da: {
+      demo: 'demo',
+    },
+    op: {
+      equal: 'Bằng',
+      notEqual: 'Không bằng',
+      contain: 'Chứa',
+      notContain: 'Không chứa',
+    },
+    dialog: {
+      btn: {
+        new: 'Mới',
+        add: 'Thêm',
+        edit: 'Sửa',
+        close: 'Đóng',
+        save: 'Lưu',
+        cancel: 'Hủy',
+        clear: 'Xóa',
+        ok: 'OK',
+        reset: 'Đặt lại',
+        search: 'Tìm kiếm',
+        import: 'Nhập',
+        confirm: 'Xác nhận',
+        reload: 'Tải lại',
+        more: 'Thêm',
+      },
+    },
+    app: {
+      title: 'SJ Clemenger EBooking',
+      search: 'Tìm kiếm',
+      searchPlaceholder: 'Nhập từ khóa tìm kiếm',
+      action: 'Thao tác',
+      loading: 'Đang làm mới ứng dụng...',
+      http: {
+        err_title: 'Lỗi yêu cầu mạng',
+        err_401msg: 'Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.',
+        err_403msg: 'Bạn không có quyền thao tác, vui lòng đăng nhập lại.',
+        err_500msg: 'Lỗi máy chủ nội bộ, vui lòng liên hệ quản trị viên.',
+        err_time_out_msg: 'Yêu cầu mạng hết thời gian chờ, vui lòng thử lại.',
+        err_other_msg: 'Yêu cầu mạng thất bại, vui lòng tải lại trang.',
+        err_data_msg: 'Dữ liệu không chính xác, vui lòng thử lại.',
+      },
+      err401: {
+        title: 'Bạn chưa được cấp quyền! 🔐',
+        text: 'Bạn không có quyền truy cập trang này. Hãy về trang chủ!',
+        btnText: 'Về trang chủ',
+      },
+      err404: {
+        title: 'Không tìm thấy trang',
+        text: 'Chúng tôi không tìm thấy trang bạn đang tìm!',
+        btnText: 'Về trang chủ',
+      },
+      saveSuccess: 'Đã lưu thành công.',
+      searchMore: 'từ khóa tìm kiếm',
+      updateTitle: 'Phiên bản mới đã sẵn sàng. Cập nhật ngay?',
+      updateBtnText: 'Cập nhật ngay',
+      updateRemindBtnText: 'Nhắc lại sau 5 phút',
+    },
+    loginPage: {
+      title: 'Đăng nhập',
+      label: {
+        email: 'Email',
+        password: 'Mật khẩu',
+      },
+      err: {
+        email: 'Phải là email hợp lệ.',
+        password: 'Vui lòng nhập mật khẩu.',
+      },
+      placeholder: {
+        email: 'Nhập email của bạn',
+        password: 'Nhập mật khẩu của bạn',
+      },
+      forgotPassword: 'Quên mật khẩu?',
+      submitBtn: 'Đăng nhập',
+      logout: 'Đăng xuất',
+      newMessage: 'Mới sử dụng nền tảng của chúng tôi?',
+      newBtn: 'Tạo tài khoản',
+      ssoLogin: 'Đăng nhập SSO...',
+      ssoLoginText: 'Dùng token tạm thời {0} để đăng nhập SSO...',
+      ssoLoginTitle: 'Đăng nhập SSO',
+      ssoLoginBtnText: 'Đăng nhập bằng tài khoản',
+      p1: 'Khi đăng nhập vào Nền tảng, bạn đồng ý với',
+      p2: 'Chính sách quyền riêng tư',
+      p3: 'và',
+      p4: 'Điều khoản và Điều kiện',
+      t1: 'Một',
+      t2: 'Điểm dừng.',
+      subTitle: 'Kết nối con người, hàng hóa và công nghệ',
+      desc: 'OneStop Connections hướng đến việc cung cấp các kết nối liền mạch, an toàn và theo thời gian thực dựa trên dữ liệu để hỗ trợ logistics giao nhận. Chúng tôi thực hiện điều này thông qua bộ giải pháp phần mềm hàng đầu trong ngành, được vận hành bằng dữ liệu thời gian thực nhằm mang lại khả năng theo dõi xuyên suốt và hiệu quả.',
+      privacyPolicy: {
+        p1: 'Doanh nghiệp này quyết định cách sử dụng dữ liệu cá nhân được thu thập trên các nền tảng truyền thông của chúng tôi và trên Internet. Chúng tôi có thể thu thập dữ liệu bạn gửi trực tiếp cho chúng tôi hoặc dữ liệu được thu thập tự động, bao gồm từ cookie như thông tin thiết bị hoặc địa chỉ IP.',
+        p2: 'Vui lòng đọc',
+        p3: 'Chính sách quyền riêng tư',
+        p4: 'Bằng cách tiếp tục sử dụng trang web, bạn đồng ý với Chính sách quyền riêng tư của chúng tôi.',
+        btnText: 'Chấp nhận',
+      },
+    },
+    privacyPage: {
+      title: 'Chính sách quyền riêng tư',
+      desc: 'Chúng tôi rất coi trọng việc bảo vệ quyền riêng tư của bạn. Khi bạn sử dụng SJ Clemenger (sau đây gọi là "Dịch vụ này"), chúng tôi sẽ thu thập, sử dụng, tiết lộ và bảo vệ thông tin cá nhân của bạn theo chính sách dưới đây. Vui lòng đọc kỹ và hiểu đầy đủ Chính sách quyền riêng tư này.',
+      p1: {
+        title: '1. Thu thập thông tin',
+        d1: 'Chúng tôi thu thập thông tin bạn tự nguyện cung cấp khi sử dụng Dịch vụ, bao gồm nhưng không giới hạn ở thông tin cá nhân như tên, địa chỉ email và số điện thoại.',
+        d2: 'Chúng tôi thu thập thông tin phát sinh trong quá trình bạn sử dụng Dịch vụ, chẳng hạn như nhật ký thao tác, địa chỉ IP truy cập và mẫu thiết bị.',
+        d3: 'Chúng tôi có thể thu thập và lưu trữ thông tin liên quan đến việc bạn truy cập Dịch vụ thông qua Cookie hoặc các công nghệ khác để mang lại trải nghiệm tốt hơn.',
+      },
+      p2: {
+        title: '2. Sử dụng thông tin',
+        d1: 'Chúng tôi sử dụng thông tin đã thu thập để cung cấp, duy trì và cải thiện Dịch vụ, xử lý giao dịch, gửi thông báo và bảo đảm an toàn cho Dịch vụ.',
+      },
+      p3: {
+        title: '3. Chia sẻ thông tin',
+        d1: 'Chúng tôi sẽ không chia sẻ thông tin cá nhân của bạn với bên thứ ba trừ khi có sự đồng ý rõ ràng của bạn hoặc khi pháp luật yêu cầu.',
+      },
+      p4: {
+        title: '4. Bảo mật dữ liệu',
+        d1: 'Chúng tôi áp dụng các biện pháp bảo mật theo tiêu chuẩn ngành để bảo vệ thông tin cá nhân của bạn, bao gồm truyền tải và lưu trữ được mã hóa.',
+      },
+      p5: {
+        title: '5. Sử dụng Cookie',
+        d1: 'Chúng tôi sử dụng Cookie và các công nghệ tương tự để cải thiện trải nghiệm người dùng, phân tích lưu lượng truy cập website và cung cấp nội dung được cá nhân hóa.',
+      },
+      p6: {
+        title: '6. Quyền của bạn',
+        d1: 'Bạn có quyền truy cập, chỉnh sửa và xóa thông tin cá nhân của mình, hoặc hạn chế việc chúng tôi xử lý thông tin đó.',
+      },
+      date: 'Cập nhật lần cuối: Tháng 1 năm 2025',
+    },
+    menuPage: {
+      dashboard: 'Bảng điều khiển',
+
+      freight: 'Vận tải',
+      booking: 'Đặt chỗ',
+
+      system: 'Hệ thống',
+      system_user: 'Người dùng',
+      system_group: 'Nhóm',
+      system_security: 'Bảo mật',
+      system_logs: 'Nhật ký',
+    },
+  },
+}

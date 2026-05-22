@@ -17,6 +17,8 @@
                 <v-list activatable min-width="120">
                   <v-list-item @click="changeAppLanguage('en')">English</v-list-item>
                   <v-list-item @click="changeAppLanguage('zhHans')">中文简体</v-list-item>
+                  <v-list-item @click="changeAppLanguage('zhHant')">中文繁體</v-list-item>
+                  <v-list-item @click="changeAppLanguage('vi')">Tiếng Việt</v-list-item>
                 </v-list>
               </v-menu>
 
