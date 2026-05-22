@@ -1,8 +1,10 @@
 import { createI18n } from 'vue-i18n'
-import { en, zhHans } from 'vuetify/locale'
+import { en, vi, zhHans, zhHant } from 'vuetify/locale'
 
 import en__ from '@/i18n/en'
+import vi__ from '@/i18n/vi'
 import zhHans__ from '@/i18n/zhHans'
+import zhHant__ from '@/i18n/zhHant'
 
 const messages = {
   en: {
@@ -15,6 +17,18 @@ const messages = {
     $vuetify: {
       ...zhHans,
       ...zhHans__,
+    },
+  },
+  zhHant: {
+    $vuetify: {
+      ...zhHant,
+      ...zhHant__,
+    },
+  },
+  vi: {
+    $vuetify: {
+      ...vi,
+      ...vi__,
     },
   },
 }
@@ -37,6 +51,38 @@ const datetimeFormats = {
     },
   },
   zhHans: {
+    short: {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+    long: {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      // second: '2-digit',
+      hour12: false,
+    },
+  },
+  zhHant: {
+    short: {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+    long: {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      // second: '2-digit',
+      hour12: false,
+    },
+  },
+  vi: {
     short: {
       year: 'numeric',
       month: '2-digit',

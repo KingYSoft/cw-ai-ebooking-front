@@ -12,7 +12,13 @@ service.interceptors.request.use(
   config => {
     // const cookieLangValue = 'zh-Hans' // getCookieValue('Localization.CultureName')
     const lang = localStorage.getItem('lang')
-    const cookieLangValue = lang ? (lang === 'zhHans' ? 'zh-Hans' : lang) : 'en'
+    const cookieLangMap = {
+      en: 'en',
+      zhHans: 'zh-Hans',
+      zhHant: 'zh-Hant',
+      vi: 'vi',
+    }
+    const cookieLangValue = lang ? (cookieLangMap[lang] ?? 'en') : 'en'
     const token = sessionStorage.getItem('token')
     config.headers = {
       'Content-Type': 'application/json',

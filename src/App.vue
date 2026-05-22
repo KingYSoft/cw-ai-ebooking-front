@@ -28,6 +28,12 @@
   const theme = useTheme()
 
   const appThemeIcon = ref('light')
+  const htmlLangMap = {
+    en: 'en',
+    zhHans: 'zh-CN',
+    zhHant: 'zh-TW',
+    vi: 'vi-VN',
+  }
 
   const appInit = async callback => {
     // 关闭错误弹框
@@ -37,11 +43,7 @@
       const lang = localStorage.getItem('lang')
       current.value = lang
       document.title = t('$vuetify.custom.app.title')
-      if (lang === 'zhHans') {
-        document.documentElement.lang = 'zh-CN'
-      } else {
-        document.documentElement.lang = 'en'
-      }
+      document.documentElement.lang = htmlLangMap[lang] ?? 'en'
       localStorage.setItem('lang', lang)
     } else {
       // 默认 en
