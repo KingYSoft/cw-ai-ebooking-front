@@ -1,0 +1,270 @@
+// Vuetify 主题覆盖方式实现 ref-form 样式
+
+// 在 :root 中定义全局变量
+:root {
+  --ref-form-input-height: 32px;
+  --ref-form-input-padding: 0px;
+  --ref-form-field-padding-top: 0px;
+  --ref-form-field-padding-start: 8px;
+  --ref-form-field-padding-end: 4px;
+  --ref-form-field-padding-bottom: 0px;
+  --ref-form-icon-size: 0.75;
+  --ref-form-label-font-size: small;
+  --ref-form-input-font-size: xx-small;
+}
+
+// 直接使用全局选择器，不需要 :deep()
+.ref-form-pre {
+  .v-input {
+    &.v-input--horizontal {
+      .v-input__prepend {
+        margin-inline-end: 4px;
+      }
+      .v-input__append {
+        margin-inline-start: 0;
+      }
+    }
+
+    &.v-input--density-compact {
+      --v-input-control-height: var(--ref-form-input-height);
+      --v-input-padding-top: var(--ref-form-input-padding);
+
+      .v-field {
+        --v-field-padding-top: var(--ref-form-field-padding-top);
+        --v-field-padding-start: var(--ref-form-field-padding-start);
+        --v-field-padding-end: var(--ref-form-field-padding-end);
+        --v-field-padding-bottom: var(--ref-form-field-padding-bottom);
+
+        &.v-field--appended {
+          padding-inline-end: 0px;
+        }
+
+        &.v-field--variant-underlined {
+          .v-field__clearable {
+            align-items: center;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            .v-icon {
+              --v-icon-size-multiplier: 0.7;
+            }
+          }
+        }
+        .v-field__field {
+          .v-label {
+            font-size: var(--ref-form-label-font-size);
+          }
+
+          .v-field__input {
+            font-size: var(--ref-form-input-font-size);
+            color: rgba(var(--v-theme-text-input-color));
+          }
+        }
+
+        .v-field__clearable {
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+
+          .v-icon {
+            // --v-icon-size-multiplier: var(--ref-form-icon-size);
+            --v-icon-size-multiplier: 0.7;
+          }
+        }
+
+        .v-field__append-inner {
+          margin-inline-start: 0px;
+          margin-inline-end: 0px;
+          align-items: center;
+
+          .v-icon {
+            --v-icon-size-multiplier: var(--ref-form-icon-size);
+          }
+
+          .v-autocomplete__menu-icon,
+          .v-select__menu-icon {
+            margin-inline-start: 0px;
+          }
+        }
+
+        .v-field__outline {
+          .v-label {
+            transform: translateY(-50%);
+          }
+        }
+      }
+
+      .v-input__control {
+        .v-field {
+          .v-field__append-inner {
+            // margin-inline-end: 8px !important;
+          }
+        }
+      }
+
+      &.v-number-input--stacked {
+        .v-field__append-inner {
+          .v-number-input__control {
+            .v-btn {
+              width: var(--v-input-control-height);
+
+              .v-btn__content {
+                .v-icon {
+                  --v-icon-size-multiplier: 0.85;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      &.v-number-input--default {
+        .v-field__append-inner {
+          .v-number-input__control {
+            .v-btn {
+              width: var(--v-input-control-height);
+            }
+          }
+        }
+      }
+
+      &.v-radio-group {
+        .v-selection-control-group--inline {
+          gap: 12px;
+          align-items: center;
+        }
+      }
+
+      &.v-textarea {
+        --v-input-padding-top: 8px;
+
+        .v-field {
+          --v-field-padding-bottom: 8px;
+        }
+      }
+    }
+
+    &.hide-step > .v-input__control {
+      .v-field {
+        .v-field__append-inner {
+          display: none;
+        }
+      }
+    }
+    &.v-checkbox {
+      .v-input__control {
+        .v-selection-control__input {
+          .v-icon--size-default {
+            padding-top: 3px;
+          }
+        }
+      }
+    }
+  }
+
+  .v-table {
+    td.v-data-table__td {
+      .v-input {
+        &.v-input--density-compact {
+          --v-input-control-height: 24px;
+
+          &.v-textarea {
+            --v-input-padding-top: 3px;
+
+            .v-field {
+              --v-field-padding-bottom: 1px;
+
+              textarea {
+                min-height: var(--v-textarea-control-height);
+              }
+            }
+          }
+
+          &.v-number-input--default {
+            .v-number-input__control {
+              .v-btn--icon.v-btn--density-default {
+                width: 24px;
+              }
+            }
+          }
+          .v-field--variant-underlined {
+            --v-input-control-height: 24px;
+          }
+        }
+      }
+    }
+  }
+
+  .input_date {
+    .v-field {
+      .v-field__field {
+        align-items: center;
+      }
+    }
+
+    .v-field__input {
+      display: inline-block;
+      text-align: start;
+      vertical-align: middle;
+      font-size: small;
+      position: relative;
+
+      &::-webkit-calendar-picker-indicator {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        left: auto;
+        right: 12px;
+        padding-left: 100%;
+      }
+
+      &::-webkit-datetime-edit-year-field,
+      &::-webkit-datetime-edit-month-field,
+      &::-webkit-datetime-edit-day-field,
+      &::-webkit-datetime-edit-hour-field,
+      &::-webkit-datetime-edit-minute-field {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        min-width: 15px;
+      }
+
+      &::-webkit-datetime-edit-year-field {
+        min-width: 30px;
+      }
+
+      &::-webkit-datetime-edit-text {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        margin: 0;
+        padding: 0;
+        min-width: 0;
+      }
+
+      &::-webkit-datetime-edit-ampm-field {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        min-width: 18px;
+        margin: 0;
+        padding: 0;
+      }
+
+      &::-webkit-inner-spin-button {
+        visibility: hidden;
+        display: none;
+      }
+
+      &::-webkit-clear-button {
+        -webkit-appearance: none;
+        display: none;
+        appearance: none;
+      }
+    }
+  }
+}

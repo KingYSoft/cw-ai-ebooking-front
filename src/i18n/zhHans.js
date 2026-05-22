@@ -1,0 +1,180 @@
+export default {
+  custom: {
+    unsavedInputData: {
+      title: '页面未保存更新',
+      message: '页面未保存更新。',
+    },
+    dataTable: {
+      filter: '筛选',
+      menus: {
+        inputLabel: '搜索项',
+        inputPlaceholder: '搜索项',
+      },
+      header: {
+        dialog: {
+          title: '隐藏列',
+        },
+      },
+    },
+    tableLayout: {
+      headerSettings: '表头显示设置',
+      availableFields: '可选择字段',
+      selectedFields: '已展示字段',
+    },
+    branchFilter: {
+      menus: {
+        inputLabel: '搜索项',
+        inputPlaceholder: '搜索项',
+      },
+      tab0: {
+        title: '筛选分公司',
+        subtitle: '筛选分公司过滤数据',
+      },
+      tab1: {
+        title: '切换数据',
+        subtitle: '切换视图类型过滤数据',
+        own: {
+          title: '自己的',
+          subtitle: '只查看自己的数据',
+        },
+      },
+    },
+    da: {
+      demo: '德莫',
+    },
+    op: {
+      equal: '等于',
+      notEqual: '不等于',
+      contain: '包含',
+      notContain: '不包含',
+    },
+    dialog: {
+      btn: {
+        new: '新建',
+        add: '新增',
+        edit: '编辑',
+        close: '关闭',
+        save: '保存',
+        cancel: '取消',
+        clear: '清空',
+        ok: '好',
+        reset: '重置',
+        search: '搜索',
+        import: '导入',
+        confirm: '确认',
+        reload: '刷新',
+        more: '更多',
+      },
+    },
+    app: {
+      title: 'SJ Clemenger EBooking',
+      search: '搜索',
+      searchPlaceholder: '输入搜索关键词',
+      action: '操作',
+      loading: '启动应用程序...',
+      http: {
+        err_title: '网络请求错误',
+        err_401msg: '登入失效，请重新登入。',
+        err_403msg: '无操作权限，请重新登入。',
+        err_500msg: '内部服务器错误，请联系管理员。',
+        err_time_out_msg: '网络请求超时，请刷新页面。',
+        err_other_msg: '网络请求失败，请刷新页面。',
+        err_data_msg: '数据错误，请重试。',
+      },
+      err401: {
+        title: '未授权！🔐',
+        text: `没有权限访问，请返回首页！`,
+        btnText: '首页',
+      },
+      err404: {
+        title: '页面不存在',
+        text: '我们找不到您要找的页面！',
+        btnText: '首页',
+      },
+      saveSuccess: '保存成功',
+      searchMore: '关键字搜索',
+      updateTitle: '新版本已经准备好，是否立即更新？',
+      updateBtnText: '立即更新',
+      updateRemindBtnText: '稍后5分钟提醒',
+    },
+    loginPage: {
+      title: '登入',
+      label: {
+        email: '邮箱',
+        password: '密码',
+      },
+      err: {
+        email: '必须是有效的电子邮件。',
+        password: '需要输入密码。',
+      },
+      placeholder: {
+        email: '输入你的邮箱地址',
+        password: '输入你的密码',
+      },
+      forgotPassword: '忘记密码？',
+      submitBtn: '登入',
+      logout: '退出',
+      newMessage: '在我们平台上注册？',
+      newBtn: '创建账号',
+      ssoLogin: '单点登入...',
+      ssoLoginText: '使用临时 Token {0} 进行单点登入...',
+      ssoLoginTitle: '单点登入',
+      ssoLoginBtnText: '账号登入',
+      p1: '登录平台，您即表示同意我们的',
+      p2: '隐私政策',
+      p3: '和',
+      p4: '条款与条件',
+      t1: '一站式',
+      t2: '平台.',
+      subTitle: '连接人、货物与技术',
+      desc: '一站式连接，致力于提供无缝、安全且实时的数据驱动型连接服务，以支持物流配送流程。我们通过一系列行业领先的软件解决方案来实现这一目标，这些解决方案由实时数据驱动，能够实现全程的可见性和高效性。',
+      privacyPolicy: {
+        p1: '本企业全权决定在旗下媒体平台及互联网全域收集的个人数据的使用方式。我们可能收集你直接向我方提交的数据，也可能通过自动方式收集数据，包括借助 Cookie 获取的相关信息（如设备信息、IP 地址等）。',
+        p2: '请查阅我们的',
+        p3: '隐私政策',
+        p4: '继续使用本网站，即表示你同意接受本《隐私政策》的约束。',
+        btnText: '接受',
+      },
+    },
+    privacyPage: {
+      title: '隐私政策',
+      desc: '我们非常重视您的隐私保护，在您使用 SJ Clemenger 时(以下简称为“本服务”)，我们将按照以下政策收集、使用、披露和保护您的个人信息。请您仔细阅读并充分理解本隐私政策。',
+      p1: {
+        title: '1. 信息收集',
+        d1: '我们收集您在使用服务过程中主动提供的信息，包括但不限于姓名、电子邮件地址、电话号码等个人信息。',
+        d2: '在您使用本服务过程中产生的信息，如操作日志、访问IP地址、设备型号等。',
+        d3: '我们可能会通过 Cookies 或其他技术收集和存储您访问本服务的相关信息，以便为您提供更好的用户体验。',
+      },
+      p2: {
+        title: '2. 信息使用',
+        d1: '我们使用收集的信息来提供、维护和改进我们的服务，处理交易，发送通知，以及确保服务的安全性。',
+      },
+      p3: {
+        title: '3. 信息共享',
+        d1: '除非获得您的明确同意，或在法律要求的情况下，我们不会与第三方共享您的个人信息。',
+      },
+      p4: {
+        title: '4. 数据安全',
+        d1: '我们采用行业标准的安全措施来保护您的个人信息，包括加密传输和存储。',
+      },
+      p5: {
+        title: '5. Cookie 使用',
+        d1: '我们使用 Cookie 和类似技术来改善用户体验，分析网站流量，并提供个性化内容。',
+      },
+      p6: {
+        title: '6. 您的权利',
+        d1: '您有权访问、更正、删除您的个人信息，或限制我们对其的处理。',
+      },
+      date: '最后更新日期：2025年1月',
+    },
+    menuPage: {
+      dashboard: '仪表盘',
+
+      system: '系统',
+      system_user: '用户',
+      system_group: '组',
+      system_security: '权限',
+      system_logs: '日志',
+    },
+  },
+}

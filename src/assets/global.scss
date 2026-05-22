@@ -1,0 +1,164 @@
+/** 全局样式统一管理,避免多处定义,管理混乱 **/
+
+// 在 :root 中定义全局变量
+:root {
+  --global-label-width: 80px;
+  --global-label-width-90: 90px;
+  --global-label-width-100: 100px;
+  --global-label-width-110: 110px;
+  --global-label-width-120: 120px;
+  --global-label-width-130: 130px;
+  --global-label-width-140: 140px;
+  --global-fixed-table-shadow: 4px 0 4px rgba(0, 0, 0, 0.12);
+
+  --global-padding-xsmall: 4px;
+  --global-padding-small: 8px;
+  --global-padding-middle: 12px;
+  --global-padding-large: 16px;
+  --global-padding-xlarge: 24px;
+
+  --global-min-height: 32px;
+}
+
+html {
+  overflow-y: auto;
+}
+// .overflow-y-auto {
+//   overflow-x: hidden;
+// }
+// /** vuetify 全局Reset CSS **/
+// // v-list
+// .v-list {
+//   padding: 0;
+// }
+
+// .v-list-item-title {
+//   font-size: 0.875em;
+// }
+.v-list--density-compact:not(.v-list--nav) {
+  .v-list-item--density-compact.v-list-item--one-line {
+    --v-list-prepend-gap: 8px;
+    padding-inline: 12px;
+    min-height: var(--global-min-height);
+    .v-list-item-title {
+      font-size: 0.875em;
+    }
+    .v-icon--size-default {
+      font-size: calc(var(--v-icon-size-multiplier) * 1.2em);
+    }
+  }
+}
+// .v-icon--size-default {
+//   font-size: calc(var(--v-icon-size-multiplier) * 1.2em);
+// }
+
+// .v-list-item--density-compact:not(.v-list-item--nav).v-list-item--one-line {
+//   padding-inline: var(--global-padding-small);
+// }
+
+// .v-list-item--slim .v-list-item__prepend > .v-badge ~ .v-list-item__spacer,
+// .v-list-item--slim .v-list-item__prepend > .v-icon ~ .v-list-item__spacer,
+// .v-list-item--slim .v-list-item__prepend > .v-tooltip ~ .v-list-item__spacer {
+//   width: var(--v-list-prepend-gap, var(--global-padding-small));
+// }
+
+// .c_chart {
+//   .apexcharts-tooltip-marker::before {
+//     top: -4px;
+//     position: relative;
+//   }
+
+//   .apexcharts-yaxistooltip-left {
+//     display: none;
+//   }
+
+//   .apexcharts-tooltip {
+//     background-color: rgba(var(--v-theme-background));
+
+//     .apexcharts-tooltip-title {
+//       background-color: rgba(var(--v-theme-surface-light));
+//     }
+//   }
+// }
+
+// .fixed-table {
+//   .v-table__wrapper {
+//     /* checkbox 列 */
+//     th:nth-child(1),
+//     td:nth-child(1) {
+//       position: sticky;
+//       left: 0;
+//       z-index: 1;
+//     }
+
+//     /* 第 1 列 */
+//     th:nth-child(2),
+//     td:nth-child(2) {
+//       position: sticky;
+//       left: 36px;
+//       z-index: 1;
+//     }
+
+//     th:nth-child(1),
+//     th:nth-child(2) {
+//       background-color: rgb(var(--v-theme-surface));
+//     }
+
+//     td:nth-child(1),
+//     td:nth-child(2) {
+//       background-color: rgb(var(--v-theme-surface));
+//     }
+
+//     .v-data-table__tr:nth-child(even) {
+//       td:nth-child(1),
+//       td:nth-child(2) {
+//         background-image: linear-gradient(
+//           0deg,
+//           rgba(var(--v-border-color), var(--v-hover-opacity)),
+//           rgba(var(--v-border-color), var(--v-hover-opacity))
+//         );
+//       }
+//     }
+//   }
+// }
+
+.fixed-table-cc {
+  .v-table__wrapper {
+    /* 第 1 列 */
+    th:nth-child(2),
+    td:nth-child(2) {
+      box-shadow: var(--global-fixed-table-shadow);
+    }
+  }
+}
+
+/** 默认 80px **/
+.w-label {
+  width: var(--global-label-width);
+  line-height: 1.2;
+}
+.w-label-90 {
+  width: var(--global-label-width-90);
+  line-height: 1.2;
+}
+
+.w-label-100 {
+  width: var(--global-label-width-100);
+  line-height: 1.2;
+}
+.w-label-110 {
+  width: var(--global-label-width-110);
+  line-height: 1.2;
+}
+.w-label-120 {
+  width: var(--global-label-width-120);
+  line-height: 1.2;
+}
+.w-label-130 {
+  width: var(--global-label-width-130);
+  line-height: 1.2;
+}
+.w-label-140 {
+  width: var(--global-label-width-140);
+  line-height: 1.2;
+}
