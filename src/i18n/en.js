@@ -170,6 +170,9 @@ export default {
     menuPage: {
       dashboard: 'Dashboard',
 
+      freight: 'Freight',
+      booking: 'Booking',
+
       system: 'System',
       system_user: 'User',
       system_group: 'Group',
