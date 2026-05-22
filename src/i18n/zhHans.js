@@ -170,6 +170,9 @@ export default {
     menuPage: {
       dashboard: '仪表盘',
 
+      freight: '货运',
+      booking: '订舱',
+
       system: '系统',
       system_user: '用户',
       system_group: '组',
