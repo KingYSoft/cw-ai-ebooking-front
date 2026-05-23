@@ -173,11 +173,126 @@ export default {
       freight: '货运',
       booking: '订舱',
 
+      warehouse: '仓库',
+      warehouse_booking: '订舱',
+
       system: '系统',
       system_user: '用户',
       system_group: '组',
       system_security: '权限',
       system_logs: '日志',
+    },
+    bookingPage: {
+      form: {
+        shipper_name: {
+          err: 'Shipper Name 不能为空。',
+        },
+        consignee_name: {
+          err: 'Consignee Name 不能为空。',
+        },
+        bkg_transport_mode: {
+          err: 'Transport Mode 不能为空。',
+        },
+        bkg_origin: {
+          err: 'Origin 不能为空。',
+        },
+        bkg_destination: {
+          err: 'Destination 不能为空。',
+        },
+        bkg_load_port: {
+          err: 'Load 不能为空。',
+        },
+        bkg_etd: {
+          err: 'ETD 不能为空。',
+        },
+        bkg_eta: {
+          err: 'ETA 不能为空。',
+        },
+        bkg_cargo_ready: {
+          err: 'Cargo Ready Date 不能为空。',
+        },
+        etd_must_be_before_cargo_ready: {
+          err: 'ETD 必须晚于 Cargo Ready Date。',
+        },
+        eta_vs_etd_sea: {
+          err: '海运 (SEA) 下，ETA 须晚于 ETD（不可同日）。',
+        },
+        eta_vs_etd_air: {
+          err: '空运 (AIR) 下，ETA 不可早于 ETD。',
+        },
+        bkg_packing_mode: {
+          err: 'Container 不能为空。',
+        },
+        bkg_inco: {
+          err: 'Inco Term 不能为空。',
+        },
+        bkg_service_level: {
+          err: 'Service Level 不能为空。',
+        },
+        bkg_actual_volume: {
+          err: 'CBM 必须大于 0。',
+        },
+        bkg_actual_weight: {
+          err: 'Gross Weight 必须大于 0。',
+        },
+        bkg_actual_chargeable: {
+          err: 'Chargeable Weight 必须大于 0。',
+        },
+        bkg_volume_weight: {
+          err: 'Volume Weight 必须大于 0。',
+        },
+        bkg_total_package_count: {
+          err: 'No. of Package 必须大于 0。',
+        },
+        bkg_transit_time: {
+          err: 'Transit Time 必须大于 0。',
+        },
+        bkg_goods_value: {
+          err: 'Cargo Value 必须大于 0。',
+        },
+        bkg_goods_value_currency: {
+          err: 'Cargo Value Currency 不能为空。',
+        },
+        bkg_insurance_value: {
+          err: 'Ins. Value 必须大于 0。',
+        },
+        bkg_insurance_currency: {
+          err: 'Ins. Value Currency 不能为空。',
+        },
+        bkg_freight_terms: {
+          err: 'Freight Terms 不能为空。',
+        },
+        bkg_release_type: {
+          err: 'Release Type 不能为空。',
+        },
+        bkg_commodity: {
+          err: 'Commodity 不能为空。',
+        },
+        bkg_goods_description: {
+          err: 'Good Desc. 不能为空。',
+        },
+        bkg_marks_nos: {
+          err: 'Marks & No. 不能为空。',
+        },
+        pac_container_type: {
+          err: 'Container Type 不能为空。',
+        },
+        pac_container_count: {
+          err: 'Container Count 必须大于 0。',
+        },
+        pac_package_count: {
+          err: 'Pieces 必须大于 0。',
+        },
+        pac_pack_type: {
+          err: 'Pack Type 不能为空。',
+        },
+        pac_gross_weight: {
+          err: 'Gross Wt 必须大于 0。',
+        },
+        pac_actual_volume: {
+          err: 'Volume 必须大于 0。',
+        },
+      },
     },
   },
 }

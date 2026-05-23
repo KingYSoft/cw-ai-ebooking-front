@@ -173,11 +173,126 @@ export default {
       freight: 'Freight',
       booking: 'Booking',
 
+      warehouse: 'Warehouse',
+      warehouse_booking: 'Booking',
+
       system: 'System',
       system_user: 'User',
       system_group: 'Group',
       system_security: 'Security',
       system_logs: 'Logs',
+    },
+    bookingPage: {
+      form: {
+        shipper_name: {
+          err: 'Shipper Name not null.',
+        },
+        consignee_name: {
+          err: 'Consignee Name not null.',
+        },
+        bkg_transport_mode: {
+          err: 'Transport Mode not null.',
+        },
+        bkg_origin: {
+          err: 'Origin not null.',
+        },
+        bkg_destination: {
+          err: 'Destination not null.',
+        },
+        bkg_load_port: {
+          err: 'Load not null.',
+        },
+        bkg_etd: {
+          err: 'ETD not null.',
+        },
+        bkg_eta: {
+          err: 'ETA not null.',
+        },
+        bkg_cargo_ready: {
+          err: 'Cargo Ready Date not null.',
+        },
+        etd_must_be_before_cargo_ready: {
+          err: 'Cargo Ready date must be earlier than ETD.',
+        },
+        eta_vs_etd_sea: {
+          err: 'For ocean (SEA), ETA must be later than ETD (same calendar day is not allowed).',
+        },
+        eta_vs_etd_air: {
+          err: 'For air (AIR), ETA cannot be earlier than ETD.',
+        },
+        bkg_packing_mode: {
+          err: 'Container not null.',
+        },
+        bkg_inco: {
+          err: 'Inco Term not null.',
+        },
+        bkg_service_level: {
+          err: 'Service Level not null.',
+        },
+        bkg_actual_volume: {
+          err: 'CBM must be greater than 0.',
+        },
+        bkg_actual_weight: {
+          err: 'Gross Weight must be greater than 0.',
+        },
+        bkg_actual_chargeable: {
+          err: 'Chargeable Weight must be greater than 0.',
+        },
+        bkg_volume_weight: {
+          err: 'Volume Weight must be greater than 0.',
+        },
+        bkg_total_package_count: {
+          err: 'No. of Package must be greater than 0.',
+        },
+        bkg_transit_time: {
+          err: 'Transit Time must be greater than 0.',
+        },
+        bkg_goods_value: {
+          err: 'Cargo Value must be greater than 0.',
+        },
+        bkg_goods_value_currency: {
+          err: 'Cargo Value Currency not null.',
+        },
+        bkg_insurance_value: {
+          err: 'Ins. Value must be greater than 0.',
+        },
+        bkg_insurance_currency: {
+          err: 'Ins. Value Currency not null.',
+        },
+        bkg_freight_terms: {
+          err: 'Freight Terms not null.',
+        },
+        bkg_release_type: {
+          err: 'Release Type not null.',
+        },
+        bkg_commodity: {
+          err: 'Commodity not null.',
+        },
+        bkg_goods_description: {
+          err: 'Good Desc. not null.',
+        },
+        bkg_marks_nos: {
+          err: 'Marks & No. not null.',
+        },
+        pac_container_type: {
+          err: 'Container Type not null.',
+        },
+        pac_container_count: {
+          err: 'Container Count must be greater than 0.',
+        },
+        pac_package_count: {
+          err: 'Pieces must be greater than 0.',
+        },
+        pac_pack_type: {
+          err: 'Pack Type not null.',
+        },
+        pac_gross_weight: {
+          err: 'Gross Wt must be greater than 0.',
+        },
+        pac_actual_volume: {
+          err: 'Volume must be greater than 0.',
+        },
+      },
     },
   },
 }

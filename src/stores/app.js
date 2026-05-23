@@ -607,7 +607,7 @@ export const useAppStore = defineStore('app', {
      */
     async fetchAppConfig(callback) {
       const that = this
-      const excludeName = that.env.isUAT() ? ['po_management', 'bi', 'warehouse'] : []
+      const excludeName = that.env.isUAT() ? ['po_management', 'bi'] : []
       if (that.configLoading) {
         return
       }
