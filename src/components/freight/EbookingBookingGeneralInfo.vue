@@ -16,7 +16,7 @@
             </v-divider>
 
             <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-              <FRemoteTableMenu
+              <FRemoteTableMenuWithCode
                 v-model="inputData[party.key].add_address_name"
                 bind-key="code"
                 :bind-value="inputData[party.key].add_address_code"
@@ -50,7 +50,7 @@
                     </template>
                   </v-checkbox>
                 </template>
-              </FRemoteTableMenu>
+              </FRemoteTableMenuWithCode>
 
               <v-text-field
                 v-model="inputData[party.key].add_address1"
@@ -680,7 +680,13 @@
         : (addressType === 'CONSIGNEE'
           ? 'consignee'
           : 'notify_party')
-    inputData.value[target] = { add_address_name: '', add_address1: '', add_address2: '', add_address3: '' }
+    inputData.value[target] = {
+      add_address_name: '',
+      add_address_code: '',
+      add_address1: '',
+      add_address2: '',
+      add_address3: '',
+    }
     if (addressType === 'NOTIFY_PARTY') {
       inputData.value.notify_party_same_as_consignee = 'N'
     }

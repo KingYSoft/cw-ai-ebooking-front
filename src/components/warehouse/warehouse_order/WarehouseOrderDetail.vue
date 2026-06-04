@@ -10,7 +10,7 @@
           </v-divider>
 
           <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-            <FRemoteTableMenu
+            <FRemoteTableMenuWithCode
               id="1@shipper_name"
               v-model="inputData.shipper.add_address_name"
               bind-key="code"
@@ -30,7 +30,7 @@
               <template #prepend>
                 <div class="text-caption text-end w-label">Name:</div>
               </template>
-            </FRemoteTableMenu>
+            </FRemoteTableMenuWithCode>
 
             <v-text-field
               v-model="inputData.shipper.add_address1"
@@ -87,7 +87,7 @@
           </v-divider>
 
           <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-            <FRemoteTableMenu
+            <FRemoteTableMenuWithCode
               id="1@consignee_name"
               v-model="inputData.consignee.add_address_name"
               bind-key="code"
@@ -107,7 +107,7 @@
               <template #prepend>
                 <div class="text-caption text-end w-label">Name:</div>
               </template>
-            </FRemoteTableMenu>
+            </FRemoteTableMenuWithCode>
 
             <v-text-field
               v-model="inputData.consignee.add_address1"
@@ -266,7 +266,7 @@
             </div>
           </v-divider>
           <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-            <FRemoteTableMenu
+            <FRemoteTableMenuWithCode
               v-model="inputData.notify_party.add_address_name"
               bind-key="code"
               :bind-value="inputData.notify_party.add_address_code"
@@ -307,7 +307,7 @@
                   <span>SAME AS CONSIGNEE</span>
                 </v-tooltip>
               </template>
-            </FRemoteTableMenu>
+            </FRemoteTableMenuWithCode>
             <v-text-field
               v-model="inputData.notify_party.add_address1"
               color="primary"
