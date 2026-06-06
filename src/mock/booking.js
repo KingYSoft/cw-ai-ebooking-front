@@ -58,6 +58,8 @@ function enrichListRow(item) {
     shipper_name: item.shipper_name ?? item.shipper?.add_address_name ?? null,
     consignee_name: item.consignee_name ?? item.consignee?.add_address_name ?? null,
     job_status: item.job?.job_status ?? item.job_status ?? 'Open',
+    booking_status: item.booking_status ?? 'submitted',
+    bkg_booking_reference: item.bkg_booking_reference ?? '',
   }
 }
 
@@ -69,6 +71,8 @@ export const mockBookings = [
     bkg_transport_mode: 'SEA',
     bkg_packing_mode: 'FCL',
     bkg_consign_no: 'EBK2025001',
+    bkg_booking_reference: 'BK-2025001',
+    booking_status: 'submitted',
     bkg_house_bill: 'HBL001',
     shipper: { add_address_name: 'ABC Trading Co.', add_address1: '88 Export Rd', add_address2: '', add_address3: '' },
     consignee: { add_address_name: 'XYZ Logistics Ltd.', add_address1: '12 Harbor St', add_address2: '', add_address3: '' },
@@ -107,6 +111,8 @@ export const mockBookings = [
     bkg_transport_mode: 'AIR',
     bkg_packing_mode: 'LSE',
     bkg_consign_no: 'EBK2025002',
+    bkg_booking_reference: 'BK-2025002',
+    booking_status: 'confirmed',
     bkg_house_bill: 'HBL002',
     shipper: { add_address_name: 'Global Export Inc.', add_address1: 'Unit 5', add_address2: '', add_address3: '' },
     consignee: { add_address_name: 'Pacific Import Pte', add_address1: 'Airport Blvd', add_address2: '', add_address3: '' },
@@ -128,6 +134,8 @@ export const mockBookings = [
     bkg_transport_mode: 'SEA',
     bkg_packing_mode: 'LCL',
     bkg_consign_no: 'EBK2025003',
+    bkg_booking_reference: 'BK-2025003',
+    booking_status: 'under_review',
     bkg_house_bill: 'HBL003',
     shipper: { add_address_name: 'East Wind Manufacturing', add_address1: '', add_address2: '', add_address3: '' },
     consignee: { add_address_name: 'Euro Freight GmbH', add_address1: '', add_address2: '', add_address3: '' },
@@ -203,9 +211,13 @@ export function updateMockBooking(pk, row) {
   return mockBookings[idx]
 }
 
-export function queryMockBookings({ skipCount = 0, maxResultCount = 2000 } = {}) {
-  const totalCount = mockBookings.length
-  const items = mockBookings.slice(skipCount, skipCount + maxResultCount).map((item, index) => ({
+export function queryMockBookings({ skipCount = 0, maxResultCount = 2000, statusFilter = [] } = {}) {
+  let rows = [...mockBookings]
+  if (Array.isArray(statusFilter) && statusFilter.length > 0) {
+    rows = rows.filter(row => statusFilter.includes(row.booking_status))
+  }
+  const totalCount = rows.length
+  const items = rows.slice(skipCount, skipCount + maxResultCount).map((item, index) => ({
     ...enrichListRow(item),
     index: skipCount + index + 1,
   }))
