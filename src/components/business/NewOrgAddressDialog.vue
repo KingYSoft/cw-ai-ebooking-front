@@ -3,7 +3,6 @@
     <v-card
       :disabled="saveLoading"
       :loading="saveLoading"
-      prepend-icon="mdi-city"
       :title="dialogTitle"
     >
       <template #loader="{ isActive }">
@@ -16,7 +15,7 @@
           icon="mdi-close"
           size="small"
           variant="text"
-          @click="userDiaPwdVis = false"
+          @click="dialogVisible = false"
         />
       </template>
 
@@ -293,6 +292,10 @@
       type: String,
       default: '',
     },
+    initialData: {
+      type: Object,
+      default: () => ({}),
+    },
     saveLoading: {
       type: Boolean,
       default: false,
@@ -304,16 +307,22 @@
 
   const refOrgAddressForm = ref(null)
 
-  const dialogTitle = computed(() => {
-    console.log(addressType.value, 'addressType.value')
+  const isEditMode = computed(() => {
+    const data = props.initialData
+    return !!(data?.pk || data?.company_name || data?.address1)
+  })
 
-    if (addressType.value === 'SHIPPER') {
-      return 'New Shipper'
-    } else if (addressType.value === 'CONSIGNEE') {
-      return 'New Consignee'
-    } else {
-      return 'New Company'
-    }
+  const addressTypeLabel = computed(() => {
+    if (addressType.value === 'SHIPPER') return 'Shipper'
+    if (addressType.value === 'CONSIGNEE') return 'Consignee'
+    if (addressType.value === 'NOTIFY_PARTY') return 'Notify Party'
+    if (addressType.value === 'PICKUP') return 'Pickup'
+    return 'Company'
+  })
+
+  const dialogTitle = computed(() => {
+    const prefix = isEditMode.value ? 'Edit' : 'New'
+    return `${prefix} ${addressTypeLabel.value}`
   })
 
   const defaultInputData = () => ({
@@ -337,14 +346,21 @@
   })
   const input = ref(defaultInputData())
 
+  const resetInput = () => {
+    input.value = {
+      ...defaultInputData(),
+      ...props.initialData,
+      address_type: addressType.value,
+    }
+  }
+
   watch(
     () => dialogVisible.value,
     val => {
       if (val) {
-        input.value = defaultInputData()
+        resetInput()
       }
     },
-    { immediate: true },
   )
 
   const rules = {

@@ -6,6 +6,8 @@ const emptyParty = () => ({
   add_address1: '',
   add_address2: '',
   add_address3: '',
+  add_phone: '',
+  add_fax: '',
 })
 
 export const defaultBookingForm = () => ({
@@ -18,6 +20,13 @@ export const defaultBookingForm = () => ({
   consignee: emptyParty(),
   notify_party: { add_address_name: 'SAME AS CONSIGNEE' },
   notify_party_same_as_consignee: 'Y',
+  pickup: emptyParty(),
+  bkg_fcl_cut_off_date: '2026-06-07 15:00:00',
+  bkg_oog_cut_off_date: '2026-06-07 16:00:00',
+  bkg_reefer_cut_off_date: '2026-06-07 17:00:00',
+  bkg_dg_cut_off_date: '2026-06-07 18:00:00',
+  bkg_vgm_cut_off_date: '2026-06-07 19:00:00',
+  bkg_doc_cut_off_date: '2026-06-07 20:00:00',
   bkg_origin: '',
   bkg_destination: '',
   bkg_etd: '',
@@ -58,6 +67,8 @@ function enrichListRow(item) {
     shipper_name: item.shipper_name ?? item.shipper?.add_address_name ?? null,
     consignee_name: item.consignee_name ?? item.consignee?.add_address_name ?? null,
     job_status: item.job?.job_status ?? item.job_status ?? 'Open',
+    booking_status: item.booking_status ?? 'submitted',
+    bkg_booking_reference: item.bkg_booking_reference ?? '',
   }
 }
 
@@ -69,9 +80,11 @@ export const mockBookings = [
     bkg_transport_mode: 'SEA',
     bkg_packing_mode: 'FCL',
     bkg_consign_no: 'EBK2025001',
+    bkg_booking_reference: 'BK-2025001',
+    booking_status: 'submitted',
     bkg_house_bill: 'HBL001',
-    shipper: { add_address_name: 'ABC Trading Co.', add_address1: '88 Export Rd', add_address2: '', add_address3: '' },
-    consignee: { add_address_name: 'XYZ Logistics Ltd.', add_address1: '12 Harbor St', add_address2: '', add_address3: '' },
+    shipper: { add_address_name: 'ABC Trading Co.', add_address_code: 'ABC001', add_address1: '88 Export Rd', add_address2: 'address2', add_address3: 'address3', add_phone: '1234567890', add_fax: '1234567890' },
+    consignee: { add_address_name: 'XYZ Logistics Ltd.', add_address_code: 'XYZ001', add_address1: '12 Harbor St', add_address2: 'address2', add_address3: 'address3', add_phone: '1234567890', add_fax: '1234567890' },
     notify_party: { add_address_name: 'SAME AS CONSIGNEE' },
     notify_party_same_as_consignee: 'Y',
     bkg_origin: 'CNSHA',
@@ -79,6 +92,12 @@ export const mockBookings = [
     bkg_cargo_ready: '2025-05-01',
     bkg_etd: '2025-05-20',
     bkg_eta: '2025-05-28',
+    bkg_fcl_cut_off_date: '2026-06-07 15:00:00',
+    bkg_oog_cut_off_date: '2026-06-07 16:00:00',
+    bkg_reefer_cut_off_date: '2026-06-07 17:00:00',
+    bkg_dg_cut_off_date: '2026-06-07 18:00:00',
+    bkg_vgm_cut_off_date: '2026-06-07 19:00:00',
+    bkg_doc_cut_off_date: '2026-06-07 20:00:00',
     bkg_actual_weight: 12_500,
     bkg_actual_volume: 28.5,
     bkg_freight_terms: 'PP',
@@ -107,6 +126,8 @@ export const mockBookings = [
     bkg_transport_mode: 'AIR',
     bkg_packing_mode: 'LSE',
     bkg_consign_no: 'EBK2025002',
+    bkg_booking_reference: 'BK-2025002',
+    booking_status: 'confirmed',
     bkg_house_bill: 'HBL002',
     shipper: { add_address_name: 'Global Export Inc.', add_address1: 'Unit 5', add_address2: '', add_address3: '' },
     consignee: { add_address_name: 'Pacific Import Pte', add_address1: 'Airport Blvd', add_address2: '', add_address3: '' },
@@ -128,6 +149,8 @@ export const mockBookings = [
     bkg_transport_mode: 'SEA',
     bkg_packing_mode: 'LCL',
     bkg_consign_no: 'EBK2025003',
+    bkg_booking_reference: 'BK-2025003',
+    booking_status: 'under_review',
     bkg_house_bill: 'HBL003',
     shipper: { add_address_name: 'East Wind Manufacturing', add_address1: '', add_address2: '', add_address3: '' },
     consignee: { add_address_name: 'Euro Freight GmbH', add_address1: '', add_address2: '', add_address3: '' },
@@ -155,6 +178,7 @@ export function mapBookingToForm(row) {
     consignee: { ...emptyParty(), ...row.consignee },
     notify_party: row.notify_party || { add_address_name: 'SAME AS CONSIGNEE' },
     notify_party_same_as_consignee: row.notify_party_same_as_consignee ?? 'Y',
+    pickup: { ...emptyParty(), ...row.pickup },
     pac_list: Array.isArray(row.pac_list) ? row.pac_list.map((p, i) => ({ ...p, id: p.id ?? i + 1 })) : [],
     job: row.job || { job_status: row.job_status || 'Open' },
   }
@@ -203,9 +227,13 @@ export function updateMockBooking(pk, row) {
   return mockBookings[idx]
 }
 
-export function queryMockBookings({ skipCount = 0, maxResultCount = 2000 } = {}) {
-  const totalCount = mockBookings.length
-  const items = mockBookings.slice(skipCount, skipCount + maxResultCount).map((item, index) => ({
+export function queryMockBookings({ skipCount = 0, maxResultCount = 2000, statusFilter = [] } = {}) {
+  let rows = [...mockBookings]
+  if (Array.isArray(statusFilter) && statusFilter.length > 0) {
+    rows = rows.filter(row => statusFilter.includes(row.booking_status))
+  }
+  const totalCount = rows.length
+  const items = rows.slice(skipCount, skipCount + maxResultCount).map((item, index) => ({
     ...enrichListRow(item),
     index: skipCount + index + 1,
   }))
