@@ -16,3 +16,15 @@ export function getBookingListStatusLabel(status) {
   }
   return STATUS_LABEL_MAP[status] ?? status
 }
+
+export const BOOKING_LIST_STATUS_CHIP = {
+  submitted: { color: 'primary', variant: 'tonal' },
+  under_review: { color: 'warning', variant: 'tonal' },
+  confirmed: { color: 'success', variant: 'tonal' },
+  cancelled: { color: 'grey', variant: 'tonal' },
+  rejected: { color: 'error', variant: 'tonal' },
+}
+
+export function getBookingListStatusChipProps(status) {
+  return BOOKING_LIST_STATUS_CHIP[status] ?? { color: 'default', variant: 'tonal' }
+}

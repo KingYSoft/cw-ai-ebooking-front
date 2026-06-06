@@ -141,7 +141,13 @@
       </template>
 
       <template #item.booking_status="{ item }">
-        {{ getBookingListStatusLabel(item.booking_status) }}
+        <v-chip
+          v-if="item.booking_status"
+          size="small"
+          v-bind="getBookingListStatusChipProps(item.booking_status)"
+        >
+          {{ getBookingListStatusLabel(item.booking_status) }}
+        </v-chip>
       </template>
 
       <template #bottom>
@@ -168,6 +174,7 @@
   import { useLayoutCols } from '@/composables/useLayoutCols'
   import {
     BOOKING_LIST_STATUS_OPTIONS,
+    getBookingListStatusChipProps,
     getBookingListStatusLabel,
   } from '@/constants/bookingListStatus'
   import { queryMockBookings } from '@/mock/booking'
@@ -246,9 +253,9 @@
   const tblHeaders = [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
     { title: 'BookingNo.', key: 'bkg_booking_reference', align: 'start', width: '100px' },
+    { title: 'Status', key: 'booking_status', align: 'start', minWidth: '110px' },
     { title: 'Trans Mode', key: 'bkg_transport_mode', align: 'start', minWidth: '90px' },
     { title: 'Container Mode', key: 'bkg_packing_mode', align: 'start', minWidth: '110px' },
-    { title: 'Status', key: 'booking_status', align: 'start', minWidth: '110px' },
     { title: 'Shipment No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
     { title: 'House Bill', key: 'bkg_house_bill', align: 'start', minWidth: '120px' },
     {
