@@ -11,6 +11,8 @@ const STATUS_LABEL_MAP = Object.fromEntries(
 )
 
 export function getBookingListStatusLabel(status) {
-  if (!status) return ''
+  if (!status) {
+    return ''
+  }
   return STATUS_LABEL_MAP[status] ?? status
 }

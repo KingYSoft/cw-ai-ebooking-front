@@ -4,7 +4,7 @@ import { getMockWhsOrderFormByPk, saveMockWhsOrder } from '@/mock/whs-order'
 /**
  * 分页查询仓库订单列表
  */
-export const pageWhsOrder = params => {
+export const pageWhsOrder = () => {
   // return service({
   //   url: '/whs-order/page-whs-order',
   //   method: 'get',
