@@ -322,6 +322,7 @@
       <v-navigation-drawer
         ref="refDrawer"
         :class="fluid ? 'nav-collapse' : ''"
+        color="primary"
         expand-on-hover
         :model-value="drawer"
         :rail="rail"
@@ -331,9 +332,9 @@
         <v-list
           v-model:opened="menusOpened"
           v-model:selected="selected"
+          base-color="transparent"
           class="pl-0 nav-list"
           :class="fluid ? 'pr-0' : 'pr-4'"
-          color="primary"
           density="compact"
           lines="one"
           mandatory
@@ -357,11 +358,11 @@
         </template>
       </v-navigation-drawer>
 
+      <!-- color="surface" -->
       <v-main>
         <v-tabs
-          bg-color="surface"
+          bg-color="primary"
           class="border-b-thin border-e-thin"
-          color="primary"
           density="compact"
           mandatory
           :model-value="route.name"
@@ -371,7 +372,7 @@
         >
           <template v-for="(item, idx) in routerTabs" :key="item.value">
             <v-tab
-              class="ff-tab text-none text-high-emphasis border-e-thin"
+              class="ff-tab text-none border-e-thin"
               :class="idx === 0 ? 'border-s-thin' : ''"
               draggable="true"
               :prepend-icon="item.prependIcon"
