@@ -84,7 +84,7 @@
   <div>
     <v-divider />
 
-    <v-footer class="d-flex justify-center" height="35">
+    <v-footer class="d-flex justify-center" color="primary" height="35">
       <div class="text-caption text-center">
         &copy; {{ new Date().getFullYear() }}
         <span class="d-none d-sm-inline-block">
