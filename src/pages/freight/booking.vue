@@ -187,7 +187,7 @@
     menu: true,
     order: 1,
     meta: {
-      keepAlive: true,
+      keepAlive: false,
       requiresAuth: true,
       isLayout: true,
     },
