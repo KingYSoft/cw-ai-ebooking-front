@@ -31,9 +31,9 @@
         </v-sheet>
 
         <v-app-bar-title>
-          <span>{{ appStore.userSession.session().branch_internal_code }}</span>
+          <span>{{ appStore.userSession.session().org_header_code }}</span>
           <span> - </span>
-          <span>{{ appStore.userSession.session().branch_name }}</span>
+          <span>{{ appStore.userSession.session().org_header_name }}</span>
         </v-app-bar-title>
 
         <template #append>
@@ -72,7 +72,7 @@
 
                 <v-list>
                   <v-list-item
-                    :subtitle="appStore.userSession.session().branch_code"
+                    :subtitle="appStore.userSession.session().org_header_code"
                     :title="appStore.userSession.session().full_name"
                   />
                 </v-list>
@@ -87,9 +87,9 @@
                   </v-list-item-title>
 
                   <v-list-item-subtitle>
-                    <span>{{ appStore.userSession.session().branch_code }}</span>
+                    <span>{{ appStore.userSession.session().org_header_code }}</span>
                     <span> - </span>
-                    <span>{{ appStore.userSession.session().branch_name }}</span>
+                    <span>{{ appStore.userSession.session().org_header_name }}</span>
                   </v-list-item-subtitle>
 
                   <template #prepend>
@@ -111,8 +111,7 @@
                   </template>
 
                   <v-list-item-title>
-                    {{ appStore.userSession.session().company_code }} -
-                    {{ appStore.userSession.session().company_name }}
+                    {{ appStore.userSession.session().org_header_name }}
                   </v-list-item-title>
                 </v-list-item>
 

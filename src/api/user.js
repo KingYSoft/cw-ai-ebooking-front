@@ -3,8 +3,7 @@ import service from './index'
 export const queryUserPage = params => service({ url: '/user/query-page', method: 'get', params })
 export const saveUser = data => service({ url: '/user/save', method: 'post', data })
 export const deleteUserById = id => service({ url: `/user/delete/${id}`, method: 'post' })
-export const getUserById = (id, pk) =>
-  service({ url: '/user/detail', method: 'get', params: { id, pk } })
+export const getUserById = pk => service({ url: '/user/detail', method: 'get', params: { pk } })
 
 /**
  * 获取用户收藏菜单列表
@@ -57,6 +56,5 @@ export const userChangePassword = data =>
 export const userChangeSetting = data =>
   service({ url: '/user/change-setting', method: 'post', data })
 
-/** 公司/用户本位币与默认发票币种等（响应 body.data 为币种代码） */
-export const getUserHomeCurrency = () =>
-  service({ url: '/user/home-currency', method: 'get' })
+export const userQueryOrgHeader = (params, signal) =>
+  service({ url: '/user/query-org-header', method: 'get', params, signal })
