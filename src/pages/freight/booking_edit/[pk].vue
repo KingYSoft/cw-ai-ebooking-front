@@ -15,7 +15,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      tabTitle: 'Booking',
+      tabTitle: 'BK-{shipment_no}',
     },
   })
 </script>

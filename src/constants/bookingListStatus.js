@@ -6,6 +6,12 @@ export const BOOKING_LIST_STATUS_OPTIONS = [
   { value: 'rejected', title: 'Rejected' },
 ]
 
+export const BOOKING_LIST_STATUS_VALUES = BOOKING_LIST_STATUS_OPTIONS.map(item => item.value)
+
+export function defaultBookingListStatusSelection() {
+  return [...BOOKING_LIST_STATUS_VALUES]
+}
+
 const STATUS_LABEL_MAP = Object.fromEntries(
   BOOKING_LIST_STATUS_OPTIONS.map(item => [item.value, item.title]),
 )

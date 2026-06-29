@@ -1,14 +1,30 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { bookingDetail, bookingSave } from '@/api/booking'
 import {
-  addMockBooking,
-  getMockBookingByPk,
-  mapBookingToForm,
-  mapFormToBooking,
-  updateMockBooking,
-} from '@/mock/booking'
+  createDefaultBookingForm,
+  mapBookingDetailToForm,
+  mapFormToSavePayload,
+} from '@/composables/mapEbookingBooking'
 import { useAppStore } from '@/stores/app'
+
+const TAB_PREFIX = 'BK-'
+
+export function resolveBookingConsignNo(data, form) {
+  return data?.bkg_consign_no ?? form?.bkg_consign_no ?? data?.shipment_no ?? ''
+}
+
+function buildEditTabQuery(consignNo, id, options = {}) {
+  const query = {
+    id: id ?? '',
+    shipment_no: consignNo,
+  }
+  if (options.isCopyAsNew) {
+    query.copy = '1'
+  }
+  return query
+}
 
 export function useEbookingBookingForm(options = {}) {
   const { isEditMode = false } = options
@@ -16,89 +32,177 @@ export function useEbookingBookingForm(options = {}) {
   const route = useRoute()
   const appStore = useAppStore()
 
-  const skeletonLoading = ref(false)
+  const skeletonLoading = ref(isEditMode)
   const cardLoading = ref(false)
   const activedTab = ref(1)
-  const defaultData = () => ({
-    pk: '',
-    id: 0,
-    freight_status: 'draft',
-    bkg_transport_mode: 'SEA',
-    bkg_packing_mode: 'FCL',
-    shipper: { add_address_name: '测试', add_address_code: '测试', add_address1: '地址1', add_address2: '地址2', add_address3: '地址3' },
-    consignee: { add_address_name: '测试', add_address_code: '测试', add_address1: '地址1', add_address2: '地址2', add_address3: '地址3' },
-    notify_party: { add_address_name: 'SAME AS CONSIGNEE' },
-    notify_party_same_as_consignee: 'Y',
-    pickup: { add_address_name: '测试', add_address_code: '测试', add_address1: '地址1', add_address2: '地址2', add_address3: '地址3', add_phone: '1234567890', add_fax: '1234567890' },
-    bkg_fcl_cut_off_date: '2026-06-07 15:00:00',
-    bkg_oog_cut_off_date: '2026-06-07 16:00:00',
-    bkg_reefer_cut_off_date: '2026-06-07 17:00:00',
-    bkg_dg_cut_off_date: '2026-06-07 18:00:00',
-    bkg_vgm_cut_off_date: '2026-06-07 19:00:00',
-    bkg_doc_cut_off_date: '2026-06-07 20:00:00',
-    bkg_origin: '',
-    bkg_destination: '',
-    bkg_etd: appStore.utils.formatDate(new Date()),
-    bkg_eta: '',
-    bkg_cargo_ready: '',
-    bkg_actual_weight: null,
-    bkg_unit_of_weight: 'KG',
-    bkg_actual_volume: null,
-    bkg_unit_of_volume: 'M3',
-    bkg_volume_weight: null,
-    bkg_volume_weight_unit: 'KG',
-    bkg_actual_chargeable: null,
-    bkg_actual_chargeable_unit: 'KG',
-    bkg_total_package_count: null,
-    bkg_pack_type: 'CTN',
-    bkg_inco: 'FOB',
-    bkg_freight_terms: 'PP',
-    bkg_preferred_carrier: '',
-    bkg_release_type: '',
-    bkg_service_level: '',
-    bkg_delivery_mode: 'CY/CY',
-    bkg_commodity: '',
-    bkg_goods_value: null,
-    bkg_goods_value_currency: 'USD',
-    bkg_insurance_value: null,
-    bkg_insurance_value_currency: 'USD',
-    bkg_goods_description: '',
-    bkg_marks_nos: '',
-    bkg_booking_reference: '',
-    bkg_additional_terms: '',
-    pac_list: [],
-    job: { job_status: 'Open' },
-  })
+
+  const defaultData = () => createDefaultBookingForm(appStore)
 
   const inputData = ref(defaultData())
 
-  const loadData = () => {
+  const isCopyAsNew = () => String(route.query.copy ?? '') === '1'
+
+  const syncBookingEditTab = ({
+    oldTabValue,
+    pk,
+    id,
+    consignNo,
+    copyAsNew = isCopyAsNew(),
+  } = {}) => {
+    const tabPk = pk ?? route.params.pk
+    if (!tabPk) {
+      return
+    }
+
+    const newTabValue = `booking_edit-pk-${tabPk}`
+    const title = copyAsNew ? 'New Booking' : `${TAB_PREFIX}${consignNo}`
+    const query = buildEditTabQuery(consignNo, id, { isCopyAsNew: copyAsNew })
+
+    appStore.event.trigger('replaceBookingEditTab', {
+      oldTabValue: oldTabValue ?? newTabValue,
+      newTabValue,
+      title,
+      to: {
+        name: 'booking_edit-pk',
+        params: { pk: tabPk },
+        query,
+      },
+      params: { pk: tabPk },
+      query,
+    })
+  }
+
+  const loadData = async () => {
     if (!isEditMode) {
+      skeletonLoading.value = false
       inputData.value = defaultData()
       return
     }
-    const row = getMockBookingByPk(route.params.pk)
-    if (!row) {
-      appStore.openMessage({ content: 'Booking not found.', color: 'warning' })
+
+    skeletonLoading.value = true
+    try {
+      const { success, data } = await bookingDetail(route.params.pk)
+      if (!success || !data) {
+        appStore.openMessage({ content: 'Booking not found.', color: 'warning' })
+        router.push({ name: 'booking' })
+        return
+      }
+      inputData.value = mapBookingDetailToForm(data, appStore)
+
+      const consignNo = resolveBookingConsignNo(data, inputData.value)
+      if (!isCopyAsNew() && consignNo) {
+        syncBookingEditTab({
+          pk: route.params.pk,
+          id: data.id,
+          consignNo,
+        })
+
+        if (!route.query.shipment_no) {
+          await router.replace({
+            query: {
+              ...route.query,
+              id: String(data.id ?? route.query.id ?? ''),
+              shipment_no: consignNo,
+            },
+          })
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      appStore.openMessage({ content: 'Failed to load booking.', color: 'error' })
       router.push({ name: 'booking' })
-      return
+    } finally {
+      skeletonLoading.value = false
     }
-    inputData.value = mapBookingToForm(row)
   }
 
   const onSave = async () => {
     cardLoading.value = true
     try {
-      const payload = mapFormToBooking(inputData.value)
-      if (isEditMode) {
-        updateMockBooking(route.params.pk, payload)
-        inputData.value.freight_status = inputData.value.freight_status === 'draft' ? 'saved' : inputData.value.freight_status
-        appStore.openMessage({ content: 'Booking saved.', color: 'success' })
-      } else {
-        const created = addMockBooking(payload)
-        appStore.openMessage({ content: 'Booking created.', color: 'success' })
-        router.push({ name: 'booking_edit-pk', params: { pk: created.pk } })
+      const copyAsNew = isCopyAsNew()
+      const payload = mapFormToSavePayload(inputData.value, { isCopyAsNew: copyAsNew })
+      const { success, data } = await bookingSave(payload)
+
+      if (!success || !data) {
+        return
       }
+
+      const consignNo = resolveBookingConsignNo(data, inputData.value)
+
+      inputData.value.id = data.id ?? inputData.value.id
+      inputData.value.pk = data.pk ?? inputData.value.pk
+      if (consignNo) {
+        inputData.value.bkg_consign_no = consignNo
+      }
+
+      if (inputData.value.freight_status === 'draft') {
+        inputData.value.freight_status = 'saved'
+      }
+
+      appStore.openMessage({ content: 'Booking saved.', color: 'success' })
+
+      const editQuery = buildEditTabQuery(consignNo, data.id)
+
+      if (!isEditMode) {
+        await router.replace({
+          name: 'booking_edit-pk',
+          params: { pk: data.pk },
+          query: editQuery,
+        })
+        appStore.event.trigger('replaceBookingEditTab', {
+          oldTabValue: 'booking_new',
+          newTabValue: `booking_edit-pk-${data.pk}`,
+          title: `${TAB_PREFIX}${consignNo}`,
+          to: {
+            name: 'booking_edit-pk',
+            params: { pk: data.pk },
+            query: editQuery,
+          },
+          params: { pk: data.pk },
+          query: editQuery,
+        })
+        return
+      }
+
+      if (copyAsNew) {
+        const oldPk = route.params.pk?.toString()
+        await router.replace({
+          name: 'booking_edit-pk',
+          params: { pk: data.pk },
+          query: editQuery,
+        })
+        appStore.event.trigger('replaceBookingEditTab', {
+          oldTabValue: `booking_edit-pk-${oldPk}`,
+          newTabValue: `booking_edit-pk-${data.pk}`,
+          title: `${TAB_PREFIX}${consignNo}`,
+          to: {
+            name: 'booking_edit-pk',
+            params: { pk: data.pk },
+            query: editQuery,
+          },
+          params: { pk: data.pk },
+          query: editQuery,
+        })
+        return
+      }
+
+      syncBookingEditTab({
+        pk: data.pk,
+        id: data.id,
+        consignNo,
+      })
+
+      if (consignNo && route.query.shipment_no !== consignNo) {
+        await router.replace({
+          query: {
+            ...route.query,
+            id: String(data.id ?? route.query.id ?? ''),
+            shipment_no: consignNo,
+          },
+        })
+      }
+    } catch (error) {
+      console.log(error)
     } finally {
       cardLoading.value = false
     }
@@ -126,11 +230,15 @@ export function useEbookingBookingForm(options = {}) {
   }
 
   const tabTitle = () => {
-    if (isEditMode && inputData.value.bkg_consign_no) {
-      return inputData.value.bkg_consign_no
+    if (!isEditMode || isCopyAsNew()) {
+      return 'New Booking'
     }
-    return 'New Booking'
+    const shipmentNo =
+      route.query.shipment_no || inputData.value.bkg_consign_no || inputData.value.shipment_no || ''
+    return `${TAB_PREFIX}${shipmentNo}`
   }
+
+  const displayBookingNo = () => tabTitle().replace(`${TAB_PREFIX}`, '')
 
   return {
     skeletonLoading,
@@ -142,5 +250,7 @@ export function useEbookingBookingForm(options = {}) {
     addNewContainer,
     removeNewContainer,
     tabTitle,
+    displayBookingNo,
+    isCopyAsNew,
   }
 }
