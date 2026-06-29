@@ -78,5 +78,7 @@
     await onSave()
   }
 
-  onMounted(() => loadData())
+  onMounted(async () => {
+    await loadData()
+  })
 </script>

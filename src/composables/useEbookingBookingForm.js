@@ -1,13 +1,12 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { bookingDetail, bookingSave } from '@/api/booking'
 import {
-  addMockBooking,
-  getMockBookingByPk,
-  mapBookingToForm,
-  mapFormToBooking,
-  updateMockBooking,
-} from '@/mock/booking'
+  createDefaultBookingForm,
+  mapBookingDetailToForm,
+  mapFormToSavePayload,
+} from '@/composables/mapEbookingBooking'
 import { useAppStore } from '@/stores/app'
 
 export function useEbookingBookingForm(options = {}) {
@@ -16,89 +15,74 @@ export function useEbookingBookingForm(options = {}) {
   const route = useRoute()
   const appStore = useAppStore()
 
-  const skeletonLoading = ref(false)
+  const skeletonLoading = ref(isEditMode)
   const cardLoading = ref(false)
   const activedTab = ref(1)
-  const defaultData = () => ({
-    pk: '',
-    id: 0,
-    freight_status: 'draft',
-    bkg_transport_mode: 'SEA',
-    bkg_packing_mode: 'FCL',
-    shipper: { add_address_name: '测试', add_address_code: '测试', add_address1: '地址1', add_address2: '地址2', add_address3: '地址3' },
-    consignee: { add_address_name: '测试', add_address_code: '测试', add_address1: '地址1', add_address2: '地址2', add_address3: '地址3' },
-    notify_party: { add_address_name: 'SAME AS CONSIGNEE' },
-    notify_party_same_as_consignee: 'Y',
-    pickup: { add_address_name: '测试', add_address_code: '测试', add_address1: '地址1', add_address2: '地址2', add_address3: '地址3', add_phone: '1234567890', add_fax: '1234567890' },
-    bkg_fcl_cut_off_date: '2026-06-07 15:00:00',
-    bkg_oog_cut_off_date: '2026-06-07 16:00:00',
-    bkg_reefer_cut_off_date: '2026-06-07 17:00:00',
-    bkg_dg_cut_off_date: '2026-06-07 18:00:00',
-    bkg_vgm_cut_off_date: '2026-06-07 19:00:00',
-    bkg_doc_cut_off_date: '2026-06-07 20:00:00',
-    bkg_origin: '',
-    bkg_destination: '',
-    bkg_etd: appStore.utils.formatDate(new Date()),
-    bkg_eta: '',
-    bkg_cargo_ready: '',
-    bkg_actual_weight: null,
-    bkg_unit_of_weight: 'KG',
-    bkg_actual_volume: null,
-    bkg_unit_of_volume: 'M3',
-    bkg_volume_weight: null,
-    bkg_volume_weight_unit: 'KG',
-    bkg_actual_chargeable: null,
-    bkg_actual_chargeable_unit: 'KG',
-    bkg_total_package_count: null,
-    bkg_pack_type: 'CTN',
-    bkg_inco: 'FOB',
-    bkg_freight_terms: 'PP',
-    bkg_preferred_carrier: '',
-    bkg_release_type: '',
-    bkg_service_level: '',
-    bkg_delivery_mode: 'CY/CY',
-    bkg_commodity: '',
-    bkg_goods_value: null,
-    bkg_goods_value_currency: 'USD',
-    bkg_insurance_value: null,
-    bkg_insurance_value_currency: 'USD',
-    bkg_goods_description: '',
-    bkg_marks_nos: '',
-    bkg_booking_reference: '',
-    bkg_additional_terms: '',
-    pac_list: [],
-    job: { job_status: 'Open' },
-  })
+
+  const defaultData = () => createDefaultBookingForm(appStore)
 
   const inputData = ref(defaultData())
 
-  const loadData = () => {
+  const loadData = async () => {
     if (!isEditMode) {
+      skeletonLoading.value = false
       inputData.value = defaultData()
       return
     }
-    const row = getMockBookingByPk(route.params.pk)
-    if (!row) {
-      appStore.openMessage({ content: 'Booking not found.', color: 'warning' })
+
+    skeletonLoading.value = true
+    try {
+      const { success, data } = await bookingDetail(route.params.pk)
+      if (!success || !data) {
+        appStore.openMessage({ content: 'Booking not found.', color: 'warning' })
+        router.push({ name: 'booking' })
+        return
+      }
+      inputData.value = mapBookingDetailToForm(data, appStore)
+    } catch (error) {
+      console.log(error)
+      appStore.openMessage({ content: 'Failed to load booking.', color: 'error' })
       router.push({ name: 'booking' })
-      return
+    } finally {
+      skeletonLoading.value = false
     }
-    inputData.value = mapBookingToForm(row)
   }
 
   const onSave = async () => {
     cardLoading.value = true
     try {
-      const payload = mapFormToBooking(inputData.value)
-      if (isEditMode) {
-        updateMockBooking(route.params.pk, payload)
-        inputData.value.freight_status = inputData.value.freight_status === 'draft' ? 'saved' : inputData.value.freight_status
-        appStore.openMessage({ content: 'Booking saved.', color: 'success' })
-      } else {
-        const created = addMockBooking(payload)
-        appStore.openMessage({ content: 'Booking created.', color: 'success' })
-        router.push({ name: 'booking_edit-pk', params: { pk: created.pk } })
+      const isCopyAsNew = String(route.query.copy ?? '') === '1'
+      const payload = mapFormToSavePayload(inputData.value, { isCopyAsNew })
+      const { success, data } = await bookingSave(payload)
+
+      if (!success || !data) {
+        return
       }
+
+      inputData.value.id = data.id ?? inputData.value.id
+      inputData.value.pk = data.pk ?? inputData.value.pk
+      if (data.bkg_consign_no) {
+        inputData.value.bkg_consign_no = data.bkg_consign_no
+      }
+
+      if (inputData.value.freight_status === 'draft') {
+        inputData.value.freight_status = 'saved'
+      }
+
+      appStore.openMessage({ content: 'Booking saved.', color: 'success' })
+
+      if (!isEditMode || isCopyAsNew) {
+        router.push({
+          name: 'booking_edit-pk',
+          params: { pk: data.pk },
+          query: {
+            id: data.id,
+            shipment_no: data.bkg_consign_no ?? inputData.value.bkg_consign_no,
+          },
+        })
+      }
+    } catch (error) {
+      console.log(error)
     } finally {
       cardLoading.value = false
     }

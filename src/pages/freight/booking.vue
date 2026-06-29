@@ -168,16 +168,23 @@
   import { useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
 
+  import { bookingQueryPage } from '@/api/booking'
+  import { debounceFn } from '@/api/utils'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PageFilterBar from '@/components/PageFilterBar.vue'
+  import {
+    buildBookingListFilters,
+    buildBookingStatusFilters,
+    mapBookingListRow,
+  } from '@/composables/mapEbookingBooking'
   import { useLayoutCols } from '@/composables/useLayoutCols'
   import {
     BOOKING_LIST_STATUS_OPTIONS,
+    defaultBookingListStatusSelection,
     getBookingListStatusChipProps,
     getBookingListStatusLabel,
   } from '@/constants/bookingListStatus'
-  import { queryMockBookings } from '@/mock/booking'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'Booking' })
@@ -211,7 +218,7 @@
   const tblItems = ref([])
   const totalCount = ref(0)
   const pageObj = ref({ pageSize: 2000, pageIndex: 1 })
-  const selectedStatuses = ref([])
+  const selectedStatuses = ref(defaultBookingListStatusSelection())
   const statusOptions = BOOKING_LIST_STATUS_OPTIONS
 
   const defaultSearchData = () => ({
@@ -234,11 +241,16 @@
 
   const onResetMore = () => {
     inputSearchData.value = defaultSearchData()
-    selectedStatuses.value = []
+    selectedStatuses.value = defaultBookingListStatusSelection()
     queryData()
   }
 
   const isStatusSelected = value => selectedStatuses.value.includes(value)
+
+  const queryDataByStatus = debounceFn(() => {
+    pageObj.value.pageIndex = 1
+    queryData()
+  }, 1000)
 
   const toggleStatus = value => {
     if (isStatusSelected(value)) {
@@ -246,8 +258,7 @@
     } else {
       selectedStatuses.value = [...selectedStatuses.value, value]
     }
-    pageObj.value.pageIndex = 1
-    queryData()
+    queryDataByStatus()
   }
 
   const tblHeaders = [
@@ -314,20 +325,34 @@
   const queryData = async () => {
     cardLoading.value = true
     try {
-      const data = queryMockBookings({
+      const { success, data } = await bookingQueryPage({
+        filters: [
+          ...buildBookingListFilters(inputSearchData.value),
+          ...buildBookingStatusFilters(selectedStatuses.value, statusOptions.length),
+        ],
         skipCount: (pageObj.value.pageIndex - 1) * pageObj.value.pageSize,
         maxResultCount: pageObj.value.pageSize,
-        statusFilter: selectedStatuses.value,
       })
 
       skeletonLoading.value = false
-      tblItems.value = data.items
-      totalCount.value = data.totalCount
+      if (success && data) {
+        const items = data.items ?? []
+        tblItems.value = items.map((item, index) =>
+          mapBookingListRow(item, (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1),
+        )
+        totalCount.value = data.totalCount || 0
+      } else {
+        tblItems.value = []
+        totalCount.value = 0
+      }
 
       nextTick(() => {
         refTableLayout.value?.initHeaders?.()
         refTableLayout.value?.initScrollListener?.()
       })
+    } catch (error) {
+      console.log(error)
+      skeletonLoading.value = false
     } finally {
       cardLoading.value = false
     }
