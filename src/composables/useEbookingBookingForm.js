@@ -9,6 +9,23 @@ import {
 } from '@/composables/mapEbookingBooking'
 import { useAppStore } from '@/stores/app'
 
+const TAB_PREFIX = 'BK-'
+
+export function resolveBookingConsignNo(data, form) {
+  return data?.bkg_consign_no ?? form?.bkg_consign_no ?? data?.shipment_no ?? ''
+}
+
+function buildEditTabQuery(consignNo, id, options = {}) {
+  const query = {
+    id: id ?? '',
+    shipment_no: consignNo,
+  }
+  if (options.isCopyAsNew) {
+    query.copy = '1'
+  }
+  return query
+}
+
 export function useEbookingBookingForm(options = {}) {
   const { isEditMode = false } = options
   const router = useRouter()
@@ -22,6 +39,38 @@ export function useEbookingBookingForm(options = {}) {
   const defaultData = () => createDefaultBookingForm(appStore)
 
   const inputData = ref(defaultData())
+
+  const isCopyAsNew = () => String(route.query.copy ?? '') === '1'
+
+  const syncBookingEditTab = ({
+    oldTabValue,
+    pk,
+    id,
+    consignNo,
+    copyAsNew = isCopyAsNew(),
+  } = {}) => {
+    const tabPk = pk ?? route.params.pk
+    if (!tabPk) {
+      return
+    }
+
+    const newTabValue = `booking_edit-pk-${tabPk}`
+    const title = copyAsNew ? 'New Booking' : `${TAB_PREFIX}${consignNo}`
+    const query = buildEditTabQuery(consignNo, id, { isCopyAsNew: copyAsNew })
+
+    appStore.event.trigger('replaceBookingEditTab', {
+      oldTabValue: oldTabValue ?? newTabValue,
+      newTabValue,
+      title,
+      to: {
+        name: 'booking_edit-pk',
+        params: { pk: tabPk },
+        query,
+      },
+      params: { pk: tabPk },
+      query,
+    })
+  }
 
   const loadData = async () => {
     if (!isEditMode) {
@@ -39,6 +88,25 @@ export function useEbookingBookingForm(options = {}) {
         return
       }
       inputData.value = mapBookingDetailToForm(data, appStore)
+
+      const consignNo = resolveBookingConsignNo(data, inputData.value)
+      if (!isCopyAsNew() && consignNo) {
+        syncBookingEditTab({
+          pk: route.params.pk,
+          id: data.id,
+          consignNo,
+        })
+
+        if (!route.query.shipment_no) {
+          await router.replace({
+            query: {
+              ...route.query,
+              id: String(data.id ?? route.query.id ?? ''),
+              shipment_no: consignNo,
+            },
+          })
+        }
+      }
     } catch (error) {
       console.log(error)
       appStore.openMessage({ content: 'Failed to load booking.', color: 'error' })
@@ -51,18 +119,20 @@ export function useEbookingBookingForm(options = {}) {
   const onSave = async () => {
     cardLoading.value = true
     try {
-      const isCopyAsNew = String(route.query.copy ?? '') === '1'
-      const payload = mapFormToSavePayload(inputData.value, { isCopyAsNew })
+      const copyAsNew = isCopyAsNew()
+      const payload = mapFormToSavePayload(inputData.value, { isCopyAsNew: copyAsNew })
       const { success, data } = await bookingSave(payload)
 
       if (!success || !data) {
         return
       }
 
+      const consignNo = resolveBookingConsignNo(data, inputData.value)
+
       inputData.value.id = data.id ?? inputData.value.id
       inputData.value.pk = data.pk ?? inputData.value.pk
-      if (data.bkg_consign_no) {
-        inputData.value.bkg_consign_no = data.bkg_consign_no
+      if (consignNo) {
+        inputData.value.bkg_consign_no = consignNo
       }
 
       if (inputData.value.freight_status === 'draft') {
@@ -71,13 +141,63 @@ export function useEbookingBookingForm(options = {}) {
 
       appStore.openMessage({ content: 'Booking saved.', color: 'success' })
 
-      if (!isEditMode || isCopyAsNew) {
-        router.push({
+      const editQuery = buildEditTabQuery(consignNo, data.id)
+
+      if (!isEditMode) {
+        await router.replace({
           name: 'booking_edit-pk',
           params: { pk: data.pk },
+          query: editQuery,
+        })
+        appStore.event.trigger('replaceBookingEditTab', {
+          oldTabValue: 'booking_new',
+          newTabValue: `booking_edit-pk-${data.pk}`,
+          title: `${TAB_PREFIX}${consignNo}`,
+          to: {
+            name: 'booking_edit-pk',
+            params: { pk: data.pk },
+            query: editQuery,
+          },
+          params: { pk: data.pk },
+          query: editQuery,
+        })
+        return
+      }
+
+      if (copyAsNew) {
+        const oldPk = route.params.pk?.toString()
+        await router.replace({
+          name: 'booking_edit-pk',
+          params: { pk: data.pk },
+          query: editQuery,
+        })
+        appStore.event.trigger('replaceBookingEditTab', {
+          oldTabValue: `booking_edit-pk-${oldPk}`,
+          newTabValue: `booking_edit-pk-${data.pk}`,
+          title: `${TAB_PREFIX}${consignNo}`,
+          to: {
+            name: 'booking_edit-pk',
+            params: { pk: data.pk },
+            query: editQuery,
+          },
+          params: { pk: data.pk },
+          query: editQuery,
+        })
+        return
+      }
+
+      syncBookingEditTab({
+        pk: data.pk,
+        id: data.id,
+        consignNo,
+      })
+
+      if (consignNo && route.query.shipment_no !== consignNo) {
+        await router.replace({
           query: {
-            id: data.id,
-            shipment_no: data.bkg_consign_no ?? inputData.value.bkg_consign_no,
+            ...route.query,
+            id: String(data.id ?? route.query.id ?? ''),
+            shipment_no: consignNo,
           },
         })
       }
@@ -110,11 +230,15 @@ export function useEbookingBookingForm(options = {}) {
   }
 
   const tabTitle = () => {
-    if (isEditMode && inputData.value.bkg_consign_no) {
-      return inputData.value.bkg_consign_no
+    if (!isEditMode || isCopyAsNew()) {
+      return 'New Booking'
     }
-    return 'New Booking'
+    const shipmentNo =
+      route.query.shipment_no || inputData.value.bkg_consign_no || inputData.value.shipment_no || ''
+    return `${TAB_PREFIX}${shipmentNo}`
   }
+
+  const displayBookingNo = () => tabTitle().replace(`${TAB_PREFIX}`, '')
 
   return {
     skeletonLoading,
@@ -126,5 +250,7 @@ export function useEbookingBookingForm(options = {}) {
     addNewContainer,
     removeNewContainer,
     tabTitle,
+    displayBookingNo,
+    isCopyAsNew,
   }
 }
