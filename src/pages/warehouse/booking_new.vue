@@ -116,14 +116,21 @@
 </template>
 
 <script setup>
+  import { computed, onActivated, onMounted, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
 
+  import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
   import { saveWhsOrderFromForm } from '@/composables/mapWhsOrderDetail'
   import { useBookingForm } from '@/composables/useBookingForm'
+  import {
+    formatWhsTabTitle,
+    resolveWhsConsignNo,
+    scheduleWhsBookingTabSync,
+  } from '@/composables/useWarehouseBookingTab'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'WarehouseBookingNew' })
@@ -136,7 +143,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      tabTitle: 'New Warehouse Booking',
+      tabTitle: 'WHS-{shipment_no}',
     },
   })
 
@@ -170,6 +177,19 @@
     onCloseConvertToShipmentDiaVis,
   } = useBookingForm({ isEditMode: false, saveLoader: saveWhsOrderFromForm })
 
+  const newPageTabTitle = computed(() =>
+    formatWhsTabTitle(resolveWhsConsignNo({ route, inputData: inputData.value })),
+  )
+
+  const syncNewPageTabTitle = () => {
+    scheduleWhsBookingTabSync(appStore, {
+      tabValue: 'warehouse_booking_new',
+      route,
+      router,
+      inputData: inputData.value,
+    })
+  }
+
   const onConfirmConvertToShipmentWithLockCheck = async () => {
     await onConfirmConvertToShipmentHandle()
   }
@@ -190,5 +210,66 @@
     router.push({ name: 'warehouse_booking_new' })
   }
 
-  queryData()
+  const applyOrgRowToShipper = (shipper, row) => {
+    shipper.add_address_type = row.address_type
+    shipper.add_address_short_code = row.short_code
+    shipper.add_address_code = row.code ?? row.org_code
+    shipper.add_address_name = row.company_name ?? row.address_name
+    shipper.add_address = row.pk
+    shipper.add_address1 = row.address1
+    shipper.add_address2 = row.address2
+    shipper.add_address3 = row.address3
+    shipper.add_contact = row.contact
+    shipper.add_city = row.city
+    shipper.add_state = row.state
+    shipper.add_postal_code = row.postal_code
+    shipper.add_country_code = row.country_code
+    shipper.add_phone = row.phone
+    shipper.add_mobile = row.mobile
+    shipper.add_fax = row.fax
+    shipper.add_email = row.email
+    shipper.add_port_code = row.port_code
+  }
+
+  /** 列表点 New 进入本页时：用 userSession.org_code 预填 Shipper（编辑页不经过此文件） */
+  const prefillShipperFromSession = async () => {
+    const orgCode = appStore.userSession.session()?.org_header_code
+    if (!orgCode) {
+      return
+    }
+    if (inputData.value.shipper?.add_address_name) {
+      return
+    }
+
+    try {
+      const { success, data } = await organizationQueryOrgAddress({
+        query: orgCode,
+        address_type: 'SHIPPER',
+      })
+      const items = data?.items ?? []
+      if (!success || items.length === 0) {
+        return
+      }
+
+      if (!inputData.value.shipper || typeof inputData.value.shipper !== 'object') {
+        inputData.value.shipper = {}
+      }
+      applyOrgRowToShipper(inputData.value.shipper, items[0])
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const initNewBookingPage = async () => {
+    await queryData()
+    await prefillShipperFromSession()
+    syncNewPageTabTitle()
+  }
+
+  watch(newPageTabTitle, () => {
+    syncNewPageTabTitle()
+  })
+
+  onMounted(initNewBookingPage)
+  onActivated(initNewBookingPage)
 </script>

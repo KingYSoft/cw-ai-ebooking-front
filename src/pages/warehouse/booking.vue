@@ -47,10 +47,11 @@
   import { useDisplay } from 'vuetify'
 
   // import { pageWhsOrder } from '@/api/whs-order'
+  import { whsOrderQueryPage } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesWarehouseBookingFilter from '@/components/warehouse/PagesWarehouseBookingFilter.vue'
-  import { queryMockWhsOrders } from '@/mock/whs-order'
+  import { mapWhsOrderListRow } from '@/composables/mapWhsOrderDetail'
   import { useAppStore } from '@/stores/app'
 
   const appStore = useAppStore()
@@ -216,34 +217,32 @@
     return vvv
   }
 
-  const mapWhsOrderRow = (item, index) => ({
-    ...item,
-    index,
-  })
+  const mapWhsOrderRow = (item, index) => mapWhsOrderListRow(item, index)
 
   const queryData = async () => {
     cardLoading.value = true
     try {
-      // const { data } = await pageWhsOrder({
-      //   filters: buildListFilters(),
-      //   skipCount: (pageObj.value.pageIndex - 1) * pageObj.value.pageSize,
-      //   maxResultCount: pageObj.value.pageSize,
-      // })
-
-      const data = queryMockWhsOrders({
+      const { success, data } = await whsOrderQueryPage({
+        filters: buildListFilters(),
         skipCount: (pageObj.value.pageIndex - 1) * pageObj.value.pageSize,
         maxResultCount: pageObj.value.pageSize,
       })
 
       skeletonLoading.value = false
-      const items = data.items ?? []
-      tblItems.value = items.map((item, index) =>
-        mapWhsOrderRow(
-          item,
-          (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1,
-        ),
-      )
-      totalCount.value = data.totalCount ?? 0
+      if (success && data) {
+        const items = data.items ?? []
+        tblItems.value = items.map((item, index) =>
+          mapWhsOrderRow(
+            item,
+            (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1,
+          ),
+        )
+        totalCount.value = data.totalCount ?? 0
+      } else {
+        tblItems.value = []
+        totalCount.value = 0
+      }
+
       nextTick(() => {
         if (refTableLayout.value) {
           refTableLayout.value.initHeaders()
@@ -252,6 +251,7 @@
       })
     } catch (error) {
       console.error(error)
+      skeletonLoading.value = false
     } finally {
       cardLoading.value = false
     }

@@ -5,7 +5,7 @@
         <template #title>
           <div class="d-flex align-center ga-2">
             <div class="d-flex flex-column ga-0">
-              <span class="font-weight-bold text-body-2">CFS Order</span>
+              <span class="font-weight-bold text-body-2">WHS-</span>
 
               <div class="d-flex align-center ga-1">
                 <span class="font-weight-bold text-body-2">{{ tabTitle.replace('WHS-', '') }}</span>
@@ -93,17 +93,22 @@
 </template>
 
 <script setup>
-  import { computed, onActivated, ref } from 'vue'
+  import { computed, onActivated, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
 
-  import { whsOrderGetById } from '@/api/whs-order'
+  import { whsOrderDetail } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
-  import { saveWhsOrderFromForm } from '@/composables/mapWhsOrderDetail'
+  import { mapWhsOrderDetailToForm, saveWhsOrderFromForm } from '@/composables/mapWhsOrderDetail'
   import { useBookingForm } from '@/composables/useBookingForm'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
+  import {
+    formatWhsTabTitle,
+    resolveWhsConsignNo,
+    scheduleWhsBookingTabSync,
+  } from '@/composables/useWarehouseBookingTab'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'WarehouseBookingEdit' })
@@ -130,9 +135,9 @@
       return { success: false, data: null }
     }
     try {
-      const { success, data } = await whsOrderGetById(pkid)
+      const { success, data } = await whsOrderDetail(pkid)
       if (success && data) {
-        return { success: true, data }
+        return { success: true, data: mapWhsOrderDetailToForm(data) }
       }
       return { success: false, data: null }
     } catch (error) {
@@ -178,11 +183,20 @@
     if (isCopyAsNew.value) {
       return 'New Warehouse Order'
     }
-    const tabTitleTemplate = route.meta.tabTitle || 'Edit Warehouse Order'
-    const orderNo =
-      route.query.shipment_no || inputData.value.bkg_consign_no || inputData.value.wso_consign_no || ''
-    return tabTitleTemplate.replace('{shipment_no}', orderNo)
+    return formatWhsTabTitle(resolveWhsConsignNo({ route, inputData: inputData.value }))
   })
+
+  const syncEditTabTitle = () => {
+    if (isCopyAsNew.value) {
+      return
+    }
+    scheduleWhsBookingTabSync(appStore, {
+      tabValue: `warehouse_booking_edit-pk-${route.params.pk}`,
+      route,
+      router,
+      inputData: inputData.value,
+    })
+  }
 
   const handleCopyOrderNo = () => {
     const orderNo = inputData.value.bkg_consign_no || inputData.value.wso_consign_no || ''
@@ -218,9 +232,15 @@
     loadedPk.value = pk
     await queryData(pk, id)
     await editLockGuard.acquireLock()
+    syncEditTabTitle()
   }
 
   loadData()
+
+  watch(
+    () => resolveWhsConsignNo({ route, inputData: inputData.value }),
+    () => syncEditTabTitle(),
+  )
 
   onActivated(() => {
     const currentPk = route.params.pk?.toString()

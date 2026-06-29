@@ -707,7 +707,11 @@
   // 辅助函数：替换标题中的占位符
   const replacePlaceholders = (title, data) => {
     return title.replace(/\{([^}]+)\}/g, (match, key) => {
-      return data[key] || match
+      const value = data?.[key]
+      if (value != null && value !== '') {
+        return String(value)
+      }
+      return ''
     })
   }
 
