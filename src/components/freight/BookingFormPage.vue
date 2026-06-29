@@ -8,6 +8,7 @@
 
             <div class="d-flex align-center ga-1">
               <span class="font-weight-bold text-body-2">{{ displayBookingNo() }}</span>
+
               <v-icon
                 v-if="inputData.bkg_consign_no && !isCopyAsNew()"
                 icon="mdi-content-copy"

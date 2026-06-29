@@ -18,7 +18,7 @@
               display-key="company_name"
               :fetch-method="organizationQueryOrgAddress"
               :headers="addrTableHeaders"
-              :query-extra="{ address_type: 'WHS' }"
+              :query-extra="{ address_type: 'SHIPPER' }"
               :text-field-props="{
                 'min-width': '100%',
               }"
@@ -95,7 +95,7 @@
               display-key="company_name"
               :fetch-method="organizationQueryOrgAddress"
               :headers="addrTableHeaders"
-              :query-extra="{ address_type: 'WHS' }"
+              :query-extra="{ address_type: 'CONSIGNEE' }"
               :text-field-props="{
                 'min-width': '100%',
               }"

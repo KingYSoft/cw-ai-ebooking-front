@@ -54,18 +54,34 @@
 
       <!-- Market -->
       <template #item.market="{ item }">
-        <v-select
+        <v-autocomplete
           v-model="item.market"
+          auto-select-first
+          autocomplete="off"
+          clearable
+          :custom-filter="filterMarketOption"
           density="compact"
           hide-details
-          :items="['Market A', 'Market B']"
+          item-title="market"
+          item-value="market"
+          :items="marketOptions"
+          :menu-props="{ maxWidth: '320px' }"
           variant="outlined"
-        />
+          @update:model-value="value => onMarketChange(item, value)"
+        >
+          <template #item="{ props: itemProps, item: option }">
+            <v-list-item
+              v-bind="itemProps"
+              :subtitle="[option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')"
+              :title="option.raw.market"
+            />
+          </template>
+        </v-autocomplete>
       </template>
 
       <!-- Plant ID -->
       <template #item.plant_id="{ item }">
-        <v-text-field v-model="item.plant_id" density="compact" hide-details variant="outlined" />
+        <v-text-field v-model="item.plant_id" density="compact" disabled hide-details variant="outlined" />
       </template>
 
       <!-- Packing List No. -->
@@ -247,6 +263,7 @@
   import { organizationQueryOrgAddress, organizationQueryOrgCarrier } from '@/api/organization'
   import { queryServiceLevelPage } from '@/api/service_level'
   import { debounceFn } from '@/api/utils'
+  import { getWhsMarketOptions } from '@/api/whs-market'
   import FDatePicker from '@/components/FDatePicker.vue'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import {
@@ -472,6 +489,44 @@
   }
 
   const serviceLevelCodeItems = ref([])
+  const marketOptions = ref([])
+
+  const filterMarketOption = (_value, query, item) => {
+    const q = String(query ?? '').trim().toLowerCase()
+    if (!q) {
+      return true
+    }
+    const raw = item?.raw ?? {}
+    return [
+      raw.market,
+      raw.plant_id,
+      raw.shipping_mode,
+      raw.port_code,
+      raw.port_of_discharge,
+      raw.destination,
+    ].some(field => String(field ?? '').toLowerCase().includes(q))
+  }
+
+  const onMarketChange = (row, market) => {
+    const value = String(market ?? '').trim()
+    row.market = value
+    if (!value) {
+      row.plant_id = ''
+      return
+    }
+    const matched = marketOptions.value.find(opt => String(opt.market ?? '').trim() === value)
+    row.plant_id = String(matched?.plant_id ?? '').trim()
+  }
+
+  const loadMarketOptions = async () => {
+    try {
+      const { data } = await getWhsMarketOptions()
+      marketOptions.value = Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error('loadMarketOptions failed:', error)
+      marketOptions.value = []
+    }
+  }
 
   const loadServiceLevelCodes = async () => {
     try {
@@ -487,6 +542,7 @@
       serviceLevelCodeItems.value = []
     }
   }
+  loadMarketOptions()
   loadServiceLevelCodes()
 
   const addrTableHeaders = [
@@ -536,7 +592,7 @@
 
   const tblContainerHeaders = [
     { title: '', key: 'actions', width: '50px', align: 'center' },
-    { title: 'Market', key: 'market', width: '120px' },
+    { title: 'Market', key: 'market', width: '120px', minWidth: '120px' },
     { title: 'Plant ID', key: 'plant_id', width: '100px' },
     { title: 'Packing List No.', key: 'packing_list_no', width: '150px' },
     { title: 'Description', key: 'description', width: '200px' },

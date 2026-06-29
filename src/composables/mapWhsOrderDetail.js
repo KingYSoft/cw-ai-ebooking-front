@@ -1,4 +1,4 @@
-import { saveMockWhsOrder } from '@/mock/whs-order'
+import { whsOrderSave } from '@/api/whs-order'
 
 const WSO_TO_BKG_FIELDS = [
   ['wso_transport_mode', 'bkg_transport_mode'],
@@ -60,6 +60,7 @@ const WSO_TO_BKG_FIELDS = [
   ['wso_so_confirm_date', 'bkg_so_confirm_date'],
   ['wso_vgm_cut_off_date', 'bkg_vgm_cut_off_date'],
   ['wso_so_number', 'bkg_so_number'],
+  ['wso_po_number', 'bkg_po_number'],
 ]
 
 /** Item Detail 表格 UI 字段 ↔ 接口 woi_* */
@@ -180,7 +181,7 @@ export function mapWhsOrderDetailToForm(el) {
   return mapped
 }
 
-const ADDRESS_PARTY_KEYS = ['shipper', 'consignee', 'notify_party', 'pickup', 'delivery']
+const ADDRESS_PARTY_KEYS = ['shipper', 'consignee', 'notify_party']
 
 function cloneAddressParty(addr) {
   if (!addr || typeof addr !== 'object') {
@@ -201,6 +202,8 @@ const WSO_PASSTHROUGH_KEYS = [
   'wso_shipment_status',
   'wso_cargo_receipt',
   'wso_is_split',
+  'wso_org_header_pk',
+  'wso_status',
   'create_user',
   'last_modify_user',
 ]
@@ -341,22 +344,31 @@ export function mapWhsOrderFormToSave(form, options = {}) {
     payload.wso_actual_chargeable_unit = form.bkg_unit_of_volume
   }
 
+  if (!hasFieldValue(payload.wso_insurance_currency) && hasFieldValue(form.bkg_insurance_value_currency)) {
+    payload.wso_insurance_currency = form.bkg_insurance_value_currency
+  }
+
   const pacList = Array.isArray(form.pac_list) ? form.pac_list : []
   payload.item_list = pacList.map(row => mapFormItemToWoi(row, payload.pk)).filter(Boolean)
 
-  // 与 bookingSave 一致：提交完整地址对象及 Same as Consignee 标记
+  // save 接口仅接受 shipper / consignee / notify_party
   for (const key of ADDRESS_PARTY_KEYS) {
     payload[key] = cloneAddressParty(form[key])
   }
-  payload.notify_party_same_as_consignee = resolveNotifyPartySameAsConsignee(
-    form.notify_party_same_as_consignee,
-    form.notify_party,
-  )
 
   return payload
 }
 
+export function mapWhsOrderListRow(item, index) {
+  return {
+    ...item,
+    index,
+    shipper_name: item.shipper_name ?? item.shipper?.add_address_name ?? null,
+    consignee_name: item.consignee_name ?? item.consignee?.add_address_name ?? null,
+  }
+}
+
 export async function saveWhsOrderFromForm(form, options = {}) {
   const payload = mapWhsOrderFormToSave(form, options)
-  return saveMockWhsOrder(payload)
+  return whsOrderSave(payload)
 }

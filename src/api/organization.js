@@ -1,4 +1,4 @@
-// import service from './index'
+import service from './index'
 
 const ok = (data = null) => Promise.resolve({ success: true, data })
 
@@ -23,6 +23,35 @@ export const organizationSaveOrgAddress = formData =>
     },
   })
 
-export const organizationQueryOrgAddress = () => ok({ items: [] })
+/**
+ * GET /api/organization/query-org-address
+ * @param {object} params query, address_type, skipCount, maxResultCount
+ */
+export const organizationQueryOrgAddress = (params = {}, signal) => {
+  const {
+    query,
+    address_type,
+    skipCount,
+    maxResultCount,
+    Sorting,
+    SkipCount,
+    MaxResultCount,
+    ...rest
+  } = params
+
+  return service({
+    url: '/api/organization/query-org-address',
+    method: 'get',
+    params: {
+      query,
+      address_type,
+      Sorting,
+      SkipCount: SkipCount ?? skipCount ?? 0,
+      MaxResultCount: MaxResultCount ?? maxResultCount ?? 50,
+      ...rest,
+    },
+    signal,
+  })
+}
 
 export const organizationQueryOrgCarrier = () => ok({ items: [] })

@@ -158,7 +158,7 @@
       orgAddressLoading.value = true
       const { success, data } = await organizationSaveOrgAddress({
         ...formData,
-        address_type: 'WHS',
+        address_type: orgAddressType.value || formData.address_type,
       })
       if (success) {
         const row = data?.address

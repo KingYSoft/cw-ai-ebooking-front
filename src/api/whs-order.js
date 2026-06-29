@@ -1,40 +1,31 @@
-// import service from './index'
-import { getMockWhsOrderFormByPk, saveMockWhsOrder } from '@/mock/whs-order'
+import service from './index'
 
-/**
- * 分页查询仓库订单列表
- */
-export const pageWhsOrder = () => {
-  // return service({
-  //   url: '/whs-order/page-whs-order',
-  //   method: 'get',
-  //   params,
-  // })
-  return Promise.resolve({ data: null })
-}
+/** POST /whs-order/query-page — 分页列表 */
+export const whsOrderQueryPage = data =>
+  service({
+    url: '/whs-order/query-page',
+    method: 'post',
+    data,
+  })
 
-/**
- * 根据 pk 获取仓库订单详情
- * @param {string} pkid
- */
-export const whsOrderGetById = pkid => {
-  // return service({
-  //   url: '/whs-order/whs-order-getbyid',
-  //   method: 'get',
-  //   params: { pkid },
-  // })
-  const data = getMockWhsOrderFormByPk(pkid)
-  return Promise.resolve({ success: !!data, data })
-}
+/** GET /whs-order/detail — 详情 */
+export const whsOrderDetail = pk =>
+  service({
+    url: '/whs-order/detail',
+    method: 'get',
+    params: { pk },
+  })
 
-/**
- * 保存仓库订单（含 item_list 明细）
- */
-export const whsOrderSave = data => {
-  // return service({
-  //   url: '/whs-order/save',
-  //   method: 'post',
-  //   data,
-  // })
-  return saveMockWhsOrder(data)
-}
+/** POST /whs-order/save — 保存 */
+export const whsOrderSave = data =>
+  service({
+    url: '/whs-order/save',
+    method: 'post',
+    data,
+  })
+
+/** @deprecated 使用 whsOrderQueryPage */
+export const pageWhsOrder = whsOrderQueryPage
+
+/** @deprecated 使用 whsOrderDetail */
+export const whsOrderGetById = pk => whsOrderDetail(pk)
