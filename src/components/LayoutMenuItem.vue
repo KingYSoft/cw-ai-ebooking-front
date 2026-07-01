@@ -1,11 +1,14 @@
 <template>
   <v-list-item
-    :prepend-icon="menuInfo.icon"
     rounded="te-xl be-xl"
     :title="menuInfo.title"
     :to="menuInfo.path"
     :value="menuInfo.code"
-  />
+  >
+    <template #prepend>
+      <v-icon :icon="menuInfo.icon" size="20" />
+    </template>
+  </v-list-item>
 </template>
 
 <script setup>

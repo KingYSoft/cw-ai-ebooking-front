@@ -1145,15 +1145,18 @@
     &.v-list--slim {
       :deep(.v-list-group) {
         --prepend-width: 8px;
+        .v-list-group__items .v-list-item {
+          transition: padding-inline-start 0.2s ease;
+        }
       }
     }
 
-    :deep(.v-list-group) {
-      .v-list-item--active {
-        // background-color: rgba(var(--v-theme-primary), 0.1) !important;
-        // color: rgba(var(--v-theme-primary)) !important;
-      }
-    }
+    // :deep(.v-list-group) {
+    // .v-list-item--active {
+    // background-color: rgba(var(--v-theme-primary), 0.1) !important;
+    // color: rgba(var(--v-theme-primary)) !important;
+    // }
+    // }
   }
 
   .nav-collapse {

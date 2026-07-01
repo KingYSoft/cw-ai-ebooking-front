@@ -1,12 +1,11 @@
 <template>
   <v-list-group color="transparent" :fluid="fluid" :value="menuInfo.code">
     <template #activator="{ props }">
-      <v-list-item
-        v-bind="props"
-        :prepend-icon="menuInfo.icon"
-        rounded="te-xl be-xl"
-        :title="menuInfo.title"
-      />
+      <v-list-item v-bind="props" rounded="te-xl be-xl" :title="menuInfo.title">
+        <template #prepend>
+          <v-icon :icon="menuInfo.icon" size="20" />
+        </template>
+      </v-list-item>
     </template>
 
     <slot />
