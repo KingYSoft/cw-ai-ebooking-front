@@ -829,11 +829,11 @@
 
   <v-divider />
 
-  <v-tabs v-model="tab" color="primary" density="compact">
-    <v-tab class="erp-tab" :value="1">Inbound Order</v-tab>
-    <v-tab class="erp-tab" :value="2">Outbound Order</v-tab>
-    <v-tab class="erp-tab" :value="3">Transportation</v-tab>
-    <v-tab class="erp-tab" :value="4">Others</v-tab>
+  <v-tabs v-model="tab" color="indigo" density="compact">
+    <v-tab :value="1">Inbound Order</v-tab>
+    <v-tab :value="2">Outbound Order</v-tab>
+    <v-tab :value="3">Transportation</v-tab>
+    <v-tab :value="4">Others</v-tab>
   </v-tabs>
 
   <v-tabs-window v-model="tab" class="custom-window">
@@ -1115,4 +1115,6 @@
       inputData.value.wso_actual_chargeable = newChargeableWeight
     }
   }
+
+  const tab = ref(1)
 </script>
