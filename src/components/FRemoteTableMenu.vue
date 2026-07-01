@@ -1,14 +1,10 @@
 <template>
   <v-text-field
     ref="textFieldRef"
-    :model-value="inputText"
     v-bind="mergedTextFieldProps"
-    @click:clear.stop.prevent="
-      () => {
-        isClear = true
-        clickClear()
-      }
-    "
+    :clearable="mergedTextFieldProps.readonly ? false : mergedTextFieldProps.clearable"
+    :model-value="inputText"
+    @click:clear.stop.prevent="clickClear"
     @focus="onFieldFocus"
     @update:model-value="onInputValueUpdate"
   >
@@ -212,7 +208,12 @@
   const emit = defineEmits(['row-select', 'on-new-handle', 'click-clear'])
 
   const clickClear = () => {
-    emit('click-clear')
+    if (mergedTextFieldProps.value.readonly) {
+      //
+    } else {
+      isClear.value = true
+      emit('click-clear')
+    }
   }
 
   const hasOnNewHandle = computed(() => {
@@ -300,14 +301,18 @@
   })
 
   const onFieldFocus = () => {
-    // Focus always opens menu and runs query with empty search to get all options.
-    isOpen.value = true
-    // Temporarily clear input text for query, then restore
-    const originalText = inputText.value
-    inputText.value = ''
-    runQuery()
-    // Restore original text after query
-    inputText.value = originalText
+    if (mergedTextFieldProps.value.readonly) {
+      //
+    } else {
+      // Focus always opens menu and runs query with empty search to get all options.
+      isOpen.value = true
+      // Temporarily clear input text for query, then restore
+      const originalText = inputText.value
+      inputText.value = ''
+      runQuery()
+      // Restore original text after query
+      inputText.value = originalText
+    }
   }
 
   const onInputValueUpdate = value => {

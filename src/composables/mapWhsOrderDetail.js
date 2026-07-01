@@ -344,7 +344,10 @@ export function mapWhsOrderFormToSave(form, options = {}) {
     payload.wso_actual_chargeable_unit = form.bkg_unit_of_volume
   }
 
-  if (!hasFieldValue(payload.wso_insurance_currency) && hasFieldValue(form.bkg_insurance_value_currency)) {
+  if (
+    !hasFieldValue(payload.wso_insurance_currency) &&
+    hasFieldValue(form.bkg_insurance_value_currency)
+  ) {
     payload.wso_insurance_currency = form.bkg_insurance_value_currency
   }
 

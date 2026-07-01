@@ -258,7 +258,7 @@
 
 <script setup>
   import { onMounted, ref } from 'vue'
-  import { userQueryOrgHeader } from '@/api/user'
+  import { organizationQueryOrgAddress } from '@/api/organization'
   import { debounceFn } from '@/api/utils'
   import { useLayoutCols } from '@/composables/useLayoutCols'
 
@@ -290,8 +290,8 @@
     }
     orgHeaderLoading.value = true
     try {
-      const { data } = await userQueryOrgHeader({ query }, signal)
-      orgHeaderList.value = Array.isArray(data?.list) ? data.list : []
+      const { data } = await organizationQueryOrgAddress({ query }, signal)
+      orgHeaderList.value = Array.isArray(data?.items) ? data.items : []
     } catch (error) {
       console.log(error)
     } finally {

@@ -4,18 +4,14 @@
       <div v-show="activedTab === 1">
         <WarehouseOrderDetail
           v-model:input-data="inputData"
-          :convert-to-shipment-check="convertToShipmentCheck"
           :input-data-rules="inputDataRules"
-          :query-all-user-list="queryAllUserList"
           :query-port-list="queryPortList"
           @add-container="addNewContainer"
           @add-new-loose="addNewLoose"
           @on-clear-addr="OnClearAddr"
           @on-new-handle="onNewHandle"
           @on-select-addr="onSelectAddr"
-          @query-all-user="queryAllUser"
           @query-port="queryPort"
-          @register-form-refs="registerFormRefs"
           @remove-container="removeNewContainer"
           @remove-new-loose="removeNewLoose"
         />
@@ -24,13 +20,7 @@
 
     <v-scroll-x-transition hide-on-leave mode="out-in">
       <div v-show="activedTab === 2">
-        <WarehouseItemDetail
-          v-model:input-data="inputData"
-          @on-clear-addr="OnClearAddr"
-          @on-new-handle="onNewHandle"
-          @on-select-addr="onSelectAddr"
-          @register-form-refs="registerFormRefs"
-        />
+        <WarehouseItemDetail v-model:input-data="inputData" :input-data-rules="inputDataRules" />
       </div>
     </v-scroll-x-transition>
 
@@ -62,7 +52,10 @@
 
 <script setup>
   import { ref, toRefs } from 'vue'
+  import { useLocale } from 'vuetify'
   import { organizationSaveOrgAddress } from '@/api/organization'
+  import { portCodeQueryOptions } from '@/api/port_code'
+  import { debounceFn } from '@/api/utils'
   import BookingEDocs from '@/components/business/booking/BookingEDocs.vue'
   import BookingLogs from '@/components/business/booking/BookingLogs.vue'
   import NewOrgAddressDialog from '@/components/business/NewOrgAddressDialog.vue'
@@ -71,44 +64,17 @@
   import WarehouseOrderDetail from './warehouse_order/WarehouseOrderDetail.vue'
 
   const appStore = useAppStore()
+  const { t } = useLocale()
 
   const props = defineProps({
     activedTab: {
       type: Number,
       default: 1,
     },
-    inputDataRules: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    queryPortList: {
-      type: Array,
-      default: () => [],
-    },
-    queryAllUserList: {
-      type: Array,
-      default: () => [],
-    },
-    convertToShipmentCheck: {
-      type: Boolean,
-      default: false,
-    },
   })
-  const emit = defineEmits([
-    'add-container',
-    'add-new-loose',
-    'input-data:update',
-    'query-port',
-    'remove-container',
-    'remove-new-loose',
-    'query-all-user',
-    'register-form-refs',
-  ])
+  const emit = defineEmits(['input-data:update'])
 
-  const { activedTab, inputDataRules, queryPortList, queryAllUserList, convertToShipmentCheck } =
-    toRefs(props)
+  const { activedTab } = toRefs(props)
 
   const inputData = defineModel('input-data', {
     type: Object,
@@ -118,27 +84,78 @@
   })
 
   const addNewContainer = () => {
-    emit('add-container')
-  }
-  const removeNewContainer = index => {
-    emit('remove-container', index)
-  }
-  const addNewLoose = () => {
-    emit('add-new-loose')
-  }
-  const removeNewLoose = index => {
-    emit('remove-new-loose', index)
-  }
-  const queryPort = event => {
-    emit('query-port', event)
-  }
-  const queryAllUser = event => {
-    emit('query-all-user', event)
+    if (!inputData.value) {
+      return
+    }
+    const c = {
+      id: Date.now(),
+      pac_package_count: inputData.value.wso_total_package_count,
+      pac_pack_type: inputData.value.wso_pack_type,
+      pac_gross_weight: inputData.value.wso_actual_weight,
+      pac_weight_unit: inputData.value.wso_unit_of_weight,
+      pac_actual_volume: inputData.value.wso_actual_volume,
+      pac_actual_volume_uom: inputData.value.wso_unit_of_volume,
+      pac_volume_weight: inputData.value.wso_volume_weight,
+      pac_volume_weight_unit: inputData.value.wso_volume_weight_unit,
+      pac_chargeable_weight: inputData.value.wso_actual_chargeable,
+      pac_chargeable_weight_unit: inputData.value.wso_actual_chargeable_unit,
+      pac_pack_type_desc: inputData.value.wso_pack_type_desc,
+    }
+    inputData.value.pac_list.push(c)
   }
 
-  const registerFormRefs = el => {
-    emit('register-form-refs', el)
+  const removeNewContainer = index => {
+    if (!inputData.value?.pac_list) {
+      return
+    }
+    inputData.value.pac_list.splice(index, 1)
   }
+
+  const addNewLoose = () => {
+    if (!inputData.value) {
+      return
+    }
+    const c = {
+      id: Date.now(),
+      pac_package_count: inputData.value.wso_total_package_count,
+      pac_pack_type: inputData.value.wso_pack_type,
+      pac_gross_weight: inputData.value.wso_actual_weight,
+      pac_weight_unit: inputData.value.wso_unit_of_weight,
+      pac_actual_volume: inputData.value.wso_actual_volume,
+      pac_actual_volume_uom: inputData.value.wso_unit_of_volume,
+      pac_volume_weight: inputData.value.wso_volume_weight,
+      pac_volume_weight_unit: inputData.value.wso_volume_weight_unit,
+      pac_chargeable_weight: inputData.value.wso_actual_chargeable,
+      pac_chargeable_weight_unit: inputData.value.wso_actual_chargeable_unit,
+      pac_pack_type_desc: inputData.value.wso_pack_type_desc,
+    }
+    inputData.value.pac_list.push(c)
+  }
+  const removeNewLoose = index => {
+    if (!inputData.value?.pac_list) {
+      return
+    }
+    inputData.value.pac_list.splice(index, 1)
+  }
+
+  const queryPortList = ref([])
+  const queryPort = debounceFn(async (code, signal) => {
+    try {
+      const { data } = await portCodeQueryOptions(
+        {
+          query: code,
+        },
+        signal,
+      )
+      if (data) {
+        queryPortList.value = data.list ?? []
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      //
+    }
+  })
 
   // 对话框相关状态
   const orgAddressDialog = ref(false)
@@ -309,6 +326,327 @@
       inputData.value.notify_party = {}
       inputData.value.notify_party_same_as_consignee = 'N'
     }
+  }
+
+  const inputDataRules = {
+    shipper_name: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.shipper_name.err')
+        }
+      },
+    ],
+    consignee_name: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.consignee_name.err')
+        }
+      },
+    ],
+    wso_transport_mode: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_transport_mode.err')
+        }
+      },
+    ],
+    wso_packing_mode: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_packing_mode.err')
+        }
+      },
+    ],
+    wso_load_port: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_load_port.err')
+        }
+      },
+    ],
+    wso_etd: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_etd.err')
+        }
+      },
+    ],
+    wso_cargo_ready: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_cargo_ready.err')
+        }
+      },
+    ],
+    wso_actual_weight: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_actual_weight.err')
+        } else {
+          if (value && appStore.utils.testFloat(value)) {
+            return true
+          } else {
+            return t('$vuetify.custom.bookingPage.form.wso_actual_weight.err')
+          }
+        }
+      },
+    ],
+    wso_actual_volume: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_actual_volume.err')
+        } else {
+          if (value && appStore.utils.testFloat(value)) {
+            return true
+          } else {
+            return t('$vuetify.custom.bookingPage.form.wso_actual_volume.err')
+          }
+        }
+      },
+    ],
+    wso_volume_weight: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_volume_weight.err')
+        } else {
+          if (value && appStore.utils.testFloat(value)) {
+            return true
+          } else {
+            return t('$vuetify.custom.bookingPage.form.wso_volume_weight.err')
+          }
+        }
+      },
+    ],
+    wso_actual_chargeable: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_actual_chargeable.err')
+        } else {
+          if (value && appStore.utils.testFloat(value)) {
+            return true
+          } else {
+            return t('$vuetify.custom.bookingPage.form.wso_actual_chargeable.err')
+          }
+        }
+      },
+    ],
+    wso_total_package_count: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_total_package_count.err')
+        } else {
+          if (value && appStore.utils.testInt(value)) {
+            return true
+          } else {
+            return t('$vuetify.custom.bookingPage.form.wso_total_package_count.err')
+          }
+        }
+      },
+    ],
+    wso_inco: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_inco.err')
+        }
+      },
+    ],
+    wso_transit_time: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_transit_time.err')
+        } else {
+          if (value) {
+            if (appStore.utils.testInt(value)) {
+              return true
+            } else {
+              return t('$vuetify.custom.bookingPage.form.wso_transit_time.err')
+            }
+          } else {
+            // 非必填
+            return true
+          }
+        }
+      },
+    ],
+    wso_goods_value: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_insurance_value.err')
+        } else {
+          if (value) {
+            if (appStore.utils.testFloat(value)) {
+              return true
+            } else {
+              return t('$vuetify.custom.bookingPage.form.wso_goods_value.err')
+            }
+          } else {
+            // 非必填
+            return true
+          }
+        }
+      },
+    ],
+    wso_insurance_value: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.wso_insurance_value.err')
+        } else {
+          if (value) {
+            if (appStore.utils.testFloat(value)) {
+              return true
+            } else {
+              return t('$vuetify.custom.bookingPage.form.wso_insurance_value.err')
+            }
+          } else {
+            // 非必填
+            return true
+          }
+        }
+      },
+    ],
+    wso_freight_terms: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_freight_terms.err')
+        }
+      },
+    ],
+    wso_release_type: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_release_type.err')
+        }
+      },
+    ],
+    wso_commodity: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_commodity.err')
+        }
+      },
+    ],
+    wso_goods_description: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_goods_description.err')
+        }
+      },
+    ],
+    wso_marks_nos: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.wso_marks_nos.err')
+        }
+      },
+    ],
+    pac_container_type: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.pac_container_type.err')
+        }
+      },
+    ],
+    pac_container_count: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.pac_container_count.err')
+        } else {
+          // 必填
+          if (value && appStore.utils.testInt(value)) {
+            return true
+          } else {
+            return t('$vuetify.custom.bookingPage.form.pac_container_count.err')
+          }
+        }
+      },
+    ],
+    pac_package_count: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.pac_package_count.err')
+        } else {
+          // 必填
+          if (value && appStore.utils.testInt(value)) {
+            return true
+          } else {
+            return t('$vuetify.custom.bookingPage.form.pac_package_count.err')
+          }
+        }
+      },
+    ],
+    pac_pack_type: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.pac_pack_type.err')
+        }
+      },
+    ],
+    pac_gross_weight: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.pac_gross_weight.err')
+        } else {
+          if (value) {
+            if (appStore.utils.testFloat(value)) {
+              return true
+            } else {
+              return t('$vuetify.custom.bookingPage.form.pac_gross_weight.err')
+            }
+          } else {
+            // 非必填
+            return true
+          }
+        }
+      },
+    ],
+    pac_actual_volume: [
+      value => {
+        if (value === '0' || value === 0) {
+          return t('$vuetify.custom.bookingPage.form.pac_actual_volume.err')
+        } else {
+          if (value) {
+            if (appStore.utils.testFloat(value)) {
+              return true
+            } else {
+              return t('$vuetify.custom.bookingPage.form.pac_actual_volume.err')
+            }
+          } else {
+            // 非必填
+            return true
+          }
+        }
+      },
+    ],
   }
 </script>
 
