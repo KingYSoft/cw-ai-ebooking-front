@@ -285,12 +285,12 @@
   const orgHeaderList = ref([])
   const orgHeaderLoading = ref(false)
   const loadOrgHeaderList = debounceFn(async (query, signal) => {
-    if (!query) {
-      return
-    }
     orgHeaderLoading.value = true
     try {
-      const { data } = await organizationQueryOrgAddress({ query }, signal)
+      const { data } = await organizationQueryOrgAddress(
+        { query, skipCount: 0, maxResultCount: 50 },
+        signal,
+      )
       orgHeaderList.value = Array.isArray(data?.items) ? data.items : []
     } catch (error) {
       console.log(error)
