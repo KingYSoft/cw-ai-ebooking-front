@@ -167,9 +167,9 @@
   const totalCount = ref(0)
 
   const tblHeaders = [
-    { title: 'Status', key: 'wso_shipment_status', align: 'start', minWidth: '90px' },
+    { title: 'Status', key: 'wso_status', align: 'start', minWidth: '90px' },
     { title: 'Order No.', key: 'wso_consign_no', align: 'start', minWidth: '140px' },
-    { title: 'Trans Mode', key: 'wso_transport_mode', align: 'start', minWidth: '90px' },
+    { title: 'Trans Mode', key: 'wso_transport_mode', align: 'start', minWidth: '110px' },
     { title: 'Container', key: 'wso_shipment_type', align: 'start', minWidth: '110px' },
     { title: 'House Bill', key: 'wso_house_bill', align: 'start', minWidth: '120px' },
     { title: 'SO Number', key: 'wso_so_number', align: 'start', minWidth: '130px' },
@@ -181,16 +181,16 @@
       minWidth: '180px',
       cellProps: { class: 'text-truncate' },
     },
-    { title: 'Origin', key: 'wso_origin', align: 'start', minWidth: '90px' },
-    { title: 'Destination', key: 'wso_destination', align: 'start', minWidth: '90px' },
+    { title: 'Origin', key: 'wso_origin', align: 'start', minWidth: '100px' },
+    { title: 'Destination', key: 'wso_destination', align: 'start', minWidth: '100px' },
     { title: 'Target Delivery', key: 'wso_delivery_due_date', align: 'start', minWidth: '120px' },
-    { title: 'Cargo Ready', key: 'wso_cargo_ready', align: 'start', minWidth: '100px' },
+    { title: 'CRD', key: 'wso_cargo_ready', align: 'start', minWidth: '100px' },
     { title: 'ETD', key: 'wso_etd', align: 'start', minWidth: '100px' },
     { title: 'ETA', key: 'wso_eta', align: 'start', minWidth: '100px' },
-    { title: 'Gross Weight', key: 'wso_actual_weight', align: 'end', minWidth: '100px' },
-    { title: 'CBM', key: 'wso_actual_volume', align: 'end', minWidth: '80px' },
+    { title: 'Gross Weight', key: 'wso_actual_weight', align: 'end', minWidth: '140px' },
+    { title: 'CBM', key: 'wso_actual_volume', align: 'end', minWidth: '100px' },
     { title: 'Chargeable', key: 'wso_actual_chargeable', align: 'end', minWidth: '100px' },
-    { title: 'Packages', key: 'wso_total_package_count', align: 'end', minWidth: '90px' },
+    { title: 'Packages', key: 'wso_total_package_count', align: 'end', minWidth: '100px' },
     { title: 'Create User', key: 'create_user', align: 'start', minWidth: '100px' },
     { title: 'Modify User', key: 'last_modify_user', align: 'start', minWidth: '100px' },
   ]
@@ -232,10 +232,7 @@
       if (success && data) {
         const items = data.items ?? []
         tblItems.value = items.map((item, index) =>
-          mapWhsOrderRow(
-            item,
-            (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1,
-          ),
+          mapWhsOrderRow(item, (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1),
         )
         totalCount.value = data.totalCount ?? 0
       } else {

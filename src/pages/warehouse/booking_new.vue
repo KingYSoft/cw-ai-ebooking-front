@@ -1,7 +1,7 @@
 <template>
   <div>
     <FPageLayout :card-loading="cardLoading" :skeleton-loading="skeletonLoading">
-      <LayoutWithToolbar :divider="false" :height="68" :spacer="true">
+      <LayoutWithToolbar :divider="false" :height="68" :spacer="true" title="New Warehouse">
         <template #actions>
           <v-btn
             color="primary"
@@ -25,112 +25,25 @@
       <v-divider />
 
       <v-sheet class="overflow-y-auto" style="flex: 1">
-        <PagesWarehouseOrderEdit
-          v-model:input-data="inputData"
-          :actived-tab="activedTab"
-          :convert-to-shipment-check="convertToShipmentCheck"
-          :input-data-rules="inputDataRules"
-          :query-all-user-list="queryAllUserList"
-          :query-port-list="queryPortList"
-          @add-container="addNewContainer"
-          @add-new-loose="addNewLoose"
-          @query-all-user="queryAllUser"
-          @query-port="queryPort"
-          @register-form-refs="registerFormRefs"
-          @remove-container="removeNewContainer"
-          @remove-new-loose="removeNewLoose"
-        />
+        <v-form ref="refDataForm" class="ref-form-pre" color="background">
+          <PagesWarehouseOrderEdit v-model:input-data="inputData" :actived-tab="activedTab" />
+        </v-form>
       </v-sheet>
     </FPageLayout>
-
-    <v-dialog v-model="bookingEmptyVis" max-width="400" persistent>
-      <v-card
-        :disabled="cardLoading"
-        :loading="cardLoading"
-        prepend-icon="mdi-alert-circle"
-        title="Booking Not Exists."
-      >
-        <template #loader="{ isActive }">
-          <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
-        </template>
-
-        <v-card-text class="pb-2">
-          booking not exists. you can new booking or close page.
-        </v-card-text>
-
-        <template #actions>
-          <v-spacer />
-          <v-btn :text="t('$vuetify.custom.dialog.btn.close')" @click="closeBookingPageHandle" />
-          <v-btn color="primary" text="New Booking" variant="tonal" @click="newBookingHandle" />
-        </template>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="convertToShipmentDiaVis" max-width="520" persistent>
-      <v-card
-        :disabled="cardLoading"
-        :loading="cardLoading"
-        prepend-icon="mdi-alert-circle"
-        title="Convert to Shipment"
-      >
-        <template #loader="{ isActive }">
-          <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
-        </template>
-
-        <v-card-text class="py-2">
-          <div>Are you sure to convert the booking to shipment?</div>
-
-          <div class="mt-2 d-flex align-center ga-1">
-            <div class="text-body-1">Create Auto Consol:</div>
-
-            <v-radio-group
-              v-model="convertIsCreateConsol"
-              density="comfortable"
-              hide-details
-              inline
-            >
-              <v-radio color="info" label="YES" value="Y" />
-              <v-radio class="ml-4" color="warning" label="No" value="N" />
-            </v-radio-group>
-          </div>
-        </v-card-text>
-
-        <template #actions>
-          <v-spacer />
-
-          <v-btn
-            :text="t('$vuetify.custom.dialog.btn.close')"
-            @click="onCloseConvertToShipmentDiaVis"
-          />
-
-          <v-btn
-            color="primary"
-            :text="t('$vuetify.custom.dialog.btn.confirm')"
-            variant="tonal"
-            @click="onConfirmConvertToShipmentWithLockCheck"
-          />
-        </template>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
 <script setup>
-  import { computed, onActivated, onMounted, watch } from 'vue'
+  import { onActivated, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
 
   import { organizationQueryOrgAddress } from '@/api/organization'
+  import { whsOrderSave } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
-  import { saveWhsOrderFromForm } from '@/composables/mapWhsOrderDetail'
-  import { useBookingForm } from '@/composables/useBookingForm'
-  import {
-    formatWhsTabTitle,
-    resolveWhsConsignNo,
-    scheduleWhsBookingTabSync,
-  } from '@/composables/useWarehouseBookingTab'
+  import { useUnsavedInputDataGuard } from '@/composables/useUnsavedInputDataGuard'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'WarehouseBookingNew' })
@@ -143,71 +56,162 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      tabTitle: 'WHS-{shipment_no}',
+      tabTitle: 'New Warehouse',
     },
   })
 
-  const route = useRoute()
   const router = useRouter()
+  const route = useRoute()
   const appStore = useAppStore()
   const { t } = useLocale()
 
-  const {
-    skeletonLoading,
-    cardLoading,
-    activedTab,
-    bookingEmptyVis,
-    convertToShipmentDiaVis,
-    inputData,
-    inputDataRules,
-    convertToShipmentCheck,
-    convertIsCreateConsol,
-    queryPortList,
-    queryAllUserList,
-    queryPort,
-    queryAllUser,
-    queryData,
-    addNewContainer,
-    removeNewContainer,
-    onSaveHandle,
-    registerFormRefs,
-    addNewLoose,
-    removeNewLoose,
-    onConfirmConvertToShipmentHandle,
-    onCloseConvertToShipmentDiaVis,
-  } = useBookingForm({ isEditMode: false, saveLoader: saveWhsOrderFromForm })
+  const skeletonLoading = ref(true)
+  const cardLoading = ref(false)
+  const activedTab = ref(1)
 
-  const newPageTabTitle = computed(() =>
-    formatWhsTabTitle(resolveWhsConsignNo({ route, inputData: inputData.value })),
-  )
+  const defaultData = () => ({
+    id: 0,
+    pk: '',
+    wso_transport_mode: 'SEA',
+    wso_packing_mode: 'FCL',
+    shipper: {},
+    consignee: {},
+    notify_party: {
+      add_address_name: 'SAME AS CONSIGNEE',
+    },
+    item_list: [],
+    inbound_list: [],
+    outbound_list: [],
+    e_docs_list: [],
+    wso_unit_of_weight: 'KG',
+    wso_actual_chargeable_unit: 'KG',
+    wso_volume_weight_unit: 'KG',
+    wso_unit_of_volume: 'M3',
+    wso_pack_type: 'CTN',
+    wso_pack_type_desc: 'Carton',
+    notify_party_same_as_consignee: 'Y',
+    wso_so_number: '',
+    wso_po_number: '',
+    wso_actual_chargeable: null,
+    wso_volume_weight: null,
+  })
 
-  const syncNewPageTabTitle = () => {
-    scheduleWhsBookingTabSync(appStore, {
-      tabValue: 'warehouse_booking_new',
-      route,
-      router,
-      inputData: inputData.value,
-    })
+  const inputData = ref(defaultData())
+  // 注册 inputData 未保存检查；查询完成或保存成功后刷新已保存快照。
+  const { markInputDataSaved } = useUnsavedInputDataGuard(inputData)
+  const queryData = async () => {
+    try {
+      cardLoading.value = true
+      skeletonLoading.value = false
+      const orgCode = appStore.userSession.session()?.org_header_code
+      if (orgCode) {
+        const { success, data } = await organizationQueryOrgAddress({
+          query: orgCode,
+          address_type: 'SHIPPER',
+        })
+        if (success) {
+          const items = data?.items ?? []
+          if (items.length > 0) {
+            applyOrgRowToShipper(inputData.value.shipper, items[0])
+          }
+        }
+      }
+
+      markInputDataSaved()
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
+    }
+  }
+  const refDataForm = ref(null)
+
+  const onSaveHandle = async () => {
+    const { valid, errors } = await refDataForm.value.validate()
+    if (valid) {
+      try {
+        cardLoading.value = true
+        switch (activedTab.value) {
+          case 1:
+          case 2:
+          case 3:
+          case 5: {
+            await saveBookingTab()
+            break
+          }
+          case 4: {
+            break
+          }
+          default: {
+            appStore.openMessage({
+              content: 'Unknown tab.',
+              color: 'warning',
+            })
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        cardLoading.value = false
+      }
+    } else {
+      let errList = []
+      if (errors && errors.length > 0) {
+        const err = []
+        for (let i = 0; i < errors.length; i++) {
+          const e = errors[i]
+          const msg =
+            e.errorMessages && e.errorMessages.length > 0 ? e.errorMessages[0] : 'data valid fail.'
+
+          if (e.id.indexOf('@') >= 0) {
+            const tab = e.id.split('@')[0]
+            if (!Number.isNaN(Number(tab)) && Number(tab) > 0) {
+              err.push({ tab: Number(tab), msg })
+            }
+          } else {
+            err.push({ tab: 1, msg })
+          }
+        }
+        if (err.length > 0) {
+          errList = err.map(item => item).sort((a, b) => a.tab - b.tab)
+        }
+      }
+      if (errList.length > 0) {
+        activedTab.value = errList[0].tab
+        appStore.openMessage({
+          content: errList[0].msg,
+          color: 'error',
+        })
+      } else {
+        appStore.openMessage({
+          content: 'data valid fail.',
+          color: 'error',
+        })
+      }
+    }
   }
 
-  const onConfirmConvertToShipmentWithLockCheck = async () => {
-    await onConfirmConvertToShipmentHandle()
-  }
+  const saveBookingTab = async () => {
+    const { success, data } = await whsOrderSave(inputData.value)
 
-  const closeBookingPageHandle = () => {
-    setTimeout(() => {
-      appStore.event.trigger('closeTab', route.fullPath)
-    }, 100)
-    bookingEmptyVis.value = false
-    router.replace({ name: 'warehouse_booking' })
-  }
+    if (success && data) {
+      markInputDataSaved()
+      appStore.openMessage({
+        content: t('$vuetify.custom.app.saveSuccess'),
+        color: 'success',
+      })
 
-  const newBookingHandle = () => {
-    setTimeout(() => {
-      appStore.event.trigger('closeTab', route.fullPath)
-    }, 100)
-    bookingEmptyVis.value = false
-    router.push({ name: 'warehouse_booking_new' })
+      const consignNo = data?.wso_consign_no
+      inputData.value.id = data.id ?? 0
+      inputData.value.pk = data.pk
+      markInputDataSaved()
+
+      await router.push({
+        name: 'warehouse_booking_edit-pk',
+        params: { pk: data.pk },
+        query: { id: data.id, wso_consign_no: consignNo },
+      })
+    }
   }
 
   const applyOrgRowToShipper = (shipper, row) => {
@@ -231,44 +235,38 @@
     shipper.add_port_code = row.port_code
   }
 
-  /** 列表点 New 进入本页时：用 userSession.org_code 预填 Shipper（编辑页不经过此文件） */
-  const prefillShipperFromSession = async () => {
-    const orgCode = appStore.userSession.session()?.org_header_code
-    if (!orgCode) {
-      return
-    }
-    if (inputData.value.shipper?.add_address_name) {
-      return
-    }
+  // /** 列表点 New 进入本页时：用 userSession.org_code 预填 Shipper（编辑页不经过此文件） */
+  // const prefillShipperFromSession = async () => {
+  //   const orgCode = appStore.userSession.session()?.org_header_code
+  //   if (!orgCode) {
+  //     return
+  //   }
+  //   if (inputData.value.shipper?.add_address_name) {
+  //     return
+  //   }
 
-    try {
-      const { success, data } = await organizationQueryOrgAddress({
-        query: orgCode,
-        address_type: 'SHIPPER',
-      })
-      const items = data?.items ?? []
-      if (!success || items.length === 0) {
-        return
-      }
+  //   try {
+  //     const { success, data } = await organizationQueryOrgAddress({
+  //       query: orgCode,
+  //       address_type: 'SHIPPER',
+  //     })
+  //     const items = data?.items ?? []
+  //     if (!success || items.length === 0) {
+  //       return
+  //     }
 
-      if (!inputData.value.shipper || typeof inputData.value.shipper !== 'object') {
-        inputData.value.shipper = {}
-      }
-      applyOrgRowToShipper(inputData.value.shipper, items[0])
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  //     if (!inputData.value.shipper || typeof inputData.value.shipper !== 'object') {
+  //       inputData.value.shipper = {}
+  //     }
+  //     applyOrgRowToShipper(inputData.value.shipper, items[0])
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   const initNewBookingPage = async () => {
     await queryData()
-    await prefillShipperFromSession()
-    syncNewPageTabTitle()
   }
-
-  watch(newPageTabTitle, () => {
-    syncNewPageTabTitle()
-  })
 
   onMounted(initNewBookingPage)
   onActivated(initNewBookingPage)
