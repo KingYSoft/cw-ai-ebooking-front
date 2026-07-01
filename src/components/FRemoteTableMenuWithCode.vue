@@ -13,11 +13,25 @@
     />
 
     <FRemoteTableMenu
+      v-if="hasOnNewHandle"
       v-model="model"
       class="f-remote-table-menu-with-code__menu flex-1-1-0"
       v-bind="remoteMenuAttrs"
       @click-clear="onClickClear"
       @on-new-handle="emit('on-new-handle')"
+      @row-select="onRowSelect"
+    >
+      <template v-for="(_, name) in forwardedSlots" :key="name" #[name]="slotProps">
+        <slot :name="name" v-bind="slotProps" />
+      </template>
+    </FRemoteTableMenu>
+
+    <FRemoteTableMenu
+      v-else
+      v-model="model"
+      class="f-remote-table-menu-with-code__menu flex-1-1-0"
+      v-bind="remoteMenuAttrs"
+      @click-clear="onClickClear"
       @row-select="onRowSelect"
     >
       <template v-for="(_, name) in forwardedSlots" :key="name" #[name]="slotProps">
@@ -57,6 +71,14 @@
 
   const emit = defineEmits(['row-select', 'on-new-handle', 'click-clear'])
 
+  const hasOnNewHandle = computed(() => {
+    const internal = getCurrentInstance()
+    const propsV = internal?.vnode?.props || {}
+
+    // Vue 会将事件名转为 onXxx 格式
+    return typeof propsV.onOnNewHandle === 'function'
+  })
+
   const attrs = useAttrs()
   const slots = useSlots()
 
@@ -68,7 +90,7 @@
 
   const remoteMenuAttrs = computed(() => {
     const raw = { ...attrs }
-    const textFieldProps = { ...raw.textFieldProps }
+    const textFieldProps = { ...raw['text-field-props'] }
     const restTextFieldProps = { ...textFieldProps }
     delete restTextFieldProps.minWidth
     delete restTextFieldProps['min-width']
