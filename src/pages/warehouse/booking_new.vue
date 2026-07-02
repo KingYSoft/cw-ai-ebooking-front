@@ -35,10 +35,12 @@
 
 <script setup>
   import { onActivated, onMounted, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
+  import { useWarehouseBookingForm } from '@/composables/useWarehouseBookingForm'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'WarehouseBookingNew' })
@@ -66,8 +68,8 @@
   } = useWarehouseBookingForm()
 
   const appStore = useAppStore()
-  // const router = useRouter()
-  // const route = useRoute()
+  const router = useRouter()
+  const route = useRoute()
   // const { t } = useLocale()
 
   // // 注册 inputData 未保存检查；查询完成或保存成功后刷新已保存快照。
@@ -76,7 +78,6 @@
   const queryData = async () => {
     try {
       cardLoading.value = true
-      skeletonLoading.value = false
       const orgCode = appStore.userSession.session()?.org_header_code
       if (orgCode) {
         const { success, data } = await organizationQueryOrgAddress({
@@ -90,7 +91,7 @@
           }
         }
       }
-
+      skeletonLoading.value = false
       markInputDataSaved()
     } catch (error) {
       console.log(error)
@@ -112,6 +113,11 @@
         case 1:
         case 2: {
           await whsOrderSaveHandle()
+          router.push({
+            name: 'warehouse_booking_edit-pk',
+            params: { pk: inputData.value.pk },
+            query: { id: inputData.value.id, shipment_no: inputData.value.wso_consign_no },
+          })
           break
         }
         default: {

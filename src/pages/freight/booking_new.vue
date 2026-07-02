@@ -1,10 +1,8 @@
 <template>
-  <BookingFormPage title="New Booking" />
+  <PagesFreightBookingFormPage title="New Booking" />
 </template>
 
 <script setup>
-  import BookingFormPage from '@/components/freight/BookingFormPage.vue'
-
   defineOptions({ name: 'BookingNew' })
   definePage({
     name: 'booking_new',

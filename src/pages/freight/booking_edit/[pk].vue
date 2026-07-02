@@ -1,10 +1,8 @@
 <template>
-  <BookingFormPage is-edit-mode />
+  <PagesFreightBookingFormPage is-edit-mode />
 </template>
 
 <script setup>
-  import BookingFormPage from '@/components/freight/BookingFormPage.vue'
-
   defineOptions({ name: 'BookingEdit' })
   definePage({
     name: 'booking_edit-pk',
@@ -15,7 +13,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      tabTitle: 'BK-{shipment_no}',
+      tabTitle: 'BKG-{shipment_no}',
     },
   })
 </script>

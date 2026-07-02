@@ -12,14 +12,20 @@
     </v-btn>
 
     <div class="f-party-detail-card__body">
-      <div v-if="showSameAsConsigneeView" class="f-party-detail-card__line f-party-detail-card__name text-body-2">
+      <div
+        v-if="showSameAsConsigneeView"
+        class="f-party-detail-card__line f-party-detail-card__name text-body-2"
+      >
         SAME AS CONSIGNEE
       </div>
 
       <template v-else>
         <div class="f-party-detail-card__line f-party-detail-card__name text-body-2">
-          <span v-if="party.add_address_code" class="f-party-detail-card__code">{{ party.add_address_code }}</span>
-          <span v-if="party.add_address_name">{{ party.add_address_name }}</span>
+          <span v-if="party?.add_address_code" class="f-party-detail-card__code">
+            {{ party.add_address_code }}
+          </span>
+
+          <span v-if="party?.add_address_name">{{ party.add_address_name }}</span>
         </div>
 
         <div
@@ -45,8 +51,8 @@
     </div>
 
     <div class="d-flex align-center ga-2 text-caption text-medium-emphasis">
-      <span style="flex:1">Tel: {{ displayPhone }}</span>
-      <span style="flex:1">Fax: {{ displayFax }}</span>
+      <span style="flex: 1">Tel: {{ displayPhone }}</span>
+      <span style="flex: 1">Fax: {{ displayFax }}</span>
     </div>
 
     <NewOrgAddressDialog
@@ -131,30 +137,31 @@
 
   const onSaveAddress = async formData => {
     if (!formData) return
-
-    try {
-      saveLoading.value = true
-      const { success, data } = await organizationSaveOrgAddress({
-        ...formData,
-        address_type: props.addressType,
-      })
-      if (success) {
-        const row = data?.address || formData
-        mapDialogToParty(party.value, row)
-        if (props.showSameAsConsignee) {
-          emit('update:sameAsConsigneeFlag', 'N')
-        }
-        appStore.openMessage({
-          color: 'success',
-          content: 'Save success.',
-        })
-        dialogOpen.value = false
-      }
-    } catch (error) {
-      console.log('saveOrgAddress error:', error)
-    } finally {
-      saveLoading.value = false
-    }
+    mapDialogToParty(party.value, formData)
+    dialogOpen.value = false
+    // try {
+    //   saveLoading.value = true
+    //   const { success, data } = await organizationSaveOrgAddress({
+    //     ...formData,
+    //     address_type: props.addressType,
+    //   })
+    //   if (success) {
+    //     const row = data?.address || formData
+    //     mapDialogToParty(party.value, row)
+    //     if (props.showSameAsConsignee) {
+    //       emit('update:sameAsConsigneeFlag', 'N')
+    //     }
+    //     appStore.openMessage({
+    //       color: 'success',
+    //       content: 'Save success.',
+    //     })
+    //     dialogOpen.value = false
+    //   }
+    // } catch (error) {
+    //   console.log('saveOrgAddress error:', error)
+    // } finally {
+    //   saveLoading.value = false
+    // }
   }
 </script>
 

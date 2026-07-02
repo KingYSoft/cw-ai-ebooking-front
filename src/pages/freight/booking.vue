@@ -263,11 +263,11 @@
 
   const tblHeaders = [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
-    { title: 'BookingNo.', key: 'bkg_booking_reference', align: 'start', width: '100px' },
-    { title: 'Status', key: 'booking_status', align: 'start', minWidth: '110px' },
-    { title: 'Trans Mode', key: 'bkg_transport_mode', align: 'start', minWidth: '90px' },
-    { title: 'Container Mode', key: 'bkg_packing_mode', align: 'start', minWidth: '110px' },
-    { title: 'Shipment No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
+    { title: 'Booking No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
+    { title: 'Status', key: 'bkg_status', align: 'start', minWidth: '100px' },
+    { title: 'Trans Mode', key: 'bkg_transport_mode', align: 'start', minWidth: '120px' },
+    { title: 'Container Mode', key: 'bkg_packing_mode', align: 'start', minWidth: '140px' },
+    // { title: 'Shipment No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
     { title: 'House Bill', key: 'bkg_house_bill', align: 'start', minWidth: '120px' },
     {
       title: 'Shipper Name',
@@ -290,9 +290,9 @@
     { title: 'CRD', key: 'bkg_cargo_ready', align: 'start', minWidth: '100px' },
     { title: 'ETD', key: 'bkg_etd', align: 'start', minWidth: '100px' },
     { title: 'ETA', key: 'bkg_eta', align: 'start', minWidth: '100px' },
-    { title: 'Gross Weight', key: 'bkg_actual_weight', align: 'start', minWidth: '110px' },
+    { title: 'Gross Weight', key: 'bkg_actual_weight', align: 'start', minWidth: '120px' },
     { title: 'CBM', key: 'bkg_actual_volume', align: 'start', minWidth: '80px' },
-    { title: 'Freight Term', key: 'bkg_freight_terms', align: 'start', minWidth: '100px' },
+    { title: 'Freight Term', key: 'bkg_freight_terms', align: 'start', minWidth: '120px' },
     { title: 'Inco', key: 'bkg_inco', align: 'start', minWidth: '80px' },
   ]
 
@@ -338,7 +338,10 @@
       if (success && data) {
         const items = data.items ?? []
         tblItems.value = items.map((item, index) =>
-          mapBookingListRow(item, (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1),
+          mapBookingListRow(
+            item,
+            (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1,
+          ),
         )
         totalCount.value = data.totalCount || 0
       } else {

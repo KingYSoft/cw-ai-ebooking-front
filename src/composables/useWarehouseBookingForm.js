@@ -103,6 +103,7 @@ export function useWarehouseBookingForm() {
 
       inputData.value.id = data.id ?? 0
       inputData.value.pk = data.pk
+      inputData.value.wso_consign_no = data.wso_consign_no
       markInputDataSaved()
       return true
     }

@@ -1,5 +1,10 @@
-// import service from './index'
+import service from './index'
 
-const ok = (data = null) => Promise.resolve({ success: true, data })
-
-export const queryContainerTypeList = () => ok({ items: [], totalCount: 0 })
+/** List for combobox / remote menu; params: `{ query?: string }` */
+export const queryContainerTypeList = params => {
+  return service({
+    url: '/dict/query-container-type-list',
+    method: 'get',
+    params,
+  })
+}

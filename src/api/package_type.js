@@ -1,5 +1,5 @@
-﻿// import service from './index'
+﻿import service from './index'
 
-const ok = (data = null) => Promise.resolve({ success: true, data })
-
-export const queryPackageTypeList = () => ok({ items: [], totalCount: 0 })
+/** Lightweight list for combobox / remote menu; params: `{ query?: string }` */
+export const queryPackageTypeList = params =>
+  service({ url: '/package-type/query-list', method: 'get', params })
