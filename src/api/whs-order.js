@@ -24,6 +24,14 @@ export const whsOrderSave = data =>
     data,
   })
 
+/** POST /whs-order/submit — 提交 */
+export const whsOrderSubmit = pk =>
+  service({
+    url: '/whs-order/submit',
+    method: 'post',
+    data: { pk },
+  })
+
 /** @deprecated 使用 whsOrderQueryPage */
 export const pageWhsOrder = whsOrderQueryPage
 

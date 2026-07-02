@@ -35,9 +35,19 @@
             :disabled="cardLoading || isEditLockedByOther"
             size="small"
             variant="flat"
-            @click.stop="onSaveWithLockCheck"
+            @click.stop="onSaveHandle"
           >
             Save
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            :disabled="cardLoading || isEditLockedByOther"
+            size="small"
+            variant="tonal"
+            @click.stop="onSubmitClick"
+          >
+            Submit
           </v-btn>
         </template>
       </LayoutWithToolbar>
@@ -79,6 +89,29 @@
         </template>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="submitConfirmVis" max-width="420" persistent>
+      <v-card
+        :disabled="cardLoading"
+        :loading="cardLoading"
+        prepend-icon="mdi-send-check-outline"
+        title="Confirm Submit"
+      >
+        <template #loader="{ isActive }">
+          <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
+        </template>
+
+        <v-card-text class="pb-2">
+          Are you sure you want to submit this warehouse order?
+        </v-card-text>
+
+        <template #actions>
+          <v-spacer />
+          <v-btn text="Cancel" variant="text" @click="submitConfirmVis = false" />
+          <v-btn color="primary" text="Submit" variant="flat" @click="onSubmitConfirm" />
+        </template>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -86,7 +119,7 @@
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
-  import { whsOrderDetail, whsOrderSave } from '@/api/whs-order'
+  import { whsOrderDetail, whsOrderSave, whsOrderSubmit } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
@@ -122,6 +155,7 @@
   const cardLoading = ref(false)
   const activedTab = ref(1)
   const bookingEmptyVis = ref(false)
+  const submitConfirmVis = ref(false)
 
   const defaultData = () => ({
     id: 0,
@@ -213,87 +247,96 @@
 
   const refDataForm = ref(null)
 
+  const handleValidationErrors = errors => {
+    let errList = []
+    if (errors && errors.length > 0) {
+      const err = []
+      for (let i = 0; i < errors.length; i++) {
+        const e = errors[i]
+        const msg =
+          e.errorMessages && e.errorMessages.length > 0 ? e.errorMessages[0] : 'data valid fail.'
+
+        if (e.id.indexOf('@') >= 0) {
+          const tab = e.id.split('@')[0]
+          if (!Number.isNaN(Number(tab)) && Number(tab) > 0) {
+            err.push({ tab: Number(tab), msg })
+          }
+        } else {
+          err.push({ tab: 1, msg })
+        }
+      }
+      if (err.length > 0) {
+        errList = err.map(item => item).sort((a, b) => a.tab - b.tab)
+      }
+    }
+    if (errList.length > 0) {
+      activedTab.value = errList[0].tab
+      appStore.openMessage({
+        content: errList[0].msg,
+        color: 'error',
+      })
+    } else {
+      appStore.openMessage({
+        content: 'data valid fail.',
+        color: 'error',
+      })
+    }
+  }
   const onSaveHandle = async () => {
+    if (!editLockGuard.ensureCanSave()) {
+      return
+    }
     if (checkBookingLocked()) {
       return
     }
     const { valid, errors } = await refDataForm.value.validate()
-    if (valid) {
-      try {
-        cardLoading.value = true
-        switch (activedTab.value) {
-          case 1:
-          case 2:
-          case 3:
-          case 5: {
-            await saveBookingTab()
-            break
-          }
-          case 4: {
-            break
-          }
-          default: {
-            appStore.openMessage({
-              content: 'Unknown tab.',
-              color: 'warning',
-            })
-          }
+    if (!valid) {
+      handleValidationErrors(errors)
+      return
+    }
+    try {
+      cardLoading.value = true
+      switch (activedTab.value) {
+        case 1:
+        case 2: {
+          await saveBookingTab()
+          break
         }
-      } catch (error) {
-        console.log(error)
-      } finally {
-        cardLoading.value = false
-      }
-    } else {
-      let errList = []
-      if (errors && errors.length > 0) {
-        const err = []
-        for (let i = 0; i < errors.length; i++) {
-          const e = errors[i]
-          const msg =
-            e.errorMessages && e.errorMessages.length > 0 ? e.errorMessages[0] : 'data valid fail.'
-
-          if (e.id.indexOf('@') >= 0) {
-            const tab = e.id.split('@')[0]
-            if (!Number.isNaN(Number(tab)) && Number(tab) > 0) {
-              err.push({ tab: Number(tab), msg })
-            }
-          } else {
-            err.push({ tab: 1, msg })
-          }
-        }
-        if (err.length > 0) {
-          errList = err.map(item => item).sort((a, b) => a.tab - b.tab)
+        default: {
+          appStore.openMessage({
+            content: 'Unknown tab.',
+            color: 'warning',
+          })
         }
       }
-      if (errList.length > 0) {
-        activedTab.value = errList[0].tab
-        appStore.openMessage({
-          content: errList[0].msg,
-          color: 'error',
-        })
-      } else {
-        appStore.openMessage({
-          content: 'data valid fail.',
-          color: 'error',
-        })
-      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
     }
   }
 
-  const saveBookingTab = async () => {
+  /**
+   * save order inputData
+   * @param param0
+   */
+  const saveBookingTab = async ({ showMessage = true } = {}) => {
     const { success, data } = await whsOrderSave(inputData.value)
 
     if (success && data) {
-      appStore.openMessage({
-        content: t('$vuetify.custom.app.saveSuccess'),
-        color: 'success',
-      })
+      if (showMessage) {
+        appStore.openMessage({
+          content: t('$vuetify.custom.app.saveSuccess'),
+          color: 'success',
+        })
+      }
 
       inputData.value.id = data.id ?? 0
       inputData.value.pk = data.pk
       markInputDataSaved()
+      return true
     }
+    return false
   }
 
   const checkBookingLocked = () => {
@@ -322,11 +365,45 @@
     })
   }
 
-  const onSaveWithLockCheck = async () => {
+  const onSubmitClick = () => {
     if (!editLockGuard.ensureCanSave()) {
       return
     }
-    await onSaveHandle()
+    if (checkBookingLocked()) {
+      return
+    }
+    submitConfirmVis.value = true
+  }
+
+  const onSubmitConfirm = async () => {
+    submitConfirmVis.value = false
+
+    const { valid, errors } = await refDataForm.value.validate()
+    if (!valid) {
+      handleValidationErrors(errors)
+      return
+    }
+
+    try {
+      cardLoading.value = true
+      const saved = await saveBookingTab({ showMessage: false })
+      if (!saved) {
+        return
+      }
+      const pk = inputData.value.pk || route.params.pk?.toString()
+      const { success } = await whsOrderSubmit(pk)
+      if (success) {
+        appStore.openMessage({
+          content: 'Warehouse order submitted.',
+          color: 'success',
+        })
+        markInputDataSaved()
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
+    }
   }
 
   const loadData = async () => {
