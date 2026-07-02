@@ -6,14 +6,9 @@
           v-model:input-data="inputData"
           :input-data-rules="inputDataRules"
           :query-port-list="queryPortList"
-          @add-container="addNewContainer"
-          @add-new-loose="addNewLoose"
           @on-clear-addr="OnClearAddr"
-          @on-new-handle="onNewHandle"
           @on-select-addr="onSelectAddr"
           @query-port="queryPort"
-          @remove-container="removeNewContainer"
-          @remove-new-loose="removeNewLoose"
         />
       </div>
     </v-scroll-x-transition>
@@ -39,26 +34,16 @@
         />
       </div>
     </v-scroll-x-transition>
-
-    <!-- Organization Address Dialog -->
-    <NewOrgAddressDialog
-      v-model="orgAddressDialog"
-      :address-type="orgAddressType"
-      :save-loading="orgAddressLoading"
-      @save="saveOrgAddress"
-    />
   </v-sheet>
 </template>
 
 <script setup>
   import { ref, toRefs } from 'vue'
   import { useLocale } from 'vuetify'
-  import { organizationSaveOrgAddress } from '@/api/organization'
   import { portCodeQueryOptions } from '@/api/port_code'
   import { debounceFn } from '@/api/utils'
   import BookingEDocs from '@/components/business/booking/BookingEDocs.vue'
   import BookingLogs from '@/components/business/booking/BookingLogs.vue'
-  import NewOrgAddressDialog from '@/components/business/NewOrgAddressDialog.vue'
   import { useAppStore } from '@/stores/app'
   import WarehouseItemDetail from './warehouse_order/WarehouseItemDetail.vue'
   import WarehouseOrderDetail from './warehouse_order/WarehouseOrderDetail.vue'
@@ -72,7 +57,7 @@
       default: 1,
     },
   })
-  const emit = defineEmits(['input-data:update'])
+  // const emit = defineEmits([])
 
   const { activedTab } = toRefs(props)
 
@@ -82,61 +67,6 @@
       return {}
     },
   })
-
-  const addNewContainer = () => {
-    if (!inputData.value) {
-      return
-    }
-    const c = {
-      id: Date.now(),
-      pac_package_count: inputData.value.wso_total_package_count,
-      pac_pack_type: inputData.value.wso_pack_type,
-      pac_gross_weight: inputData.value.wso_actual_weight,
-      pac_weight_unit: inputData.value.wso_unit_of_weight,
-      pac_actual_volume: inputData.value.wso_actual_volume,
-      pac_actual_volume_uom: inputData.value.wso_unit_of_volume,
-      pac_volume_weight: inputData.value.wso_volume_weight,
-      pac_volume_weight_unit: inputData.value.wso_volume_weight_unit,
-      pac_chargeable_weight: inputData.value.wso_actual_chargeable,
-      pac_chargeable_weight_unit: inputData.value.wso_actual_chargeable_unit,
-      pac_pack_type_desc: inputData.value.wso_pack_type_desc,
-    }
-    inputData.value.pac_list.push(c)
-  }
-
-  const removeNewContainer = index => {
-    if (!inputData.value?.pac_list) {
-      return
-    }
-    inputData.value.pac_list.splice(index, 1)
-  }
-
-  const addNewLoose = () => {
-    if (!inputData.value) {
-      return
-    }
-    const c = {
-      id: Date.now(),
-      pac_package_count: inputData.value.wso_total_package_count,
-      pac_pack_type: inputData.value.wso_pack_type,
-      pac_gross_weight: inputData.value.wso_actual_weight,
-      pac_weight_unit: inputData.value.wso_unit_of_weight,
-      pac_actual_volume: inputData.value.wso_actual_volume,
-      pac_actual_volume_uom: inputData.value.wso_unit_of_volume,
-      pac_volume_weight: inputData.value.wso_volume_weight,
-      pac_volume_weight_unit: inputData.value.wso_volume_weight_unit,
-      pac_chargeable_weight: inputData.value.wso_actual_chargeable,
-      pac_chargeable_weight_unit: inputData.value.wso_actual_chargeable_unit,
-      pac_pack_type_desc: inputData.value.wso_pack_type_desc,
-    }
-    inputData.value.pac_list.push(c)
-  }
-  const removeNewLoose = index => {
-    if (!inputData.value?.pac_list) {
-      return
-    }
-    inputData.value.pac_list.splice(index, 1)
-  }
 
   const queryPortList = ref([])
   const queryPort = debounceFn(async (code, signal) => {
@@ -156,44 +86,6 @@
       //
     }
   })
-
-  // 对话框相关状态
-  const orgAddressDialog = ref(false)
-  const orgAddressLoading = ref(false)
-  const orgAddressType = ref('')
-
-  // 处理新建地址
-  const onNewHandle = addressType => {
-    orgAddressType.value = addressType
-    orgAddressDialog.value = true
-  }
-
-  const saveOrgAddress = async formData => {
-    if (!formData) return
-
-    try {
-      orgAddressLoading.value = true
-      const { success, data } = await organizationSaveOrgAddress({
-        ...formData,
-        address_type: orgAddressType.value || formData.address_type,
-      })
-      if (success) {
-        const row = data?.address
-        if (row) {
-          onSelectAddr(row, orgAddressType.value)
-        }
-        appStore.openMessage({
-          color: 'success',
-          content: 'Save success.',
-        })
-      }
-    } catch (error) {
-      console.log('saveOrgAddress error:', error)
-    } finally {
-      orgAddressLoading.value = false
-      orgAddressDialog.value = false
-    }
-  }
 
   const onSelectAddr = (row, addressType) => {
     if (!row || typeof row !== 'object') {
