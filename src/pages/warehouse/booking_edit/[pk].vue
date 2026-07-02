@@ -118,13 +118,13 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useLocale } from 'vuetify'
-  import { whsOrderDetail, whsOrderSave, whsOrderSubmit } from '@/api/whs-order'
+  // import { useLocale } from 'vuetify'
+  import { whsOrderDetail, whsOrderSubmit } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
-  import { useUnsavedInputDataGuard } from '@/composables/useUnsavedInputDataGuard'
+  import { useWarehouseBookingForm } from '@/composables/useWarehouseBookingForm'
   import {
     formatWhsTabTitle,
     resolveWhsConsignNo,
@@ -146,51 +146,33 @@
     },
   })
 
+  const {
+    inputData,
+    skeletonLoading,
+    cardLoading,
+    activedTab,
+    whsOrderSaveHandle,
+    handleValidationErrors,
+    markInputDataSaved,
+  } = useWarehouseBookingForm()
+
   const router = useRouter()
   const route = useRoute()
   const appStore = useAppStore()
-  const { t } = useLocale()
+  // const { t } = useLocale()
 
-  const skeletonLoading = ref(true)
-  const cardLoading = ref(false)
-  const activedTab = ref(1)
+  // const skeletonLoading = ref(true)
+  // const cardLoading = ref(false)
+  // const activedTab = ref(1)
   const bookingEmptyVis = ref(false)
   const submitConfirmVis = ref(false)
 
-  const defaultData = () => ({
-    id: 0,
-    pk: '',
-    wso_transport_mode: 'SEA',
-    wso_packing_mode: 'FCL',
-    shipper: {},
-    consignee: {},
-    notify_party: {
-      add_address_name: 'SAME AS CONSIGNEE',
-    },
-    item_list: [],
-    inbound_list: [],
-    outbound_list: [],
-    e_docs_list: [],
-    wso_unit_of_weight: 'KG',
-    wso_actual_chargeable_unit: 'KG',
-    wso_volume_weight_unit: 'KG',
-    wso_unit_of_volume: 'M3',
-    wso_pack_type: 'CTN',
-    wso_pack_type_desc: 'Carton',
-    notify_party_same_as_consignee: 'Y',
-    wso_so_number: '',
-    wso_po_number: '',
-    wso_actual_chargeable: null,
-    wso_volume_weight: null,
-  })
-
   const applyBookingInput = el => {
     if (!el || typeof el !== 'object') {
-      inputData.value = defaultData()
       return
     }
 
-    inputData.value = Object.assign({}, defaultData(), el, {
+    inputData.value = Object.assign({}, el, {
       pk: el.pk ?? '',
       shipper: el.shipper || {},
       consignee: el.consignee || {},
@@ -215,7 +197,8 @@
     }
   }
 
-  const inputData = ref(defaultData())
+  // // 注册 inputData 未保存检查；查询完成或保存成功后刷新已保存快照。
+  // const { markInputDataSaved } = useUnsavedInputDataGuard(inputData)
 
   const editLockGuard = useEditLockGuard({
     businessType: 'warehouse_order',
@@ -223,9 +206,6 @@
   })
   const isEditLockedByOther = computed(() => editLockGuard.isSaveBlocked.value)
   const editLockWarningText = computed(() => editLockGuard.lockWarningText.value)
-
-  // 注册 inputData 未保存检查；查询完成或保存成功后刷新已保存快照。
-  const { markInputDataSaved } = useUnsavedInputDataGuard(inputData)
 
   const queryData = async pk => {
     try {
@@ -246,42 +226,6 @@
   }
 
   const refDataForm = ref(null)
-
-  const handleValidationErrors = errors => {
-    let errList = []
-    if (errors && errors.length > 0) {
-      const err = []
-      for (let i = 0; i < errors.length; i++) {
-        const e = errors[i]
-        const msg =
-          e.errorMessages && e.errorMessages.length > 0 ? e.errorMessages[0] : 'data valid fail.'
-
-        if (e.id.indexOf('@') >= 0) {
-          const tab = e.id.split('@')[0]
-          if (!Number.isNaN(Number(tab)) && Number(tab) > 0) {
-            err.push({ tab: Number(tab), msg })
-          }
-        } else {
-          err.push({ tab: 1, msg })
-        }
-      }
-      if (err.length > 0) {
-        errList = err.map(item => item).sort((a, b) => a.tab - b.tab)
-      }
-    }
-    if (errList.length > 0) {
-      activedTab.value = errList[0].tab
-      appStore.openMessage({
-        content: errList[0].msg,
-        color: 'error',
-      })
-    } else {
-      appStore.openMessage({
-        content: 'data valid fail.',
-        color: 'error',
-      })
-    }
-  }
   const onSaveHandle = async () => {
     if (!editLockGuard.ensureCanSave()) {
       return
@@ -299,7 +243,7 @@
       switch (activedTab.value) {
         case 1:
         case 2: {
-          await saveBookingTab()
+          await whsOrderSaveHandle()
           break
         }
         default: {
@@ -314,29 +258,6 @@
     } finally {
       cardLoading.value = false
     }
-  }
-
-  /**
-   * save order inputData
-   * @param param0
-   */
-  const saveBookingTab = async ({ showMessage = true } = {}) => {
-    const { success, data } = await whsOrderSave(inputData.value)
-
-    if (success && data) {
-      if (showMessage) {
-        appStore.openMessage({
-          content: t('$vuetify.custom.app.saveSuccess'),
-          color: 'success',
-        })
-      }
-
-      inputData.value.id = data.id ?? 0
-      inputData.value.pk = data.pk
-      markInputDataSaved()
-      return true
-    }
-    return false
   }
 
   const checkBookingLocked = () => {
@@ -386,7 +307,7 @@
 
     try {
       cardLoading.value = true
-      const saved = await saveBookingTab({ showMessage: false })
+      const saved = await whsOrderSaveHandle({ showMessage: false })
       if (!saved) {
         return
       }

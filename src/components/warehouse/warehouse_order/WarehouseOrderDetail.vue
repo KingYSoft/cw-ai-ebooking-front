@@ -859,10 +859,9 @@
 <script setup>
   import Decimal from 'decimal.js'
   import { computed, ref, toRefs } from 'vue'
-  import { useDisplay, useLocale } from 'vuetify'
-  import { organizationQueryOrgAddress, organizationQueryOrgCarrier } from '@/api/organization'
+  import { useLocale } from 'vuetify'
+  import { organizationQueryOrgAddress } from '@/api/organization'
   import { queryServiceLevelPage } from '@/api/service_level'
-  import { debounceFn } from '@/api/utils'
   import FDatePicker from '@/components/FDatePicker.vue'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -880,7 +879,7 @@
   })
 
   const appStore = useAppStore()
-  const display = useDisplay()
+  // const display = useDisplay()
   const { t } = useLocale()
   const { rescols } = useLayoutCols()
 
@@ -895,6 +894,21 @@
     },
   })
   const { inputDataRules, queryPortList } = toRefs(props)
+
+  const emit = defineEmits(['query-port', 'on-select-addr', 'on-clear-addr'])
+
+  const queryPort = value => {
+    emit('query-port', value)
+  }
+
+  const onSelectAddr = (event, type) => {
+    emit('on-select-addr', event, type)
+  }
+
+  const OnClearAddr = type => {
+    emit('on-clear-addr', type)
+  }
+
   const convertRequiredRule = fieldLabel => {
     return value => {
       return String(value ?? '').trim() !== '' || `${fieldLabel} is required.`
@@ -951,84 +965,12 @@
 
   const bkgEtaRules = computed(() => [...convertRequiredRules.value.eta, validateBookingEtaVsEtd()])
 
-  const bkgCargoReadyRulesWithOrder = computed(() => [
-    ...(inputDataRules.value.wso_cargo_ready ?? []),
-    validateBookingEtdNotBeforeCargoReady(),
-  ])
-
   const inputData = defineModel('input-data', {
     type: Object,
     default: () => {
       return {}
     },
   })
-
-  const emit = defineEmits([
-    'add-container',
-    'add-new-loose',
-    'on-new-handle',
-    'query-port',
-    'remove-container',
-    'remove-new-loose',
-    'on-select-addr',
-    'query-all-user',
-    'register-form-refs',
-    'on-clear-addr',
-  ])
-
-  const addNewContainer = () => {
-    emit('add-container')
-  }
-
-  const addNewLoose = () => {
-    emit('add-new-loose')
-  }
-
-  const onNewHandle = type => {
-    emit('on-new-handle', type)
-  }
-
-  const queryPort = value => {
-    emit('query-port', value)
-  }
-
-  const queryCarrierList = ref([])
-  const queryCarrier = debounceFn(async (inputStr, signal) => {
-    try {
-      const { data } = await organizationQueryOrgCarrier(
-        {
-          inputStr: String(inputStr ?? ''),
-        },
-        signal,
-      )
-      queryCarrierList.value = Array.isArray(data?.list) ? data.list : []
-    } catch (error) {
-      console.log(error)
-    }
-  })
-
-  const removeNewContainer = index => {
-    emit('remove-container', index)
-  }
-
-  const removeNewLoose = index => {
-    emit('remove-new-loose', index)
-  }
-
-  const onSelectAddr = (event, type) => {
-    emit('on-select-addr', event, type)
-  }
-
-  const OnClearAddr = type => {
-    emit('on-clear-addr', type)
-  }
-  const queryAllUser = event => {
-    emit('query-all-user', event)
-  }
-
-  const setRef = el => {
-    emit('register-form-refs', el)
-  }
 
   const serviceLevelCodeItems = ref([])
 
