@@ -258,7 +258,6 @@
 <script setup>
   import { ref, toRefs } from 'vue'
   import { useLocale } from 'vuetify'
-  import { queryServiceLevelPage } from '@/api/service_level'
   import { getWhsMarketOptions } from '@/api/whs-market'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -325,7 +324,6 @@
     inputData.value.item_list.splice(index, 1)
   }
 
-  const serviceLevelCodeItems = ref([])
   const marketOptions = ref([])
 
   const filterMarketOption = (_value, query, item) => {
@@ -370,23 +368,7 @@
       marketOptions.value = []
     }
   }
-
-  const loadServiceLevelCodes = async () => {
-    try {
-      const res = await queryServiceLevelPage({
-        SkipCount: 0,
-        MaxResultCount: 9999,
-        filters: [],
-      })
-      const items = res?.data?.items ?? []
-      serviceLevelCodeItems.value = items.map(item => item?.code).filter(code => Boolean(code))
-    } catch (error) {
-      console.error('loadServiceLevelCodes failed:', error)
-      serviceLevelCodeItems.value = []
-    }
-  }
   loadMarketOptions()
-  loadServiceLevelCodes()
 
   const tblContainerHeaders = [
     { title: '', key: 'actions', width: '50px', align: 'center' },

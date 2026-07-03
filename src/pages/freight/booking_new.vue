@@ -1,5 +1,5 @@
 <template>
-  <PagesFreightBookingFormPage title="New Booking" />
+  <PagesFreightBookingFormPage page-title="New Booking" />
 </template>
 
 <script setup>
