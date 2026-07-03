@@ -1,14 +1,280 @@
 <template>
   <div>
     <v-card-text class="py-2">
-      <v-divider class="mt-2">
-        <div class="mt-2 text-center text-caption text-uppercase text-on-surface opacity-70">
-          Party Detail
+      <v-row>
+        <v-col :cols="rescols('c12l4s6')">
+          <v-divider>
+            <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
+              Shipper
+            </div>
+          </v-divider>
+
+          <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+            <FRemoteTableMenu
+              id="1@shipper_name"
+              v-model="inputData.shipper.add_address_name"
+              bind-key="code"
+              :bind-value="inputData.shipper.add_address_code"
+              display-key="company_name"
+              :fetch-method="organizationQueryOrgAddress"
+              :headers="addrTableHeaders"
+              :query-extra="{ address_type: 'SHIPPER' }"
+              :text-field-props="{
+                'min-width': '100%',
+                readonly: true,
+                rules: inputDataRules.shipper_name,
+              }"
+              virtual
+              @click-clear="onClearAddr('SHIPPER')"
+              @row-select="onSelectAddr($event, 'SHIPPER')"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">
+                  Name<span class="text-red">*</span>:
+                </div>
+              </template>
+            </FRemoteTableMenu>
+
+            <v-text-field
+              v-model="inputData.shipper.add_address1"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address1:</div>
+              </template>
+            </v-text-field>
+
+            <v-text-field
+              v-model="inputData.shipper.add_address2"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address2:</div>
+              </template>
+            </v-text-field>
+
+            <v-text-field
+              v-model="inputData.shipper.add_address3"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address3:</div>
+              </template>
+            </v-text-field>
+          </div>
+        </v-col>
+
+        <v-col :cols="rescols('c12l4s6')">
+          <v-divider>
+            <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
+              Consignee
+            </div>
+          </v-divider>
+
+          <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+            <FRemoteTableMenu
+              id="1@consignee_name"
+              v-model="inputData.consignee.add_address_name"
+              bind-key="code"
+              :bind-value="inputData.consignee.add_address_code"
+              display-key="company_name"
+              :fetch-method="organizationQueryOrgAddress"
+              :headers="addrTableHeaders"
+              :query-extra="{ address_type: 'CONSIGNEE' }"
+              :text-field-props="{
+                'min-width': '100%',
+                rules: inputDataRules.shipper_name,
+              }"
+              virtual
+              @click-clear="onClearAddr('CONSIGNEE')"
+              @row-select="onSelectAddr($event, 'CONSIGNEE')"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">
+                  Name<span class="text-red">*</span>:
+                </div>
+              </template>
+            </FRemoteTableMenu>
+
+            <v-text-field
+              v-model="inputData.consignee.add_address1"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address1:</div>
+              </template>
+            </v-text-field>
+
+            <v-text-field
+              v-model="inputData.consignee.add_address2"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address2:</div>
+              </template>
+            </v-text-field>
+
+            <v-text-field
+              v-model="inputData.consignee.add_address3"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address3:</div>
+              </template>
+            </v-text-field>
+          </div>
+        </v-col>
+
+        <v-col :cols="rescols('c12l4s6')">
+          <v-divider>
+            <div
+              class="text-center text-caption text-uppercase text-on-surface opacity-70"
+              style="width: 120px"
+            >
+              NOTIFY PARTY
+            </div>
+          </v-divider>
+
+          <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+            <FRemoteTableMenu
+              v-model="inputData.notify_party.add_address_name"
+              bind-key="org_code"
+              :bind-value="inputData.notify_party.add_address_code"
+              display-key="company_name"
+              :fetch-method="organizationQueryOrgAddress"
+              :headers="addrTableHeaders"
+              :query-extra="{ address_type: 'NOTIFY_PARTY' }"
+              :text-field-props="{
+                'min-width': '100%',
+              }"
+              virtual
+              @click-clear="onClearAddr('NOTIFY_PARTY')"
+              @row-select="onSelectAddr($event, 'NOTIFY_PARTY')"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Name:</div>
+              </template>
+
+              <template #append>
+                <v-tooltip location="bottom">
+                  <template #activator="ssss">
+                    <v-checkbox-btn
+                      v-bind="ssss.props"
+                      v-model="inputData.notify_party_same_as_consignee"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      value="Y"
+                      @update:model-value="
+                        $event => {
+                          if ($event === 'Y') {
+                            inputData.notify_party = {
+                              add_address_name: 'SAME AS CONSIGNEE',
+                            }
+                          } else {
+                            inputData.notify_party = {}
+                          }
+                        }
+                      "
+                    />
+                  </template>
+
+                  <span>SAME AS CONSIGNEE</span>
+                </v-tooltip>
+              </template>
+            </FRemoteTableMenu>
+
+            <v-text-field
+              v-model="inputData.notify_party.add_address1"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              :readonly="inputData.notify_party_same_as_consignee === 'Y'"
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address1:</div>
+              </template>
+            </v-text-field>
+
+            <v-text-field
+              v-model="inputData.notify_party.add_address2"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              :readonly="inputData.notify_party_same_as_consignee === 'Y'"
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address2:</div>
+              </template>
+            </v-text-field>
+
+            <v-text-field
+              v-model="inputData.notify_party.add_address3"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              :readonly="inputData.notify_party_same_as_consignee === 'Y'"
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label">Address3:</div>
+              </template>
+            </v-text-field>
+          </div>
+        </v-col>
+      </v-row>
+
+      <!--  <v-divider>
+        <div class="my-1 text-center text-caption text-uppercase text-on-surface opacity-70">
+          SHIPPER / CONSIGNEE / NOTIFY PARTY / PICKUP
         </div>
       </v-divider>
-
-      <v-row class="mt-2" dense>
-        <v-col v-for="block in partyBlocks" :key="block.key" cols="12" md="3" xl="3">
+     <v-row dense>
+        <v-col v-for="block in partyBlocks" :key="block.key" :cols="rescols('c12l3s6')">
           <FPartyDetailCard
             v-model:party="inputData[block.key]"
             :address-type="block.addressType"
@@ -30,253 +296,186 @@
             :rules="[v => !!v || 'Required']"
           />
         </v-col>
-      </v-row>
+      </v-row> -->
 
-      <v-row align="start" class="mt-4 booking-date-row" dense>
-        <v-col cols="12" lg="9">
-          <v-divider>
-            <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-              Date
-            </div>
-          </v-divider>
-
-          <v-row dense>
-            <v-col cols="12" md="4">
-              <div class="d-flex flex-column ga-2">
-                <v-select
-                  v-model="inputData.bkg_transport_mode"
-                  density="compact"
-                  hide-details
-                  item-title="code"
-                  item-value="code"
-                  :items="transportModes"
-                  variant="outlined"
-                  @update:model-value="onTransportChange"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-100">
-                      Transport<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </v-select>
-
-                <v-select
-                  v-model="inputData.bkg_packing_mode"
-                  density="compact"
-                  hide-details
-                  item-title="code"
-                  item-value="code"
-                  :items="containerModes"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-100">
-                      Container<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </v-select>
-
-                <v-text-field
-                  v-model="inputData.bkg_origin"
-                  density="compact"
-                  hide-details
-                  min-width="100%"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-100">
-                      Origin<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </v-text-field>
-
-                <v-text-field
-                  v-model="inputData.bkg_destination"
-                  density="compact"
-                  hide-details
-                  min-width="100%"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-100">
-                      Destination<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </v-text-field>
-              </div>
-            </v-col>
-
-            <v-col cols="12" md="4">
-              <div class="d-flex flex-column ga-2">
-                <FDatePicker
-                  v-model:date-value="inputData.bkg_etd"
-                  max="2099-12-31"
-                  min="2000-01-01"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-100">
-                      ETD<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </FDatePicker>
-
-                <FDatePicker
-                  v-model:date-value="inputData.bkg_eta"
-                  max="2099-12-31"
-                  min="2000-01-01"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-100">ETA:</div>
-                  </template>
-                </FDatePicker>
-
-                <FDatePicker
-                  v-model:date-value="inputData.bkg_cargo_ready"
-                  max="2099-12-31"
-                  min="2000-01-01"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-100">
-                      Cargo Ready Date<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </FDatePicker>
-              </div>
-            </v-col>
-
-            <v-col cols="12" md="4">
-              <div class="d-flex flex-column ga-2">
-                <v-select
-                  v-model="inputData.bkg_inco"
-                  density="compact"
-                  hide-details
-                  :items="incoItems"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-110">
-                      Inco Term<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </v-select>
-
-                <v-select
-                  v-model="inputData.bkg_freight_terms"
-                  density="compact"
-                  hide-details
-                  :items="freightTermItems"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-110">
-                      Freight Terms<span class="text-red">*</span>:
-                    </div>
-                  </template>
-                </v-select>
-
-                <v-number-input
-                  v-model="inputData.bkg_goods_value"
-                  class="hide-step"
-                  control-variant="hidden"
-                  density="compact"
-                  hide-details
-                  :min="0"
-                  min-width="100%"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-110">Cargo Value:</div>
-                  </template>
-
-                  <template #append>
-                    <v-select
-                      v-model="inputData.bkg_goods_value_currency"
-                      density="compact"
-                      hide-details
-                      :items="['USD', 'CNY', 'HKD']"
-                      variant="underlined"
-                      width="60px"
-                    />
-                  </template>
-                </v-number-input>
-
-                <v-number-input
-                  v-model="inputData.bkg_insurance_value"
-                  class="hide-step"
-                  control-variant="hidden"
-                  density="compact"
-                  hide-details
-                  :min="0"
-                  min-width="100%"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-110">Ins. Value:</div>
-                  </template>
-
-                  <template #append>
-                    <v-select
-                      v-model="inputData.bkg_insurance_value_currency"
-                      density="compact"
-                      hide-details
-                      :items="['USD', 'CNY', 'HKD']"
-                      variant="underlined"
-                      width="60px"
-                    />
-                  </template>
-                </v-number-input>
-              </div>
-            </v-col>
-          </v-row>
-        </v-col>
-
-        <v-col class="d-none d-lg-flex justify-center px-0" cols="auto">
-          <v-divider vertical />
-        </v-col>
-
-        <v-col cols="12" lg="3" md="4">
-          <div class="booking-cutoff-panel">
-            <div class="d-flex align-center ga-1 mb-2">
-              <v-icon color="primary" icon="mdi-calendar-clock" size="18" />
-              <span class="text-caption text-uppercase">Cut-off Dates</span>
-            </div>
-
-            <div
-              v-for="item in cutOffFields"
-              :key="item.key"
-              class="d-flex align-center justify-space-between booking-cutoff-row"
-            >
-              <span class="text-caption">{{ item.label }}</span>
-
-              <span class="text-caption text-medium-emphasis">{{
-                inputData[item.key] || '-'
-              }}</span>
-            </div>
-          </div>
-        </v-col>
-      </v-row>
-
-      <v-divider class="mt-2">
-        <div class="mt-2 text-center text-caption text-uppercase text-on-surface opacity-70">
-          Cargo Detail
-        </div>
-      </v-divider>
-
-      <v-row class="mt-2" dense>
-        <v-col cols="12" md="3">
-          <div class="d-flex flex-column ga-2">
-            <v-number-input
-              v-model="inputData.bkg_actual_weight"
-              class="hide-step"
-              control-variant="hidden"
+      <v-row dense>
+        <v-col :cols="rescols('c12l3s6')">
+          <div class="d-flex align-start flex-column flex-wrap ga-1">
+            <v-select
+              id="1@bkg_transport_mode"
+              v-model="inputData.bkg_transport_mode"
+              auto-select-first
+              autocomplete="off"
               density="compact"
               hide-details
-              :min="0"
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('transportMode')"
+              :menu-props="{
+                'max-width': '100%',
+              }"
               min-width="100%"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              :rules="inputDataRules.bkg_transport_mode"
+              variant="outlined"
+              @update:model-value="onTransportChange"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  Transport<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-select>
+
+            <v-select
+              id="1@bkg_packing_mode"
+              v-model="inputData.bkg_packing_mode"
+              auto-select-first
+              autocomplete="off"
+              density="compact"
+              hide-details
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('containerMode')"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              :rules="inputDataRules.bkg_packing_mode"
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-110">
+                <div class="text-caption text-end w-label-100">
+                  Container<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-select>
+
+            <v-autocomplete
+              id="1@bkg_origin"
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
+              density="compact"
+              hide-details
+              item-title="rl_code"
+              item-value="rl_code"
+              :items="queryPortList"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              :model-value="inputData.bkg_origin"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              return-object
+              :rules="inputDataRules.bkg_origin"
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    queryPort(inputData.bkg_origin)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.bkg_origin = $event?.rl_code ?? null
+                  inputData.bkg_origin_name = $event?.rl_port_name ?? null
+                }
+              "
+              @update:search="queryPort"
+            >
+              <template #item="scope">
+                <v-list-item
+                  v-bind="scope.props"
+                  :subtitle="scope.item.raw.rl_port_name"
+                  :title="scope.item.raw.rl_code"
+                />
+              </template>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  Origin<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-autocomplete>
+
+            <v-autocomplete
+              id="1@bkg_destination"
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
+              density="compact"
+              hide-details
+              item-title="rl_code"
+              item-value="rl_code"
+              :items="queryPortList"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              :model-value="inputData.bkg_destination"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              return-object
+              :rules="inputDataRules.bkg_destination"
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    queryPort(inputData.bkg_destination)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.bkg_destination = $event?.rl_code ?? null
+                  inputData.bkg_destination_name = $event?.rl_port_name ?? null
+                }
+              "
+              @update:search="queryPort"
+            >
+              <template #item="scope">
+                <v-list-item
+                  v-bind="scope.props"
+                  :subtitle="scope.item.raw.rl_port_name"
+                  :title="scope.item.raw.rl_code"
+                />
+              </template>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  Destination<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-autocomplete>
+
+            <v-number-input
+              id="1@bkg_actual_weight"
+              v-model="inputData.bkg_actual_weight"
+              class="hide-step"
+              color="primary"
+              control-variant="hidden"
+              density="compact"
+              hide-details
+              :max="999999999.99999"
+              :min="0"
+              :min-fraction-digits="0"
+              min-width="100%"
+              :precision="5"
+              :rules="inputDataRules.bkg_actual_weight"
+              type="input"
+              variant="outlined"
+              @update:model-value="js_w"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
                   Gross Weight<span class="text-red">*</span>:
                 </div>
               </template>
@@ -284,9 +483,18 @@
               <template #append>
                 <v-select
                   v-model="inputData.bkg_unit_of_weight"
+                  auto-select-first
+                  autocomplete="off"
+                  color="primary"
                   density="compact"
                   hide-details
-                  :items="['KG', 'LB']"
+                  item-title="code"
+                  item-value="code"
+                  :items="appStore.appCombobox.getCombobox('weightUnit')"
+                  :list-props="{
+                    density: 'compact',
+                  }"
+                  no-filter
                   variant="underlined"
                   width="50px"
                 />
@@ -294,17 +502,25 @@
             </v-number-input>
 
             <v-number-input
+              id="1@bkg_actual_volume"
               v-model="inputData.bkg_actual_volume"
               class="hide-step"
+              color="primary"
               control-variant="hidden"
               density="compact"
               hide-details
+              :max="999999999.99999"
               :min="0"
+              :min-fraction-digits="0"
               min-width="100%"
+              :precision="5"
+              :rules="inputDataRules.bkg_actual_volume"
+              type="input"
               variant="outlined"
+              @update:model-value="js_w"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-110">
+                <div class="text-caption text-end w-label-100">
                   CBM<span class="text-red">*</span>:
                 </div>
               </template>
@@ -312,109 +528,247 @@
               <template #append>
                 <v-select
                   v-model="inputData.bkg_unit_of_volume"
+                  auto-select-first
+                  autocomplete="off"
+                  color="primary"
                   density="compact"
                   hide-details
-                  :items="['M3', 'CBF']"
+                  item-title="code"
+                  item-value="code"
+                  :items="appStore.appCombobox.getCombobox('cbmUnit')"
+                  :list-props="{
+                    density: 'compact',
+                  }"
+                  no-filter
                   variant="underlined"
                   width="50px"
                 />
               </template>
             </v-number-input>
 
-            <v-text-field
+            <v-number-input
               v-model="inputData.bkg_volume_weight"
+              class="hide-step"
+              color="primary"
+              control-variant="hidden"
               density="compact"
               hide-details
+              :max="999999999.99999"
+              :min="0"
+              :min-fraction-digits="0"
               min-width="100%"
+              :precision="5"
+              type="input"
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-110">Volume Weight:</div>
+                <div class="text-caption text-end w-label-100">Volume Weight:</div>
               </template>
 
               <template #append>
-                <span class="text-caption px-2">{{ inputData.bkg_volume_weight_unit }}</span>
+                <v-select
+                  v-model="inputData.bkg_volume_weight_unit"
+                  auto-select-first
+                  autocomplete="off"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  item-title="code"
+                  item-value="code"
+                  :items="appStore.appCombobox.getCombobox('weightUnit')"
+                  :list-props="{
+                    density: 'compact',
+                  }"
+                  no-filter
+                  variant="underlined"
+                  width="50px"
+                />
               </template>
-            </v-text-field>
+            </v-number-input>
 
-            <v-text-field
+            <v-number-input
               v-model="inputData.bkg_actual_chargeable"
+              class="hide-step"
+              color="primary"
+              control-variant="hidden"
               density="compact"
               hide-details
+              :max="999999999.99999"
+              :min="0"
+              :min-fraction-digits="0"
               min-width="100%"
+              :precision="5"
+              type="input"
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-110">Chargeable Weight:</div>
+                <div class="text-caption text-end w-label-100">Chargeable Weight:</div>
               </template>
 
               <template #append>
-                <span class="text-caption px-2">{{ inputData.bkg_actual_chargeable_unit }}</span>
+                <v-select
+                  v-model="inputData.bkg_actual_chargeable_unit"
+                  auto-select-first
+                  autocomplete="off"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  item-title="code"
+                  item-value="code"
+                  :items="appStore.appCombobox.getCombobox('weightUnit')"
+                  :list-props="{
+                    density: 'compact',
+                  }"
+                  no-filter
+                  variant="underlined"
+                  width="50px"
+                />
               </template>
-            </v-text-field>
+            </v-number-input>
 
             <div class="d-flex align-center ga-0 w-100">
               <v-number-input
+                id="1@bkg_total_package_count"
                 v-model="inputData.bkg_total_package_count"
                 class="hide-step flex-1-1"
+                color="primary"
                 control-variant="hidden"
                 density="compact"
                 hide-details
+                :max="999999999"
                 :min="0"
+                :min-fraction-digits="0"
+                :precision="0"
+                :rules="inputDataRules.bkg_total_package_count"
+                type="input"
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">
+                  <div class="text-caption text-end w-label-100">
                     No. of Package<span class="text-red">*</span>:
                   </div>
                 </template>
               </v-number-input>
 
-              <v-text-field
+              <FRemoteTableMenu
                 v-model="inputData.bkg_pack_type"
-                density="compact"
-                hide-details
-                max-width="78"
-                min-width="78"
-                variant="underlined"
+                display-key="code"
+                :fetch-method="fetchPackageTypes"
+                :headers="packageTypeTableHeaders"
+                item-value="code"
+                query-key="query"
+                :text-field-props="{
+                  color: 'primary',
+                  minWidth: '78',
+                  maxWidth: '78',
+                  variant: 'underlined',
+                  clearable: true,
+                }"
+                virtual
+                @row-select="
+                  row =>
+                    assignPackageTypeFromRow(row, inputData, 'bkg_pack_type', 'bkg_pack_type_desc')
+                "
               />
             </div>
           </div>
         </v-col>
 
-        <v-col cols="12" md="3">
-          <div class="d-flex flex-column ga-2">
+        <v-col :cols="rescols('c12l3s6')">
+          <div class="d-flex align-start flex-column flex-wrap ga-1">
+            <FDatePicker
+              id="1@bkg_etd"
+              v-model:date-value="inputData.bkg_etd"
+              max="2099-12-31"
+              min="2000-01-01"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">ETD:</div>
+              </template>
+            </FDatePicker>
+
+            <FDatePicker
+              id="1@bkg_eta"
+              v-model:date-value="inputData.bkg_eta"
+              max="2099-12-31"
+              min="2000-01-01"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">ETA:</div>
+              </template>
+            </FDatePicker>
+
+            <FDatePicker
+              id="1@bkg_cargo_ready"
+              v-model:date-value="inputData.bkg_cargo_ready"
+              max="2099-12-31"
+              min="2000-01-01"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">Cargo Ready Date:</div>
+              </template>
+            </FDatePicker>
+
             <v-select
+              id="1@bkg_release_type"
               v-model="inputData.bkg_release_type"
+              auto-select-first
+              autocomplete="off"
               density="compact"
               hide-details
-              :items="releaseTypes"
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('releaseType')"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">
-                  Release Type<span class="text-red">*</span>:
-                </div>
+                <div class="text-caption text-end w-label-100">Release Type:</div>
               </template>
             </v-select>
 
-            <v-text-field
+            <v-select
+              id="1@bkg_service_level"
               v-model="inputData.bkg_service_level"
+              auto-select-first
+              autocomplete="off"
               density="compact"
               hide-details
+              item-title="code"
+              item-value="code"
+              :items="serviceLevelOptions"
+              :menu-props="{
+                'max-width': '100%',
+              }"
               min-width="100%"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
               variant="outlined"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">Service Level:</div>
               </template>
-            </v-text-field>
+            </v-select>
 
             <v-select
+              id="1@bkg_delivery_mode"
               v-model="inputData.bkg_delivery_mode"
+              auto-select-first
+              autocomplete="off"
               density="compact"
               hide-details
-              :items="deliveryModes"
+              :items="['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
               variant="outlined"
             >
               <template #prepend>
@@ -424,9 +778,12 @@
 
             <v-text-field
               v-model="inputData.bkg_commodity"
+              color="primary"
               density="compact"
               hide-details
               min-width="100%"
+              :rules="inputDataRules.bkg_commodity"
+              type="input"
               variant="outlined"
             >
               <template #prepend>
@@ -438,37 +795,198 @@
           </div>
         </v-col>
 
-        <v-col cols="12" md="3">
-          <div class="d-flex flex-column ga-2">
-            <FTextInput
-              v-model:text-value="inputData.bkg_goods_description"
+        <v-col :cols="rescols('c12l3s6')">
+          <div class="d-flex align-start flex-column flex-wrap ga-1">
+            <v-select
+              id="1@bkg_inco"
+              v-model="inputData.bkg_inco"
+              auto-select-first
+              autocomplete="off"
+              class="flex-1-1"
+              density="compact"
+              hide-details
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('incoTerm')"
+              :menu-props="{
+                'max-width': '100%',
+              }"
               min-width="100%"
-              :textarea-props="{ rows: 2 }"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              :rules="inputDataRules.bkg_inco"
+              variant="outlined"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Good Desc.<span class="text-red">*</span>:
+                  Inco Term<span class="text-red">*</span>:
                 </div>
+              </template>
+            </v-select>
+
+            <v-select
+              id="1@bkg_freight_terms"
+              v-model="inputData.bkg_freight_terms"
+              auto-select-first
+              autocomplete="off"
+              density="compact"
+              hide-details
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('freightTerms')"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              :rules="inputDataRules.bkg_freight_terms"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  Freight Terms<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-select>
+
+            <v-number-input
+              id="1@bkg_goods_value"
+              v-model="inputData.bkg_goods_value"
+              class="hide-step"
+              color="primary"
+              density="compact"
+              hide-details
+              :max="999999999.99999"
+              :min="0"
+              :min-fraction-digits="0"
+              min-width="100%"
+              :precision="5"
+              :rules="inputDataRules.bkg_goods_value"
+              type="input"
+              variant="outlined"
+              @update:model-value="
+                () => {
+                  if (inputData.bkg_goods_value === null) {
+                    inputData.bkg_goods_value_currency = null
+                  } else {
+                    if (inputData.bkg_goods_value_currency) {
+                      //
+                    } else {
+                      inputData.bkg_goods_value_currency = 'USD'
+                    }
+                  }
+                }
+              "
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">Cargo Value:</div>
+              </template>
+
+              <template #append>
+                <v-select
+                  id="1@bkg_goods_value_currency"
+                  v-model="inputData.bkg_goods_value_currency"
+                  auto-select-first
+                  autocomplete="off"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  item-title="code"
+                  item-value="code"
+                  :items="appStore.appCombobox.getCombobox('currency')"
+                  :list-props="{
+                    density: 'compact',
+                  }"
+                  no-filter
+                  variant="underlined"
+                  width="60px"
+                />
+              </template>
+            </v-number-input>
+
+            <v-number-input
+              id="1@bkg_insurance_value"
+              v-model="inputData.bkg_insurance_value"
+              class="hide-step"
+              color="primary"
+              density="compact"
+              hide-details
+              :max="999999999.99999"
+              :min="0"
+              :min-fraction-digits="0"
+              min-width="100%"
+              :precision="5"
+              :rules="inputDataRules.bkg_insurance_value"
+              type="input"
+              variant="outlined"
+              @update:model-value="
+                () => {
+                  if (inputData.bkg_insurance_value === null) {
+                    inputData.bkg_insurance_currency = null
+                  } else {
+                    if (inputData.bkg_insurance_currency) {
+                      //
+                    } else {
+                      inputData.bkg_insurance_currency = 'USD'
+                    }
+                  }
+                }
+              "
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">Ins. Value:</div>
+              </template>
+
+              <template #append>
+                <v-select
+                  id="1@bkg_insurance_currency"
+                  v-model="inputData.bkg_insurance_currency"
+                  auto-select-first
+                  autocomplete="off"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  item-title="code"
+                  item-value="code"
+                  :items="appStore.appCombobox.getCombobox('currency')"
+                  :list-props="{
+                    density: 'compact',
+                  }"
+                  no-filter
+                  variant="underlined"
+                  width="60px"
+                />
+              </template>
+            </v-number-input>
+
+            <FTextInput
+              v-model:text-value="inputData.bkg_goods_description"
+              min-width="100%"
+              :textarea-props="{ label: 'Good Desc.' }"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">Good Desc.:</div>
               </template>
             </FTextInput>
 
             <FTextInput
               v-model:text-value="inputData.bkg_marks_nos"
               min-width="100%"
-              :textarea-props="{ rows: 2 }"
+              :textarea-props="{ label: 'Marks & No.' }"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">
-                  Marks & No.<span class="text-red">*</span>:
-                </div>
+                <div class="text-caption text-end w-label-100">Marks & No.:</div>
               </template>
             </FTextInput>
 
             <v-text-field
               v-model="inputData.bkg_booking_reference"
+              color="primary"
               density="compact"
               hide-details
               min-width="100%"
+              type="input"
               variant="outlined"
             >
               <template #prepend>
@@ -478,13 +996,43 @@
 
             <v-text-field
               v-model="inputData.bkg_additional_terms"
+              color="primary"
               density="compact"
               hide-details
               min-width="100%"
+              type="input"
               variant="outlined"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">Additional Terms:</div>
+              </template>
+            </v-text-field>
+          </div>
+        </v-col>
+
+        <v-col :cols="rescols('c12l3s6')">
+          <v-divider>
+            <div class="my-1 text-center text-caption text-uppercase text-on-surface opacity-70">
+              <v-icon color="primary" icon="mdi-calendar-clock" size="18" />
+              <span class="ml-2">Cut-off Dates</span>
+            </div>
+          </v-divider>
+
+          <div class="d-flex align-start flex-column flex-wrap ga-1">
+            <v-text-field
+              v-for="item in cutOffFields"
+              :key="item.key"
+              v-model="inputData[item.key]"
+              color="primary"
+              density="compact"
+              :disabled="!item.pac_is_soc"
+              hide-details
+              min-width="100%"
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">{{ item.label }}:</div>
               </template>
             </v-text-field>
           </div>
@@ -763,47 +1311,73 @@
 
 <script setup>
   import Decimal from 'decimal.js'
-  import { computed, ref, watch } from 'vue'
-  import { useDisplay, useLocale } from 'vuetify'
-  import FPartyDetailCard from '@/components/FPartyDetailCard.vue'
+  import { computed, ref } from 'vue'
+  import { useLocale } from 'vuetify'
+  import { organizationQueryOrgAddress } from '@/api/organization'
+  import { queryServiceLevelOptions } from '@/api/service_level'
   import {
     assignContainerTypeFromRow,
     containerTypeTableHeaders,
     fetchContainerTypes,
   } from '@/composables/useContainerTypeRemoteMenu'
+  import { useLayoutCols } from '@/composables/useLayoutCols'
   import {
     assignPackageTypeFromRow,
     fetchPackageTypes,
-    packageTypeMenuTextFieldProps,
     packageTypeTableHeaders,
   } from '@/composables/usePackageTypeRemoteMenu'
-  import { BOOKING_CUT_OFF_FIELDS, BOOKING_PARTY_BLOCKS } from '@/constants/bookingPartyFields'
+  import { BOOKING_CUT_OFF_FIELDS } from '@/constants/bookingPartyFields'
   import { useAppStore } from '@/stores/app'
 
   const { t } = useLocale()
   const appStore = useAppStore()
+  const { rescols } = useLayoutCols()
 
   const props = defineProps({
     inputDataRules: {
       type: Object,
       default: () => {},
     },
+    queryPortList: {
+      type: Array,
+      default: () => [],
+    },
+    addrTableHeaders: {
+      type: Array,
+      default: () => [],
+    },
   })
-  const { inputDataRules } = toRefs(props)
+  const { inputDataRules, queryPortList } = toRefs(props)
 
   const inputData = defineModel('input-data', { type: Object, required: true })
 
-  const emit = defineEmits(['add-container', 'remove-container'])
+  const emit = defineEmits([
+    'add-container',
+    'remove-container',
+    'query-port',
+    'on-select-addr',
+    'on-clear-addr',
+  ])
 
-  const partyBlocks = BOOKING_PARTY_BLOCKS
+  const onSelectAddr = (event, type) => {
+    emit('on-select-addr', event, type)
+  }
+
+  const onClearAddr = type => {
+    emit('on-clear-addr', type)
+  }
+  const queryPort = value => {
+    emit('query-port', value)
+  }
+  // const partyBlocks = BOOKING_PARTY_BLOCKS
   const cutOffFields = BOOKING_CUT_OFF_FIELDS
 
-  const transportModes = [{ code: 'SEA' }, { code: 'AIR' }, { code: 'RAIL' }]
-  const containerModes = [{ code: 'FCL' }, { code: 'LCL' }, { code: 'LSE' }]
-  const incoItems = ['FOB', 'CIF', 'EXW', 'CFR', 'CPT']
-  const freightTermItems = ['PP', 'CC', 'Prepaid', 'Collect']
-  const releaseTypes = ['OBL', 'SWB', 'Telex']
-  const deliveryModes = ['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']
+  // const transportModes = [{ code: 'SEA' }, { code: 'AIR' }, { code: 'RAIL' }]
+  // const containerModes = [{ code: 'FCL' }, { code: 'LCL' }, { code: 'LSE' }]
+  // const incoItems = ['FOB', 'CIF', 'EXW', 'CFR', 'CPT']
+  // const freightTermItems = ['PP', 'CC', 'Prepaid', 'Collect']
+  // const releaseTypes = ['OBL', 'SWB', 'Telex']
+  // const deliveryModes = ['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']
 
   const showContainerTable = computed(
     () =>
@@ -833,6 +1407,32 @@
     { title: 'Description', key: 'pac_description', minWidth: '140px' },
   ]
 
+  const js_w = () => {
+    // 避免在 inputData 未完全初始化时调用，防止递归更新
+    if (!inputData.value) return
+
+    const cbm_d = new Decimal(inputData.value.bkg_actual_volume ?? 0)
+    const cbm = cbm_d.isNaN() ? new Decimal(0) : cbm_d
+    const vol_weight = cbm.times(new Decimal(166)).times(new Decimal(1000)).div(new Decimal(1000))
+    const vw = vol_weight.toNumber()
+    const newVolumeWeight = vw === 0 ? null : vw
+
+    // 只在值真正改变时才更新，避免触发不必要的响应式更新
+    if (inputData.value.bkg_volume_weight !== newVolumeWeight) {
+      inputData.value.bkg_volume_weight = newVolumeWeight
+    }
+
+    const gw_d = new Decimal(inputData.value.bkg_actual_weight ?? 0)
+    const gw = gw_d.isNaN() ? new Decimal(0) : gw_d
+    const cg = gw.lessThan(vol_weight) ? vol_weight.toNumber() : gw.toNumber()
+    const newChargeableWeight = cg === 0 ? null : cg
+
+    // 只在值真正改变时才更新，避免触发不必要的响应式更新
+    if (inputData.value.bkg_actual_chargeable !== newChargeableWeight) {
+      inputData.value.bkg_actual_chargeable = newChargeableWeight
+    }
+  }
+
   const jsPackingW = item => {
     // 避免在 inputData 未完全初始化时调用，防止递归更新
     if (!item) return
@@ -858,21 +1458,36 @@
       item.pac_chargeable_weight = newChargeableWeight
     }
   }
-</script>
 
-<style lang="scss" scoped>
-  .booking-cutoff-panel {
-    padding-left: 12px;
-    border-left: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
-
-    @media (max-width: 1279px) {
-      margin-top: 12px;
-      padding-left: 0;
-      border-left: none;
+  // Service Level options
+  const serviceLevelOptions = ref([])
+  const fetchServiceLevelOptions = async query => {
+    try {
+      const response = await queryServiceLevelOptions({ query })
+      serviceLevelOptions.value = response.data || []
+    } catch (error) {
+      console.error('Error fetching service level options:', error)
+      serviceLevelOptions.value = []
     }
   }
 
-  .booking-cutoff-row + .booking-cutoff-row {
-    margin-top: 8px;
-  }
+  // Fetch service level options on component mount
+  fetchServiceLevelOptions()
+</script>
+
+<style lang="scss" scoped>
+  // .booking-cutoff-panel {
+  //   padding-left: 12px;
+  //   border-left: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+
+  //   @media (max-width: 1279px) {
+  //     margin-top: 12px;
+  //     padding-left: 0;
+  //     border-left: none;
+  //   }
+  // }
+
+  // .booking-cutoff-row + .booking-cutoff-row {
+  //   margin-top: 8px;
+  // }
 </style>

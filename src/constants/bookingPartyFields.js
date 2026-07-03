@@ -1,7 +1,7 @@
 export const BOOKING_PARTY_BLOCKS = [
   { key: 'shipper', addressType: 'SHIPPER', required: true },
   { key: 'consignee', addressType: 'CONSIGNEE', required: true },
-  { key: 'notify_party', addressType: 'NOTIFY_PARTY', required: false, sameAsConsignee: false },
+  { key: 'notify_party', addressType: 'NOTIFY_PARTY', required: false, sameAsConsignee: true },
   { key: 'pickup', addressType: 'PICKUP', required: false },
 ]
 

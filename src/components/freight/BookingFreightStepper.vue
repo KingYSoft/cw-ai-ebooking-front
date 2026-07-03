@@ -51,7 +51,6 @@
   .booking-freight-stepper:deep(.v-stepper-header) {
     box-shadow: none;
     background: transparent;
-    padding: 8px 16px 4px;
   }
 
   .booking-freight-stepper:deep(.v-stepper-window) {

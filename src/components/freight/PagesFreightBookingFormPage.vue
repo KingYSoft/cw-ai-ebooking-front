@@ -84,7 +84,7 @@
 
   const props = defineProps({
     isEditMode: { type: Boolean, default: false },
-    pageTitle: { type: String, default: 'New Booking' },
+    pageTitle: { type: String, default: undefined },
   })
   const { isEditMode, pageTitle } = toRefs(props)
 

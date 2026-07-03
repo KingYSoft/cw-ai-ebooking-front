@@ -3,14 +3,25 @@
     <div v-show="activedTab === 1">
       <EbookingBookingGeneralInfo
         v-model:input-data="inputData"
+        :addr-table-headers="addrTableHeaders"
         :input-data-rules="inputDataRules"
+        :query-port-list="queryPortList"
         @add-container="emit('add-container')"
+        @on-clear-addr="onClearAddr"
+        @on-select-addr="onSelectAddr"
+        @query-port="queryPort"
         @remove-container="emit('remove-container')"
       />
     </div>
 
     <div v-show="activedTab === 2">
-      <v-card-text class="text-medium-emphasis">Additional Details (coming soon)</v-card-text>
+      <BookingAdditionalDetails
+        v-model:input-data="inputData"
+        :addr-table-headers="addrTableHeaders"
+        :input-data-rules="inputDataRules"
+        @on-clear-addr="onClearAddr"
+        @on-select-addr="onSelectAddr"
+      />
     </div>
 
     <div v-show="activedTab === 3">
@@ -25,7 +36,10 @@
 
 <script setup>
   import { useDisplay, useLocale } from 'vuetify'
+  import { portCodeQueryOptions } from '@/api/port_code'
+  import { debounceFn } from '@/api/utils'
   import { useAppStore } from '@/stores/app'
+
   defineOptions({
     name: 'PagesFreightBookingEdit',
   })
@@ -39,6 +53,204 @@
   const emit = defineEmits(['add-container', 'remove-container'])
 
   const inputData = defineModel('input-data', { type: Object, required: true })
+
+  const queryPortList = ref([])
+  const queryPort = debounceFn(async (code, signal) => {
+    try {
+      const { data } = await portCodeQueryOptions(
+        {
+          query: code,
+        },
+        signal,
+      )
+      if (data) {
+        queryPortList.value = data.list ?? []
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      //
+    }
+  })
+
+  const addrTableHeaders = [
+    {
+      title: 'Code',
+      key: 'code',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: {
+        class: 'text-truncate',
+      },
+      minWidth: '140',
+    },
+    {
+      title: 'Company Name',
+      key: 'company_name',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: {
+        class: 'text-truncate',
+      },
+      minWidth: '140',
+    },
+    {
+      title: 'Address Code',
+      key: 'address_code',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: {
+        class: 'text-truncate',
+      },
+      minWidth: '140',
+    },
+    {
+      title: 'Address1',
+      key: 'address1',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: {
+        class: 'text-truncate',
+      },
+      minWidth: '140',
+    },
+    { title: 'City', key: 'city', align: 'start', minWidth: '140' },
+    { title: 'Country', key: 'country_code', align: 'start', minWidth: '140' },
+  ]
+
+  const onSelectAddr = (row, addressType) => {
+    if (!row || typeof row !== 'object') {
+      return
+    }
+    if (addressType === 'SHIPPER') {
+      if (!inputData.value.shipper || typeof inputData.value.shipper !== 'object') {
+        inputData.value.shipper = {}
+      }
+      inputData.value.shipper.add_address_type = row.address_type
+      inputData.value.shipper.add_address_short_code = row.short_code
+      inputData.value.shipper.add_address_code = row.code
+      inputData.value.shipper.add_address_name = row.company_name
+      inputData.value.shipper.add_address = row.pk
+      inputData.value.shipper.add_address1 = row.address1
+      inputData.value.shipper.add_address2 = row.address2
+      inputData.value.shipper.add_address3 = row.address3
+      inputData.value.shipper.add_contact = row.contact
+      inputData.value.shipper.add_city = row.city
+      inputData.value.shipper.add_state = row.state
+      inputData.value.shipper.add_postal_code = row.postal_code
+      inputData.value.shipper.add_country_code = row.country_code
+      inputData.value.shipper.add_phone = row.phone
+      inputData.value.shipper.add_mobile = row.mobile
+      inputData.value.shipper.add_fax = row.fax
+      inputData.value.shipper.add_email = row.email
+      inputData.value.shipper.add_port_code = row.port_code
+    } else if (addressType === 'CONSIGNEE') {
+      if (!inputData.value.consignee || typeof inputData.value.consignee !== 'object') {
+        inputData.value.consignee = {}
+      }
+      inputData.value.consignee.add_address_type = row.address_type
+      inputData.value.consignee.add_address_short_code = row.short_code
+      inputData.value.consignee.add_address_code = row.code
+      inputData.value.consignee.add_address_name = row.company_name
+      inputData.value.consignee.add_address = row.pk
+      inputData.value.consignee.add_address1 = row.address1
+      inputData.value.consignee.add_address2 = row.address2
+      inputData.value.consignee.add_address3 = row.address3
+      inputData.value.consignee.add_contact = row.contact
+      inputData.value.consignee.add_city = row.city
+      inputData.value.consignee.add_state = row.state
+      inputData.value.consignee.add_postal_code = row.postal_code
+      inputData.value.consignee.add_country_code = row.country_code
+      inputData.value.consignee.add_phone = row.phone
+      inputData.value.consignee.add_mobile = row.mobile
+      inputData.value.consignee.add_fax = row.fax
+      inputData.value.consignee.add_email = row.email
+      inputData.value.consignee.add_port_code = row.port_code
+    } else if (addressType === 'PICKUP') {
+      if (!inputData.value.pickup || typeof inputData.value.pickup !== 'object') {
+        inputData.value.pickup = {}
+      }
+      inputData.value.pickup.add_address_type = row.address_type
+      inputData.value.pickup.add_address_short_code = row.short_code
+      inputData.value.pickup.add_address_code = row.code
+      inputData.value.pickup.add_address_name = row.company_name
+      inputData.value.pickup.add_address = row.pk
+      inputData.value.pickup.add_address1 = row.address1
+      inputData.value.pickup.add_address2 = row.address2
+      inputData.value.pickup.add_address3 = row.address3
+      inputData.value.pickup.add_contact = row.contact
+      inputData.value.pickup.add_city = row.city
+      inputData.value.pickup.add_state = row.state
+      inputData.value.pickup.add_postal_code = row.postal_code
+      inputData.value.pickup.add_country_code = row.country_code
+      inputData.value.pickup.add_phone = row.phone
+      inputData.value.pickup.add_mobile = row.mobile
+      inputData.value.pickup.add_fax = row.fax
+      inputData.value.pickup.add_email = row.email
+      inputData.value.pickup.add_port_code = row.port_code
+    } else if (addressType === 'DELIVERY') {
+      if (!inputData.value.delivery || typeof inputData.value.delivery !== 'object') {
+        inputData.value.delivery = {}
+      }
+      inputData.value.delivery.add_address_type = row.address_type
+      inputData.value.delivery.add_address_short_code = row.short_code
+      inputData.value.delivery.add_address_code = row.code
+      inputData.value.delivery.add_address_name = row.company_name
+      inputData.value.delivery.add_address = row.pk
+      inputData.value.delivery.add_address1 = row.address1
+      inputData.value.delivery.add_address2 = row.address2
+      inputData.value.delivery.add_address3 = row.address3
+      inputData.value.delivery.add_contact = row.contact
+      inputData.value.delivery.add_city = row.city
+      inputData.value.delivery.add_state = row.state
+      inputData.value.delivery.add_postal_code = row.postal_code
+      inputData.value.delivery.add_country_code = row.country_code
+      inputData.value.delivery.add_phone = row.phone
+      inputData.value.delivery.add_mobile = row.mobile
+      inputData.value.delivery.add_fax = row.fax
+      inputData.value.delivery.add_email = row.email
+      inputData.value.delivery.add_port_code = row.port_code
+    } else if (addressType === 'NOTIFY_PARTY') {
+      if (!inputData.value.notify_party || typeof inputData.value.notify_party !== 'object') {
+        inputData.value.notify_party = {}
+      }
+      inputData.value.notify_party.add_address_type = row.address_type
+      inputData.value.notify_party.add_address_short_code = row.short_code
+      inputData.value.notify_party.add_address_code = row.code
+      inputData.value.notify_party.add_address_name = row.company_name
+      inputData.value.notify_party.add_address = row.pk
+      inputData.value.notify_party.add_address1 = row.address1
+      inputData.value.notify_party.add_address2 = row.address2
+      inputData.value.notify_party.add_address3 = row.address3
+      inputData.value.notify_party.add_contact = row.contact
+      inputData.value.notify_party.add_city = row.city
+      inputData.value.notify_party.add_state = row.state
+      inputData.value.notify_party.add_postal_code = row.postal_code
+      inputData.value.notify_party.add_country_code = row.country_code
+      inputData.value.notify_party.add_phone = row.phone
+      inputData.value.notify_party.add_mobile = row.mobile
+      inputData.value.notify_party.add_fax = row.fax
+      inputData.value.notify_party.add_email = row.email
+      inputData.value.notify_party.add_port_code = row.port_code
+
+      inputData.value.notify_party_same_as_consignee = 'N'
+    }
+  }
+  const onClearAddr = type => {
+    if (type === 'SHIPPER') {
+      inputData.value.shipper = {}
+    } else if (type === 'CONSIGNEE') {
+      inputData.value.consignee = {}
+    } else if (type === 'PICKUP') {
+      inputData.value.pickup = {}
+    } else if (type === 'DELIVERY') {
+      inputData.value.delivery = {}
+    } else if (type === 'NOTIFY_PARTY') {
+      inputData.value.notify_party = {}
+      inputData.value.notify_party_same_as_consignee = 'N'
+    }
+  }
+
   const inputDataRules = {
     shipper_name: [
       value => {
