@@ -861,7 +861,6 @@
   import { computed, ref, toRefs } from 'vue'
   import { useLocale } from 'vuetify'
   import { organizationQueryOrgAddress } from '@/api/organization'
-  import { queryServiceLevelPage } from '@/api/service_level'
   import FDatePicker from '@/components/FDatePicker.vue'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -971,24 +970,6 @@
       return {}
     },
   })
-
-  const serviceLevelCodeItems = ref([])
-
-  const loadServiceLevelCodes = async () => {
-    try {
-      const res = await queryServiceLevelPage({
-        SkipCount: 0,
-        MaxResultCount: 9999,
-        filters: [],
-      })
-      const items = res?.data?.items ?? []
-      serviceLevelCodeItems.value = items.map(item => item?.code).filter(code => Boolean(code))
-    } catch (error) {
-      console.error('loadServiceLevelCodes failed:', error)
-      serviceLevelCodeItems.value = []
-    }
-  }
-  loadServiceLevelCodes()
 
   const addrTableHeaders = [
     {
