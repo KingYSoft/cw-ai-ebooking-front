@@ -862,6 +862,32 @@
               </div>
             </template>
           </v-select>
+
+          <v-select
+            id="1@wso_warehouse_pk"
+            v-model="inputData.wso_warehouse_pk"
+            auto-select-first
+            autocomplete="off"
+            density="compact"
+            hide-details
+            item-title="code"
+            item-value="pk"
+            :items="appStore.appCombobox.getCombobox('userWarehouse')"
+            :menu-props="{
+              'max-width': '100%',
+            }"
+            min-width="100%"
+            no-data-text="$vuetify.custom.app.searchMore"
+            no-filter
+            :rules="convertRequiredRules.wso_warehouse_pk"
+            variant="outlined"
+          >
+            <template #prepend>
+              <div class="text-caption text-end w-label-110">
+                Warehouse<span class="text-red">*</span>:
+              </div>
+            </template>
+          </v-select>
         </div>
       </v-col>
 
@@ -939,6 +965,13 @@
   })
   const { inputDataRules, queryPortList } = toRefs(props)
 
+  const inputData = defineModel('input-data', {
+    type: Object,
+    default: () => {
+      return {}
+    },
+  })
+
   const emit = defineEmits(['query-port', 'on-select-addr', 'on-clear-addr'])
 
   const queryPort = value => {
@@ -976,21 +1009,6 @@
         .includes(q),
     )
   }
-  const onOrderMarketChange = market_pk => {
-    const value = String(market_pk ?? '').trim()
-    if (!inputData.value) {
-      return
-    }
-    inputData.value.wso_market_pk = value
-    const matched = marketOptions.value.find(opt => String(opt.pk ?? '').trim() === value)
-    const plantId = value ? String(matched?.plant_id ?? '').trim() : ''
-    if (Array.isArray(inputData.value.pac_list)) {
-      inputData.value.pac_list.forEach(row => {
-        row.market = value
-        row.plant_id = plantId
-      })
-    }
-  }
 
   const loadMarketOptions = async () => {
     try {
@@ -1002,6 +1020,20 @@
     }
   }
   loadMarketOptions()
+
+  const ensureUserWarehouse = () => {
+    if (!inputData.value.wso_warehouse_pk) {
+      const aa = appStore.appCombobox.getCombobox('userWarehouse')
+      if (aa && aa.length > 0) {
+        inputData.value.wso_warehouse_pk = aa[0].pk
+      }
+    }
+  }
+  onMounted(() => {
+    nextTick(() => {
+      ensureUserWarehouse()
+    })
+  })
 
   const convertRequiredRule = fieldLabel => {
     return value => {
@@ -1058,13 +1090,6 @@
   ])
 
   const bkgEtaRules = computed(() => [...convertRequiredRules.value.eta, validateBookingEtaVsEtd()])
-
-  const inputData = defineModel('input-data', {
-    type: Object,
-    default: () => {
-      return {}
-    },
-  })
 
   const addrTableHeaders = [
     {
