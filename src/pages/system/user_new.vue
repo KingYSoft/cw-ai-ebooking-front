@@ -16,6 +16,7 @@
 
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
       <v-tab :value="1">Detail</v-tab>
+      <v-tab :value="2">Warehouse</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -63,6 +64,7 @@
     can_login: 1,
     is_admin: 0,
     is_active: 1,
+    warehouse_list: [],
   })
 
   const cardLoading = ref(false)

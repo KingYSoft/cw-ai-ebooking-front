@@ -1,6 +1,8 @@
 import service from './index'
 
 export const queryUserPage = params => service({ url: '/user/query-page', method: 'get', params })
+export const queryWarehouseList = params =>
+  service({ url: '/user/query-warehouse-list', method: 'get', params })
 export const saveUser = data => service({ url: '/user/save', method: 'post', data })
 export const deleteUserById = id => service({ url: `/user/delete/${id}`, method: 'post' })
 export const getUserById = pk => service({ url: '/user/detail', method: 'get', params: { pk } })

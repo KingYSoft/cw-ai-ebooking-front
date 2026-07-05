@@ -10,12 +10,19 @@
         />
       </div>
     </v-scroll-x-transition>
+
+    <v-scroll-x-transition hide-on-leave mode="out-in">
+      <div v-show="activedTab === 2">
+        <UserWarehouse v-model:input-data="inputData" :actived-tab="activedTab" />
+      </div>
+    </v-scroll-x-transition>
   </v-sheet>
 </template>
 
 <script setup>
   import { ref, toRefs } from 'vue'
   import UserDetail from './user/UserDetail.vue'
+  import UserWarehouse from './user/UserWarehouse.vue'
 
   const props = defineProps({
     activedTab: {
