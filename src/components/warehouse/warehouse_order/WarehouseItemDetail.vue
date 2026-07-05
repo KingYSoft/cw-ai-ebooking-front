@@ -58,11 +58,19 @@
         density="compact"
         hide-details
         item-title="market"
-        item-value="market"
+        item-value="pk"
         :items="marketOptions"
         :menu-props="{ maxWidth: '320px' }"
+        :model-value="item.woi_market"
+        return-object
         variant="outlined"
-        @update:model-value="value => onMarketChange(item, value)"
+        @update:model-value="
+          $event => {
+            item.woi_market_pk = $event?.pk ?? null
+            item.woi_market = $event?.market ?? null
+            item.woi_plant_id = $event?.plant_id ?? null
+          }
+        "
       >
         <template #item="{ props: itemProps, item: option }">
           <v-list-item

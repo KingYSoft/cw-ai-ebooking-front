@@ -760,6 +760,50 @@
               <div class="text-caption text-end w-label-110">Delivery Mode:</div>
             </template>
           </v-select>
+
+          <v-autocomplete
+            auto-select-first
+            autocomplete="off"
+            clearable
+            :custom-filter="filterMarketOption"
+            density="compact"
+            hide-details
+            item-title="market"
+            item-value="pk"
+            :items="marketOptions"
+            :menu-props="{ maxWidth: '320px' }"
+            min-width="100%"
+            :model-value="inputData.wso_market"
+            return-object
+            variant="outlined"
+            @update:model-value="
+              $event => {
+                inputData.wso_market_pk = $event?.pk ?? null
+                inputData.wso_market = $event?.market ?? null
+                if (Array.isArray(inputData.item_list)) {
+                  inputData.item_list.forEach(row => {
+                    row.woi_market_pk = $event?.pk ?? null
+                    row.woi_market = $event?.market ?? null
+                    row.woi_plant_id = $event?.plant_id ?? null
+                  })
+                }
+              }
+            "
+          >
+            <template #prepend>
+              <div class="text-caption text-end w-label-110">Market:</div>
+            </template>
+
+            <template #item="{ props: itemProps, item: option }">
+              <v-list-item
+                v-bind="itemProps"
+                :subtitle="
+                  [option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')
+                "
+                :title="option.raw.market"
+              />
+            </template>
+          </v-autocomplete>
         </div>
       </v-col>
 
@@ -861,6 +905,7 @@
   import { computed, ref, toRefs } from 'vue'
   import { useLocale } from 'vuetify'
   import { organizationQueryOrgAddress } from '@/api/organization'
+  import { getWhsMarketOptions } from '@/api/whs-market'
   import FDatePicker from '@/components/FDatePicker.vue'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -907,6 +952,56 @@
   const OnClearAddr = type => {
     emit('on-clear-addr', type)
   }
+
+  const marketOptions = ref([])
+
+  const filterMarketOption = (_value, query, item) => {
+    const q = String(query ?? '')
+      .trim()
+      .toLowerCase()
+    if (!q) {
+      return true
+    }
+    const raw = item?.raw ?? {}
+    return [
+      raw.market,
+      raw.plant_id,
+      raw.shipping_mode,
+      raw.port_code,
+      raw.port_of_discharge,
+      raw.destination,
+    ].some(field =>
+      String(field ?? '')
+        .toLowerCase()
+        .includes(q),
+    )
+  }
+  const onOrderMarketChange = market_pk => {
+    const value = String(market_pk ?? '').trim()
+    if (!inputData.value) {
+      return
+    }
+    inputData.value.wso_market_pk = value
+    const matched = marketOptions.value.find(opt => String(opt.pk ?? '').trim() === value)
+    const plantId = value ? String(matched?.plant_id ?? '').trim() : ''
+    if (Array.isArray(inputData.value.pac_list)) {
+      inputData.value.pac_list.forEach(row => {
+        row.market = value
+        row.plant_id = plantId
+      })
+    }
+  }
+
+  const loadMarketOptions = async () => {
+    try {
+      const { data } = await getWhsMarketOptions()
+      marketOptions.value = Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error('loadMarketOptions failed:', error)
+      marketOptions.value = []
+    }
+  }
+  loadMarketOptions()
 
   const convertRequiredRule = fieldLabel => {
     return value => {
