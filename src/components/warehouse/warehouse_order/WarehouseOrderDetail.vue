@@ -897,7 +897,7 @@
     </v-row>
   </v-card-text>
 
-  <v-divider />
+  <!-- <v-divider />
 
   <v-tabs v-model="tab" color="indigo" density="compact">
     <v-tab :value="1">Inbound Order</v-tab>
@@ -924,7 +924,7 @@
     <v-tabs-window-item :value="4">
       <v-sheet class="pa-4 border-content" min-height="400">Others</v-sheet>
     </v-tabs-window-item>
-  </v-tabs-window>
+  </v-tabs-window> -->
 </template>
 <script setup>
   import Decimal from 'decimal.js'
