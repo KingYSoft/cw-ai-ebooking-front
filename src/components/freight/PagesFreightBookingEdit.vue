@@ -25,7 +25,7 @@
     </div>
 
     <div v-show="activedTab === 3">
-      <v-card-text class="text-medium-emphasis">eDocs (coming soon)</v-card-text>
+      <v-card-text class="text-medium-emphasis">Docs (coming soon)</v-card-text>
     </div>
 
     <div v-show="activedTab === 4">

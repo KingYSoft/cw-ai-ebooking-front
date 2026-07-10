@@ -47,7 +47,7 @@
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
       <v-tab :value="1">Booking</v-tab>
       <v-tab :value="2">Additional Details</v-tab>
-      <v-tab :value="3">eDocs</v-tab>
+      <v-tab :value="3">Docs</v-tab>
       <v-tab :value="4">Log</v-tab>
     </v-tabs>
 
