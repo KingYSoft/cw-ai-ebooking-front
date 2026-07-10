@@ -18,7 +18,7 @@
       <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
         <v-tab :value="1">Order Detail</v-tab>
         <v-tab :value="2">Item Detail</v-tab>
-        <v-tab :value="3">eDocs</v-tab>
+        <v-tab :value="3">Docs</v-tab>
         <v-tab :value="5">Logs</v-tab>
       </v-tabs>
 

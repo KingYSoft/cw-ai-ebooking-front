@@ -9,7 +9,7 @@
     :max-height="maxHeight"
     :show-select="true"
     striped="even"
-    title="EDocs"
+    title="Docs"
     @row-dblclick="onRowDblClick"
     @update:items-per-page="handleItemsPerPageChange"
     @update:page="handlePageChange"
