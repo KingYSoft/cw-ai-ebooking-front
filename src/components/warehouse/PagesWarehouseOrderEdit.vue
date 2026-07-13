@@ -113,6 +113,7 @@
       inputData.value.shipper.add_fax = row.fax
       inputData.value.shipper.add_email = row.email
       inputData.value.shipper.add_port_code = row.port_code
+      inputData.value.shipper.add_uscl = row.uscl ?? row.add_uscl ?? ''
     } else if (addressType === 'CONSIGNEE') {
       if (!inputData.value.consignee || typeof inputData.value.consignee !== 'object') {
         inputData.value.consignee = {}
@@ -135,6 +136,8 @@
       inputData.value.consignee.add_fax = row.fax
       inputData.value.consignee.add_email = row.email
       inputData.value.consignee.add_port_code = row.port_code
+      inputData.value.consignee.add_switchboard = row.switchboard ?? row.add_switchboard ?? ''
+      inputData.value.consignee.add_taxId = row.taxId ?? row.add_taxId ?? ''
     } else if (addressType === 'PICKUP') {
       if (!inputData.value.pickup || typeof inputData.value.pickup !== 'object') {
         inputData.value.pickup = {}
