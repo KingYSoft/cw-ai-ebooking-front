@@ -1,0 +1,126 @@
+<template>
+  <v-card-text class="py-2">
+    <v-row dense>
+      <v-col
+        v-for="section in relationSections"
+        :key="section.key"
+        class="min-width-0"
+        :cols="rescols('c12l6')"
+      >
+        <v-btn class="mb-2" color="primary" size="small" variant="flat">
+          {{ section.title }}
+        </v-btn>
+
+        <v-data-table
+          class="table-filter"
+          disable-sort
+          :headers="section.headers"
+          hide-default-footer
+          item-value="rowKey"
+          :items="section.items"
+          :items-per-page="-1"
+          striped="even"
+        >
+          <template #item.sys_number="{ item }">
+            <span>{{ displayValue(item.sys_number) }}</span>
+          </template>
+
+          <template #item.order_no="{ item }">
+            {{ displayValue(item.order_no) }}
+          </template>
+
+          <template #item.status="{ item }">
+            {{ displayValue(item.status) }}
+          </template>
+
+          <template #item.date="{ item }">
+            {{ formatDate(item.date) }}
+          </template>
+
+          <template #item.truck_number="{ item }">
+            {{ displayValue(item.truck_number) }}
+          </template>
+
+          <template #item.container_number="{ item }">
+            {{ displayValue(item.container_number) }}
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-card-text>
+</template>
+
+<script setup>
+  import { computed } from 'vue'
+  import { useLayoutCols } from '@/composables/useLayoutCols'
+  import {
+    WHS_ORDER_RELATION_ORDER_COLUMNS,
+    WHS_ORDER_RELATION_OUTBOUND_COLUMNS,
+  } from '@/constants/warehouseOrderRelationColumns'
+  import { useAppStore } from '@/stores/app'
+
+  defineOptions({ name: 'WarehouseOrderRelationTables' })
+
+  const props = defineProps({
+    relation: {
+      type: Object,
+      default: () => ({}),
+    },
+  })
+
+  const appStore = useAppStore()
+  const { rescols } = useLayoutCols()
+
+  const mapRelationRows = rows =>
+    (Array.isArray(rows) ? rows : []).map((row, index) => ({
+      ...row,
+      rowKey: row.pk || row.id || `relation-row-${index}`,
+    }))
+
+  const inboundOrders = computed(() => mapRelationRows(props.relation?.inbound_orders))
+  const outboundOrders = computed(() => mapRelationRows(props.relation?.outbound_orders))
+
+  const relationSections = computed(() => [
+    {
+      key: 'inbound',
+      title: 'Inbound',
+      headers: WHS_ORDER_RELATION_ORDER_COLUMNS,
+      items: inboundOrders.value,
+    },
+    {
+      key: 'outbound',
+      title: 'Outbound',
+      headers: WHS_ORDER_RELATION_OUTBOUND_COLUMNS,
+      items: outboundOrders.value,
+    },
+  ])
+
+  const displayValue = value => {
+    const text = String(value ?? '').trim()
+    return text || '-'
+  }
+
+  const formatDate = value => {
+    if (value == null || value === '') {
+      return '-'
+    }
+    const text = String(value).trim()
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+      return text
+    }
+    if (/^\d{4}-\d{2}-\d{2}T/.test(text)) {
+      return text.slice(0, 10)
+    }
+    const date = value instanceof Date ? value : new Date(value)
+    if (Number.isNaN(date.getTime())) {
+      return text
+    }
+    return appStore.utils.formatDate(date)
+  }
+</script>
+
+<style scoped>
+  .min-width-0 {
+    min-width: 0;
+  }
+</style>

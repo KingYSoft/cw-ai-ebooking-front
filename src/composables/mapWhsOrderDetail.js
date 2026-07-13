@@ -65,6 +65,7 @@ const WSO_TO_BKG_FIELDS = [
 
 /** Item Detail 表格 UI 字段 ↔ 接口 woi_* */
 const WOI_UI_FIELD_PAIRS = [
+  ['woi_invoice_no', 'invoice_no'],
   ['woi_market', 'market'],
   ['woi_plant_id', 'plant_id'],
   ['woi_packlist_no', 'packing_list_no'],
@@ -104,6 +105,7 @@ function mapPacListItem(row, index = 0) {
     id: lineId,
     pk: lineId > 0 ? String(row.pk ?? '').trim() : '',
     rowKey: row.rowKey ?? row.pk ?? (lineId > 0 ? `line-${lineId}` : `line-new-${index}`),
+    invoice_no: resolveItemField(row, 'woi_invoice_no', 'invoice_no') ?? '',
     market: resolveItemField(row, 'woi_market', 'market') ?? '',
     plant_id: resolveItemField(row, 'woi_plant_id', 'plant_id') ?? '',
     packing_list_no: resolveItemField(row, 'woi_packlist_no', 'packing_list_no') ?? '',
@@ -169,6 +171,7 @@ export function mapWhsOrderDetailToForm(el) {
     el.notify_party_same_as_consignee,
     mapped.notify_party,
   )
+  mapped.whsOrderRelationOutput = normalizeWhsOrderRelationOutput(el.whsOrderRelationOutput)
 
   // Volume Weight 单位 = Gross Weight；Chargeable Weight 单位 = CBM
   mapped.bkg_volume_weight_unit =
@@ -178,7 +181,163 @@ export function mapWhsOrderDetailToForm(el) {
   mapped.wso_volume_weight_unit = mapped.bkg_volume_weight_unit
   mapped.wso_actual_chargeable_unit = mapped.bkg_actual_chargeable_unit
 
+  let marketFromApi = resolveMarketFromDetail(el)
+  if (!marketFromApi && mapped.pac_list.length > 0) {
+    marketFromApi = normalizeWhsMarketObject({
+      market: mapped.pac_list[0].market,
+      plant_id: mapped.pac_list[0].plant_id,
+    })
+  }
+  if (marketFromApi) {
+    syncMarketDerivedFields(mapped, marketFromApi)
+  } else {
+    mapped.market = defaultWhsMarketObject()
+  }
+
+  if (!hasFieldValue(mapped.wso_plant_id) && mapped.pac_list.length > 0) {
+    mapped.wso_plant_id = mapped.pac_list[0].plant_id ?? ''
+  }
+
   return mapped
+}
+
+export function defaultWhsOrderRelationOutput() {
+  return {
+    so_number: '',
+    inbound_order_nos: '',
+    outbound_order_nos: '',
+    load_plan_nos: '',
+    truck_numbers: '',
+    container_numbers: '',
+    inbound_orders: [],
+    outbound_orders: [],
+    load_plans: [],
+  }
+}
+
+function normalizeWhsOrderRelationOrderRow(raw) {
+  if (!raw || typeof raw !== 'object') {
+    return null
+  }
+  return {
+    id: raw.id ?? null,
+    pk: raw.pk ?? '',
+    sys_number: raw.sys_number ?? '',
+    order_no: raw.order_no ?? '',
+    status: raw.status ?? '',
+    date: raw.date ?? '',
+    truck_number: raw.truck_number ?? '',
+    container_number: raw.container_number ?? '',
+  }
+}
+
+function normalizeWhsOrderRelationOrders(raw) {
+  if (!Array.isArray(raw)) {
+    return []
+  }
+  return raw.map(normalizeWhsOrderRelationOrderRow).filter(Boolean)
+}
+
+function normalizeWhsOrderRelationOutput(raw) {
+  const source = raw && typeof raw === 'object' ? raw : {}
+  return {
+    ...defaultWhsOrderRelationOutput(),
+    ...source,
+    inbound_orders: normalizeWhsOrderRelationOrders(source.inbound_orders),
+    outbound_orders: normalizeWhsOrderRelationOrders(source.outbound_orders),
+    load_plans: normalizeWhsOrderRelationOrders(source.load_plans),
+  }
+}
+
+export function defaultWhsMarketObject() {
+  return {
+    id: 0,
+    pk: '',
+    market: '',
+    plant_id: '',
+    shipping_mode: '',
+    port_code: '',
+    port_of_discharge: '',
+    destination: '',
+  }
+}
+
+export function normalizeWhsMarketObject(raw) {
+  if (!raw || typeof raw !== 'object') {
+    return null
+  }
+  const market = String(raw.market ?? '').trim()
+  const pk = String(raw.pk ?? '').trim()
+  const id = Number(raw.id) || 0
+  if (!market && !pk && !id) {
+    return null
+  }
+  return {
+    id,
+    pk,
+    market,
+    plant_id: String(raw.plant_id ?? '').trim(),
+    shipping_mode: String(raw.shipping_mode ?? '').trim(),
+    port_code: String(raw.port_code ?? '').trim(),
+    port_of_discharge: String(raw.port_of_discharge ?? '').trim(),
+    destination: String(raw.destination ?? '').trim(),
+  }
+}
+
+export function syncMarketDerivedFields(form, marketObj) {
+  if (!form || typeof form !== 'object') {
+    return defaultWhsMarketObject()
+  }
+  const normalized = normalizeWhsMarketObject(marketObj) ?? defaultWhsMarketObject()
+  form.market = normalized
+  form.wso_market = normalized.market
+  form.wso_market_pk = normalized.pk
+  form.wso_plant_id = normalized.plant_id
+  form.bkg_market = normalized.market
+  form.bkg_plant_id = normalized.plant_id
+  syncPacListMarketFields(form, normalized)
+  return normalized
+}
+
+function resolveMarketFromDetail(el) {
+  const fromObject = normalizeWhsMarketObject(el?.market)
+  if (fromObject) {
+    return fromObject
+  }
+  const marketStr = String(el?.wso_market ?? el?.bkg_market ?? '').trim()
+  if (!marketStr) {
+    return null
+  }
+  return normalizeWhsMarketObject({
+    market: marketStr,
+    pk: el?.wso_market_pk ?? '',
+    plant_id: el?.wso_plant_id ?? el?.bkg_plant_id ?? '',
+  })
+}
+
+function resolveMarketForSave(form) {
+  return (
+    normalizeWhsMarketObject(form?.market) ??
+    normalizeWhsMarketObject({
+      market: form?.wso_market ?? form?.bkg_market,
+      pk: form?.wso_market_pk,
+      plant_id: form?.wso_plant_id ?? form?.bkg_plant_id,
+    })
+  )
+}
+
+function syncPacListMarketFields(form, marketObj) {
+  const normalized = normalizeWhsMarketObject(marketObj) ?? defaultWhsMarketObject()
+  const rows = form?.pac_list ?? form?.item_list
+  if (!Array.isArray(rows)) {
+    return
+  }
+  rows.forEach(row => {
+    row.market = normalized.market
+    row.plant_id = normalized.plant_id
+    row.woi_market = normalized.market
+    row.woi_plant_id = normalized.plant_id
+  })
 }
 
 const ADDRESS_PARTY_KEYS = ['shipper', 'consignee', 'notify_party']
@@ -265,6 +424,7 @@ function mapFormItemToWoi(row, parentPk = '') {
     woi_seller: row.woi_seller ?? '',
     woi_po_number: row.woi_po_number ?? '',
     woi_item: resolveItemField(row, 'woi_item', 'item_code') ?? '',
+    woi_invoice_no: resolveItemField(row, 'woi_invoice_no', 'invoice_no') ?? '',
     woi_desc: resolveItemField(row, 'woi_desc', 'description') ?? '',
     woi_market: resolveItemField(row, 'woi_market', 'market') ?? '',
     woi_plant_id: resolveItemField(row, 'woi_plant_id', 'plant_id') ?? '',
@@ -325,8 +485,19 @@ export function mapWhsOrderFormToSave(form, options = {}) {
   }
 
   // save 接口同时存在 wso_packing_mode 时与 Container 保持一致
-  if (hasFieldValue(payload.wso_shipment_type)) {
+  if (hasFieldValue(form.wso_packing_mode)) {
+    payload.wso_shipment_type = form.wso_packing_mode
+    payload.wso_packing_mode = form.wso_packing_mode
+  } else if (hasFieldValue(payload.wso_shipment_type)) {
     payload.wso_packing_mode = payload.wso_shipment_type
+  }
+
+  const market = resolveMarketForSave(form)
+  if (market) {
+    payload.wso_market = market.market
+    payload.wso_market_pk = market.pk
+    payload.wso_plant_id = market.plant_id
+    payload.market = market
   }
 
   for (const key of WSO_PASSTHROUGH_KEYS) {
