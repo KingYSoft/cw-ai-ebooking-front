@@ -109,6 +109,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn variant="text" @click="userDialogVisible = false">{{ common('cancel') }}</v-btn>
+
           <v-btn color="primary" variant="tonal" @click="userDialogVisible = false">
             {{ common('apply') }}
           </v-btn>

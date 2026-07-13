@@ -88,13 +88,11 @@
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
-  import { useAppStore } from '@/stores/app'
 
   const { detailSection, detailField } = useBookingPageI18n()
-  const appStore = useAppStore()
   const { rescols } = useLayoutCols()
 
-  const props = defineProps({
+  defineProps({
     inputDataRules: {
       type: Object,
       default: () => {},
@@ -104,7 +102,6 @@
       default: () => [],
     },
   })
-  const { inputDataRules } = toRefs(props)
 
   const inputData = defineModel('input-data', { type: Object, required: true })
 

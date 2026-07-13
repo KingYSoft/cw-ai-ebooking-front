@@ -19,8 +19,8 @@
 <script setup>
   import { computed } from 'vue'
 
-  import { BOOKING_FREIGHT_STEPS, getFreightStepIndex } from '@/constants/bookingFreightSteps'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
+  import { BOOKING_FREIGHT_STEPS, getFreightStepIndex } from '@/constants/bookingFreightSteps'
 
   const { freightStep } = useBookingPageI18n()
 

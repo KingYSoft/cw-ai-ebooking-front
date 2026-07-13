@@ -235,7 +235,7 @@ function normalizeWhsOrderRelationOrders(raw) {
   if (!Array.isArray(raw)) {
     return []
   }
-  return raw.map(normalizeWhsOrderRelationOrderRow).filter(Boolean)
+  return raw.map(row => normalizeWhsOrderRelationOrderRow(row)).filter(Boolean)
 }
 
 function normalizeWhsOrderRelationOutput(raw) {

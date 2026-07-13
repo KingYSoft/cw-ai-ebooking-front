@@ -1314,12 +1314,12 @@
   import { computed, ref } from 'vue'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { queryServiceLevelOptions } from '@/api/service_level'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import {
     assignContainerTypeFromRow,
     containerTypeTableHeaders,
     fetchContainerTypes,
   } from '@/composables/useContainerTypeRemoteMenu'
-  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
   import {
     assignPackageTypeFromRow,

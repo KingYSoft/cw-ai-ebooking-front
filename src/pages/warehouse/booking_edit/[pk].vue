@@ -85,6 +85,7 @@
 
         <template #actions>
           <v-spacer />
+
           <v-btn
             color="primary"
             :text="editDialog('orderNotExists', 'newOrder')"
@@ -113,6 +114,7 @@
         <template #actions>
           <v-spacer />
           <v-btn :text="editButton('cancel')" variant="text" @click="submitConfirmVis = false" />
+
           <v-btn
             color="primary"
             :text="editButton('submit')"

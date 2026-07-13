@@ -3,9 +3,6 @@
 </template>
 
 <script setup>
-  import { useLayoutCols } from '@/composables/useLayoutCols'
-
-  const { rescols } = useLayoutCols()
   defineOptions({
     name: 'Dashboard',
   })

@@ -21,9 +21,9 @@
 
 <script setup>
   import { ref, toRefs } from 'vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import UserDetail from './user/UserDetail.vue'
   import UserWarehouse from './user/UserWarehouse.vue'
-  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
 
   const { userEdit } = useSystemPageI18n()
 
@@ -38,7 +38,7 @@
     },
   })
 
-  const emit = defineEmits([])
+  defineEmits([])
 
   const { activedTab, isEdit } = toRefs(props)
 

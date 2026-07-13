@@ -143,52 +143,6 @@
   const pdfDiaVis = ref(false)
   const pdfTemplateName = ref('eDoc')
 
-  const resolveEdocFileUrl = item => {
-    if (!item || typeof item !== 'object') {
-      return ''
-    }
-    const path = item.file_url ?? item.file_path ?? item.url ?? item.path ?? ''
-    if (!path) {
-      return ''
-    }
-    if (/^https?:\/\//i.test(path)) {
-      return path
-    }
-    const base = import.meta.env.VITE_APP_BASE_API || ''
-    return path.startsWith('/') ? `${base}${path}` : `${base}/${path}`
-  }
-
-  const handlePreview = item => {
-    const url = resolveEdocFileUrl(item)
-    if (!url) {
-      appStore.openMessage({
-        content: 'No file URL available for preview.',
-        color: 'warning',
-      })
-      return
-    }
-    pdfTemplateName.value = item.file_name || item.file_type || 'eDoc'
-    pdfUrl.value = url
-    pdfDiaVis.value = true
-  }
-
-  const handleDownload = (item = null) => {
-    const rows = item ? [item] : tblSelectedEDoc.value || []
-    if (rows.length === 0) {
-      appStore.openMessage({
-        content: 'Please select at least one file.',
-        color: 'warning',
-      })
-      return
-    }
-    for (const row of rows) {
-      const url = resolveEdocFileUrl(row)
-      if (url) {
-        window.open(url, '_blank')
-      }
-    }
-  }
-
   const currentPage = ref(1)
   const itemsPerPage = ref(100)
   const maxHeight = computed(() => {

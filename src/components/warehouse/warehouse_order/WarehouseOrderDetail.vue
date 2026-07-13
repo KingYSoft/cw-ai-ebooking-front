@@ -1117,7 +1117,7 @@
       default: () => [],
     },
   })
-  const { inputDataRules, queryPortList } = toRefs(props)
+  const { queryPortList } = toRefs(props)
 
   const convertRequiredRules = computed(() => ({
     etd: [requiredRule(validationField('etd'))],
@@ -1278,7 +1278,6 @@
     { title: addrTable('city'), key: 'city', align: 'start', minWidth: '140' },
     { title: addrTable('country'), key: 'country_code', align: 'start', minWidth: '140' },
   ])
-
 
   /** Volume Weight 单位跟 Gross Weight；Chargeable Weight 单位跟 CBM */
   const syncDerivedWeightUnits = () => {

@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { bookingDetail } from '@/api/booking'
   import { organizationQueryOrgAddress } from '@/api/organization'

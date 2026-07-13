@@ -68,7 +68,6 @@
 <script setup>
   import { computed, ref } from 'vue'
 
-  import { organizationSaveOrgAddress } from '@/api/organization'
   import NewOrgAddressDialog from '@/components/business/NewOrgAddressDialog.vue'
   import {
     formatPartyAddressLine,
@@ -76,7 +75,6 @@
     mapDialogToParty,
     mapPartyToDialogInput,
   } from '@/constants/partyAddressFields'
-  import { useAppStore } from '@/stores/app'
 
   defineOptions({
     name: 'FPartyDetailCard',
@@ -101,7 +99,6 @@
 
   const emit = defineEmits(['update:sameAsConsigneeFlag'])
 
-  const appStore = useAppStore()
   const dialogOpen = ref(false)
   const saveLoading = ref(false)
   const dialogInitialData = ref({})

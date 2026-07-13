@@ -22,10 +22,10 @@
 
 <script setup>
   import { ref, toRefs } from 'vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import GroupDetail from './group/GroupDetail.vue'
   import GroupPermission from './group/GroupPermission.vue'
   import GroupUsers from './group/GroupUsers.vue'
-  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
 
   const { groupEdit } = useSystemPageI18n()
 

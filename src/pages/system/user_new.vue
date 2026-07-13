@@ -29,7 +29,7 @@
 
 <script setup>
   import { ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
   import { saveUser } from '@/api/user'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
@@ -53,7 +53,6 @@
     },
   })
 
-  const route = useRoute()
   const router = useRouter()
   const appStore = useAppStore()
 

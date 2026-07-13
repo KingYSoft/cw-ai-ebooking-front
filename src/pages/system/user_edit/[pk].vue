@@ -46,6 +46,7 @@
 
         <template #actions>
           <v-spacer />
+
           <v-btn
             color="primary"
             :text="userDialog('notExists', 'newUser')"
@@ -60,7 +61,7 @@
 
 <script setup>
   import { computed, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { getUserById, saveUser } from '@/api/user'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
@@ -85,7 +86,6 @@
   })
 
   const route = useRoute()
-  const router = useRouter()
   const appStore = useAppStore()
 
   const defaultInputData = () => ({

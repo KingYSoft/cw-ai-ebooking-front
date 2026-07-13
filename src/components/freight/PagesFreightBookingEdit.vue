@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-  import { useDisplay, useLocale } from 'vuetify'
+  import { useLocale } from 'vuetify'
   import { portCodeQueryOptions } from '@/api/port_code'
   import { debounceFn } from '@/api/utils'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'

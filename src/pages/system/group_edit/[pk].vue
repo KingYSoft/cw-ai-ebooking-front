@@ -45,6 +45,7 @@
 
         <template #actions>
           <v-spacer />
+
           <v-btn
             color="primary"
             :text="groupDialog('notExists', 'newGroup')"

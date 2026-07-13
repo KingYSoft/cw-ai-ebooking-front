@@ -71,7 +71,7 @@
 
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
-  const { relation } = useWarehouseOrderPageI18n()
+  const { relation: relationLabel } = useWarehouseOrderPageI18n()
 
   const INBOUND_HEADER_KEYS = {
     sys_number: 'inboundNo',
@@ -94,7 +94,7 @@
   const mapRelationHeaders = (columns, headerKeys) =>
     columns.map(col => ({
       ...col,
-      title: relation(headerKeys[col.key]),
+      title: relationLabel(headerKeys[col.key]),
     }))
 
   const mapRelationRows = rows =>
@@ -109,13 +109,13 @@
   const relationSections = computed(() => [
     {
       key: 'inbound',
-      title: relation('inbound'),
+      title: relationLabel('inbound'),
       headers: mapRelationHeaders(WHS_ORDER_RELATION_ORDER_COLUMNS, INBOUND_HEADER_KEYS),
       items: inboundOrders.value,
     },
     {
       key: 'outbound',
-      title: relation('outbound'),
+      title: relationLabel('outbound'),
       headers: mapRelationHeaders(WHS_ORDER_RELATION_OUTBOUND_COLUMNS, OUTBOUND_HEADER_KEYS),
       items: outboundOrders.value,
     },

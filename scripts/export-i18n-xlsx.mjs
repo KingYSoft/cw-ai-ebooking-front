@@ -45,7 +45,6 @@ async function loadI18nModule(filePath) {
     .replace(/^import\s+.+$/gm, '')
     .replace(/export\s+default\s+/, 'return ')
 
-  // eslint-disable-next-line no-new-func
   const evaluate = new Function(...depNames, body)
   const result = evaluate(...depNames.map(name => deps[name]))
 
