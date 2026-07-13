@@ -1,3 +1,7 @@
+import bookingPage from './blocks/bookingPage/zhHant'
+import systemPage from './blocks/systemPage/zhHant'
+import warehouseOrder from './blocks/warehouseOrder/zhHant'
+
 export default {
   custom: {
     unsavedInputData: {
@@ -280,5 +284,8 @@ export default {
         exportComingSoon: '匯出功能即將實作',
       },
     },
+    bookingPage,
+    systemPage,
+    warehouseOrder,
   },
 }

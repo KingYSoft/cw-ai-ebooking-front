@@ -9,7 +9,7 @@
       setting-name="BOOKING_LOG_HEADER_01"
       :show-select="false"
       striped="even"
-      title="Logs"
+      :title="logs('title')"
       virtual
       @row-dblclick="onRowDblClick"
     >
@@ -57,7 +57,7 @@
                 <v-textarea
                   :auto-grow="false"
                   density="comfortable"
-                  label="Content"
+                  :label="logs('content')"
                   :model-value="rowData.change_content"
                   :no-resize="false"
                   readonly
@@ -68,7 +68,7 @@
               <v-col :cols="6">
                 <v-text-field
                   density="comfortable"
-                  label="Modified User"
+                  :label="logs('modifiedUser')"
                   :model-value="rowData.change_user"
                   readonly
                 />
@@ -77,7 +77,7 @@
               <v-col :cols="6">
                 <v-text-field
                   density="comfortable"
-                  label="Modified Time"
+                  :label="logs('modifiedTime')"
                   :model-value="appStore.utils.formatUTCTime(rowData.change_time)"
                   readonly
                 />
@@ -112,6 +112,7 @@
   import { useLocale } from 'vuetify'
   import { queryEntityLog } from '@/api/logs'
   import FTableLayout from '@/components/FTableLayout.vue'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   // import { useLayoutCols } from '@/composables/useLayoutCols'
   import { useAppStore } from '@/stores/app'
 
@@ -133,6 +134,7 @@
 
   const appStore = useAppStore()
   const { t } = useLocale()
+  const { logs } = useBookingPageI18n()
   const refTblDataLogs = ref(null)
   const tblSelectedLogs = ref([])
 
@@ -154,10 +156,10 @@
   onMounted(() => {
     initTable()
   })
-  const tblLogsHeaders = ref([
+  const tblLogsHeaders = computed(() => [
     { title: '#', key: 'index', align: 'center', sortable: false, width: '40' },
     {
-      title: 'Title',
+      title: logs('titleCol'),
       key: 'title',
       align: 'start',
       minWidth: '120',
@@ -165,7 +167,7 @@
       filterable: true,
     },
     {
-      title: 'Content',
+      title: logs('content'),
       key: 'change_content',
       align: 'start',
       minWidth: '120',
@@ -177,7 +179,7 @@
       filterable: true,
     },
     {
-      title: 'Modified Time',
+      title: logs('modifiedTime'),
       key: 'change_time',
       align: 'start',
       minWidth: '120',
@@ -185,7 +187,7 @@
       filterable: true,
     },
     {
-      title: 'Modified User',
+      title: logs('modifiedUser'),
       key: 'change_user',
       align: 'start',
       minWidth: '120',

@@ -1,12 +1,12 @@
 <template>
   <FPageLayout :card-loading="cardLoading" :skeleton-loading="skeletonLoading">
     <v-card-item class="pb-6">
-      <v-card-title>Clear System Cache</v-card-title>
+      <v-card-title>{{ security('title') }}</v-card-title>
     </v-card-item>
 
     <v-card-text>
-      <p class="mb-6">All caches in the system will be cleared.</p>
-      <v-btn color="primary" @click="openClearCacheDia">Clear All Cache</v-btn>
+      <p class="mb-6">{{ security('description') }}</p>
+      <v-btn color="primary" @click="openClearCacheDia">{{ security('clearAllCache') }}</v-btn>
     </v-card-text>
 
     <v-dialog v-model="clearCacheDiaVis" max-width="400" persistent>
@@ -14,13 +14,13 @@
         :disabled="cardLoading"
         :loading="cardLoading"
         prepend-icon="mdi-alert-circle"
-        title="Clear System Cache"
+        :title="security('dialog.title')"
       >
         <template #loader="{ isActive }">
           <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
         </template>
 
-        <v-card-text class="pb-2"> Are you sure want to clear system cache? </v-card-text>
+        <v-card-text class="pb-2">{{ security('dialog.message') }}</v-card-text>
         <v-divider />
 
         <template #actions>
@@ -45,12 +45,15 @@
   </FPageLayout>
 </template>
 <script setup>
-  import { useLocale } from 'vuetify'
   import { appCacheClear } from '@/api/app'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
-  const appStore = useAppStore()
 
   defineOptions({ name: 'SystemSecurity' })
+
+  const { security, t } = useSystemPageI18n()
+  const appStore = useAppStore()
+
   definePage({
     name: 'system_security',
     icon: 'mdi-shield-lock-outline',
@@ -63,7 +66,6 @@
       //   permissions: 'PERMISSION_SYSTEM',
     },
   })
-  const { t } = useLocale()
   const skeletonLoading = ref(true)
   const cardLoading = ref(false)
 

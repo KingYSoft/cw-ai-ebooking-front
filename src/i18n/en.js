@@ -1,3 +1,7 @@
+import bookingPageEdit from './blocks/bookingPage/editEn'
+import systemPage from './blocks/systemPage/en'
+import warehouseOrder from './blocks/warehouseOrder/en'
+
 export default {
   custom: {
     unsavedInputData: {
@@ -390,7 +394,104 @@ export default {
         pac_actual_volume: {
           err: 'Volume must be greater than 0.',
         },
+        wso_transport_mode: {
+          err: 'Transport Mode not null.',
+        },
+        wso_packing_mode: {
+          err: 'Container not null.',
+        },
+        wso_load_port: {
+          err: 'Load not null.',
+        },
+        wso_etd: {
+          err: 'ETD not null.',
+        },
+        wso_cargo_ready: {
+          err: 'Cargo Ready Date not null.',
+        },
+        wso_actual_weight: {
+          err: 'Gross Weight must be greater than 0.',
+        },
+        wso_actual_volume: {
+          err: 'CBM must be greater than 0.',
+        },
+        wso_volume_weight: {
+          err: 'Volume Weight must be greater than 0.',
+        },
+        wso_actual_chargeable: {
+          err: 'Chargeable Weight must be greater than 0.',
+        },
+        wso_total_package_count: {
+          err: 'No. of Package must be greater than 0.',
+        },
+        wso_inco: {
+          err: 'Inco Term not null.',
+        },
+        wso_transit_time: {
+          err: 'Transit Time must be greater than 0.',
+        },
+        wso_goods_value: {
+          err: 'Cargo Value must be greater than 0.',
+        },
+        wso_insurance_value: {
+          err: 'Ins. Value must be greater than 0.',
+        },
+        wso_freight_terms: {
+          err: 'Freight Terms not null.',
+        },
+        wso_release_type: {
+          err: 'Release Type not null.',
+        },
+        wso_commodity: {
+          err: 'Commodity not null.',
+        },
+        wso_goods_description: {
+          err: 'Good Desc. not null.',
+        },
+        wso_marks_nos: {
+          err: 'Marks & No. not null.',
+        },
+      },
+      edit: bookingPageEdit,
+      list: {
+        pageTitle: 'Booking Details',
+        new: 'New',
+        status: 'Status:',
+        startDate: 'Start Date',
+        endDate: 'End Date',
+        jobNumber: 'Job Number',
+        tableHeaders: {
+          bookingNo: 'Booking No.',
+          status: 'Status',
+          transMode: 'Trans Mode',
+          containerMode: 'Container Mode',
+          houseBill: 'House Bill',
+          shipperName: 'Shipper Name',
+          consigneeName: 'Consignee Name',
+          origin: 'Origin',
+          destination: 'Destination',
+          crd: 'CRD',
+          etd: 'ETD',
+          eta: 'ETA',
+          grossWeight: 'Gross Weight',
+          cbm: 'CBM',
+          freightTerm: 'Freight Term',
+          inco: 'Inco',
+        },
+        menu: {
+          copy: 'Copy',
+          deactivate: 'Deactivate',
+        },
+        listStatus: {
+          submitted: 'Submitted',
+          under_review: 'Under review',
+          confirmed: 'Confirmed',
+          cancelled: 'Cancelled',
+          rejected: 'Rejected',
+        },
       },
     },
+    systemPage,
+    warehouseOrder,
   },
 }

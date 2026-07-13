@@ -9,7 +9,7 @@
     :max-height="maxHeight"
     :show-select="true"
     striped="even"
-    title="Docs"
+    :title="eDocs('title')"
     @row-dblclick="onRowDblClick"
     @update:items-per-page="handleItemsPerPageChange"
     @update:page="handlePageChange"
@@ -24,7 +24,7 @@
           variant="flat"
           @click="openShowUpload"
         >
-          Upload
+          {{ eDocs('upload') }}
         </v-btn>
       </div>
     </template>
@@ -61,7 +61,7 @@
   <v-dialog v-model="showUpload" max-width="800" persistent>
     <v-card>
       <v-card-title class="d-flex align-center justify-space-between">
-        <span>Upload eDoc</span>
+        <span>{{ eDocs('uploadDialogTitle') }}</span>
 
         <v-btn icon size="small" variant="text" @click="showUpload = false">
           <v-icon>mdi-close</v-icon>
@@ -76,7 +76,7 @@
           :job-type="'BKG'"
           :max-files="1"
           :readonly="true"
-          upload-button-text="Upload Files"
+          :upload-button-text="eDocs('uploadButtonText')"
           @clear="handleClear"
           @upload="handleUpload"
         />
@@ -98,7 +98,10 @@
   import { edocDownloadFiles, edocSave, edocSearch } from '@/api/edoc'
   import FTableLayout from '@/components/FTableLayout.vue'
   import FUpload from '@/components/FUpload.vue'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { t, eDocs } = useBookingPageI18n()
 
   const inputData = defineModel('input-data', {
     type: Object,
@@ -204,28 +207,28 @@
     initTable()
   })
 
-  const tblEDocHeaders = ref([
+  const tblEDocHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
     {
-      title: 'File Name',
+      title: eDocs('fileName'),
       key: 'file_name',
       align: 'start',
       minWidth: '140',
     },
     {
-      title: 'File Path',
+      title: eDocs('filePath'),
       key: 'file_path',
       align: 'start',
       minWidth: '200',
     },
     {
-      title: 'Ref No.',
+      title: eDocs('refNo'),
       key: 'ref_no',
       align: 'start',
       minWidth: '140',
     },
     {
-      title: 'Received Time',
+      title: eDocs('receivedTime'),
       key: 'received_time',
       align: 'start',
       minWidth: '140',
@@ -234,8 +237,8 @@
 
   // #region Row Actions Menu
   const getRowMenuItems = () => [
-    { title: 'download', prependIcon: 'mdi-download', code: 'download' },
-    { title: 'preview', prependIcon: 'mdi-eye', code: 'preview' },
+    { title: eDocs('download'), prependIcon: 'mdi-download', code: 'download' },
+    { title: eDocs('preview'), prependIcon: 'mdi-eye', code: 'preview' },
   ]
   const handleRowMenuSelect = (e, item) => {
     switch (e.id) {

@@ -1,6 +1,8 @@
 <template>
   <v-card-text class="py-2">
-    <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat"> Upload </v-btn>
+    <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat">
+      {{ itemDetailLabel('upload') }}
+    </v-btn>
 
     <v-text-field
       id="2@container_rows_required"
@@ -8,7 +10,7 @@
       density="compact"
       hide-details
       :model-value="itemList.length"
-      :rules="[v => Number(v || 0) > 0 || 'Requires at least one line.']"
+      :rules="[v => Number(v || 0) > 0 || validation('atLeastOneLine')]"
     />
   </v-card-text>
 
@@ -218,7 +220,7 @@
         <td v-for="column in columns" :key="column.key">
           <v-row class="ref-form-pre" dense>
             <template v-if="column.key === 'woi_invoice_no'">
-              <span class="font-weight-bold">Total :</span>
+              <span class="font-weight-bold">{{ itemDetailLabel('total') }} :</span>
             </template>
 
             <template v-else-if="column.key === 'woi_gross_wt'">
@@ -335,6 +337,7 @@
     fetchPackageTypes,
     packageTypeTableHeaders,
   } from '@/composables/usePackageTypeRemoteMenu'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
   import {
     formatWarehouseMeasureNumber,
@@ -346,6 +349,7 @@
   })
 
   const appStore = useAppStore()
+  const { itemHeader, itemDetailLabel, validation } = useWarehouseOrderPageI18n()
 
   const inputData = defineModel('input-data', {
     type: Object,
@@ -445,23 +449,28 @@
     inputData.value.item_list.splice(index, 1)
   }
 
-  const tblContainerHeaders = [
+  const tblContainerHeaders = computed(() => [
     { title: '', key: 'actions', width: '50px', align: 'center' },
-    { title: 'Invoice No.', key: 'woi_invoice_no', minWidth: '150px' },
-    { title: 'Packing List No.', key: 'woi_packlist_no', minWidth: '150px' },
-    { title: 'Description', key: 'woi_desc', minWidth: '200px' },
-    { title: 'Item Code', key: 'woi_item', minWidth: '120px' },
-    { title: 'Gross Weight', key: 'woi_gross_wt', minWidth: '180px' },
-    { title: 'Net Weight', key: 'woi_net_wt', minWidth: '180px' },
-    { title: 'Volume', key: 'woi_volume', minWidth: '180px' },
-    { title: 'No. of Package', key: 'woi_outer_pack', minWidth: '180px' },
-    { title: 'Pieces', key: 'woi_pieces', minWidth: '100px' },
-    { title: 'Palletization?', key: 'woi_is_palletization', minWidth: '100px', align: 'center' },
+    { title: itemHeader('invoiceNo'), key: 'woi_invoice_no', minWidth: '150px' },
+    { title: itemHeader('packingListNo'), key: 'woi_packlist_no', minWidth: '150px' },
+    { title: itemHeader('description'), key: 'woi_desc', minWidth: '200px' },
+    { title: itemHeader('itemCode'), key: 'woi_item', minWidth: '120px' },
+    { title: itemHeader('grossWeight'), key: 'woi_gross_wt', minWidth: '180px' },
+    { title: itemHeader('netWeight'), key: 'woi_net_wt', minWidth: '180px' },
+    { title: itemHeader('volume'), key: 'woi_volume', minWidth: '180px' },
+    { title: itemHeader('noOfPackage'), key: 'woi_outer_pack', minWidth: '180px' },
+    { title: itemHeader('pieces'), key: 'woi_pieces', minWidth: '100px' },
     {
-      title: 'Battery included?',
+      title: itemHeader('palletization'),
+      key: 'woi_is_palletization',
+      minWidth: '100px',
+      align: 'center',
+    },
+    {
+      title: itemHeader('batteryIncluded'),
       key: 'woi_is_battery_included',
       minWidth: '150px',
       align: 'center',
     },
-  ]
+  ])
 </script>

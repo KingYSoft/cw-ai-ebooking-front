@@ -2,7 +2,7 @@
   <v-sheet color="transparent">
     <v-card-text>
       <v-btn color="primary" size="small" variant="flat" @click="openUserDialog">
-        Select Users
+        {{ groupEdit('users.selectUsers') }}
       </v-btn>
     </v-card-text>
 
@@ -31,7 +31,7 @@
 
           <v-list activatable density="compact">
             <v-list-item prepend-icon="mdi-delete" @click.prevent="removeSelectedUser(item)">
-              <v-list-item-title>Delete</v-list-item-title>
+              <v-list-item-title>{{ common('delete') }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -43,11 +43,11 @@
     <v-dialog v-model="userDialogVisible" max-width="1100" persistent>
       <v-card>
         <v-card-title class="d-flex align-center">
-          Select Users
+          {{ groupEdit('users.selectUsers') }}
           <v-spacer />
 
           <v-chip color="primary" size="small" variant="tonal">
-            {{ userDialogSelected.length }} selected
+            {{ common('selected', userDialogSelected.length) }}
           </v-chip>
         </v-card-title>
 
@@ -60,12 +60,12 @@
                   clearable
                   density="compact"
                   hide-details
-                  placeholder="input query keywords"
+                  :placeholder="common('queryKeywordsPlaceholder')"
                   single-line
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end">Query User:</div>
+                    <div class="text-caption text-end">{{ groupEdit('users.queryUser') }}</div>
                   </template>
                 </v-text-field>
               </v-col>
@@ -85,7 +85,7 @@
             :height="420"
             hover
             item-value="pk"
-            :items="userList"
+            :items="userOptions"
             return-object
             :search="userQuerySearch"
             :show-select="true"
@@ -98,7 +98,7 @@
                 size="small"
                 variant="tonal"
               >
-                {{ item.is_active === 1 ? 'Yes' : 'No' }}
+                {{ item.is_active === 1 ? common('yes') : common('no') }}
               </v-chip>
             </template>
           </v-data-table>
@@ -108,8 +108,10 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="userDialogVisible = false">Cancel</v-btn>
-          <v-btn color="primary" variant="tonal" @click="userDialogVisible = false">Apply</v-btn>
+          <v-btn variant="text" @click="userDialogVisible = false">{{ common('cancel') }}</v-btn>
+          <v-btn color="primary" variant="tonal" @click="userDialogVisible = false">
+            {{ common('apply') }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -117,36 +119,38 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  import { useDisplay, useLocale } from 'vuetify'
+  import { computed, ref } from 'vue'
+  import { useDisplay } from 'vuetify'
   import { queryUserPage } from '@/api/user'
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
 
   defineOptions({ name: 'GroupUsers' })
+
+  const { common, groupEdit } = useSystemPageI18n()
 
   const inputData = defineModel('input-data', {
     type: Object,
     default: () => ({}),
   })
-  const { t } = useLocale()
   const display = useDisplay()
   const { rescols } = useLayoutCols()
 
   const maxHeight = computed(() => {
     return display.height.value - 320
   })
-  const userHeaders = [
-    { title: 'Login Name', key: 'login_name', align: 'start', minWidth: '160px' },
-    { title: 'Full Name', key: 'full_name', align: 'start', minWidth: '160px' },
-    { title: 'Email', key: 'email_address', align: 'start', minWidth: '220px' },
-    { title: 'Short', key: 'short_code', align: 'start', minWidth: '140px' },
-    { title: 'Active', key: 'is_active', align: 'start', minWidth: '140px' },
-  ]
-  const selectedUserHeaders = [
+  const userHeaders = computed(() => [
+    { title: groupEdit('users.headers.loginName'), key: 'login_name', align: 'start', minWidth: '160px' },
+    { title: groupEdit('users.headers.fullName'), key: 'full_name', align: 'start', minWidth: '160px' },
+    { title: groupEdit('users.headers.email'), key: 'email_address', align: 'start', minWidth: '220px' },
+    { title: groupEdit('users.headers.short'), key: 'short_code', align: 'start', minWidth: '140px' },
+    { title: groupEdit('users.headers.active'), key: 'is_active', align: 'start', minWidth: '140px' },
+  ])
+  const selectedUserHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', width: '60px', sortable: false },
-    ...userHeaders,
-  ]
-  const userList = ref([])
+    ...userHeaders.value,
+  ])
+  const userOptions = ref([])
   const userDialogVisible = ref(false)
   const userDialogSelected = computed(() => {
     return (inputData.value.users || []).map(a => a.pk)
@@ -165,7 +169,7 @@
   const loadBaseOptions = async () => {
     const { data } = await queryUserPage({ SkipCount: 0, MaxResultCount: 9999, filters: [] })
 
-    userList.value = data?.items ?? []
+    userOptions.value = data?.items ?? []
   }
   loadBaseOptions()
 </script>

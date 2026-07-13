@@ -9,15 +9,15 @@
           variant="flat"
           @click.stop="handleSave"
         >
-          Save
+          {{ common('save') }}
         </v-btn>
       </template>
     </LayoutWithToolbar>
 
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
-      <v-tab :value="1">Group Detail</v-tab>
-      <v-tab :value="2">Users</v-tab>
-      <v-tab :value="3">Permission</v-tab>
+      <v-tab :value="1">{{ groupEditTab('groupDetail') }}</v-tab>
+      <v-tab :value="2">{{ groupEditTab('users') }}</v-tab>
+      <v-tab :value="3">{{ groupEditTab('permission') }}</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -35,17 +35,22 @@
         :disabled="cardLoading"
         :loading="cardLoading"
         prepend-icon="mdi-alert-circle"
-        title="Group Not Exists."
+        :title="groupDialog('notExists', 'title')"
       >
         <template #loader="{ isActive }">
           <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
         </template>
 
-        <v-card-text class="pb-2">This group not exists. You can new group.</v-card-text>
+        <v-card-text class="pb-2">{{ groupDialog('notExists', 'message') }}</v-card-text>
 
         <template #actions>
           <v-spacer />
-          <v-btn color="primary" text="New Group" variant="tonal" @click="newGroupHandle" />
+          <v-btn
+            color="primary"
+            :text="groupDialog('notExists', 'newGroup')"
+            variant="tonal"
+            @click="newGroupHandle"
+          />
         </template>
       </v-card>
     </v-dialog>
@@ -55,12 +60,15 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useDisplay, useLocale } from 'vuetify'
+  import { useDisplay } from 'vuetify'
   import { getGroupById, saveGroup } from '@/api/group'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesSystemGroupEdit from '@/components/system/PagesSystemGroupEdit.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { common, groupDialog, groupEditTab } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemGroupEdit' })
   definePage({
@@ -79,7 +87,6 @@
   const route = useRoute()
   const router = useRouter()
   const appStore = useAppStore()
-  const { t } = useLocale()
   const display = useDisplay()
 
   const contentHeight = computed(() => display.height.value - 65 - 35)

@@ -38,12 +38,14 @@
   import { useDisplay, useLocale } from 'vuetify'
   import { portCodeQueryOptions } from '@/api/port_code'
   import { debounceFn } from '@/api/utils'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
     name: 'PagesFreightBookingEdit',
   })
   const { t } = useLocale()
+  const { addrTable } = useBookingPageI18n()
   const appStore = useAppStore()
 
   defineProps({
@@ -73,9 +75,9 @@
     }
   })
 
-  const addrTableHeaders = [
+  const addrTableHeaders = computed(() => [
     {
-      title: 'Code',
+      title: addrTable('code'),
       key: 'code',
       align: 'start',
       maxWidth: '200',
@@ -85,7 +87,7 @@
       minWidth: '140',
     },
     {
-      title: 'Company Name',
+      title: addrTable('companyName'),
       key: 'company_name',
       align: 'start',
       maxWidth: '200',
@@ -95,7 +97,7 @@
       minWidth: '140',
     },
     {
-      title: 'Address Code',
+      title: addrTable('addressCode'),
       key: 'address_code',
       align: 'start',
       maxWidth: '200',
@@ -105,7 +107,7 @@
       minWidth: '140',
     },
     {
-      title: 'Address1',
+      title: addrTable('address1'),
       key: 'address1',
       align: 'start',
       maxWidth: '200',
@@ -114,9 +116,9 @@
       },
       minWidth: '140',
     },
-    { title: 'City', key: 'city', align: 'start', minWidth: '140' },
-    { title: 'Country', key: 'country_code', align: 'start', minWidth: '140' },
-  ]
+    { title: addrTable('city'), key: 'city', align: 'start', minWidth: '140' },
+    { title: addrTable('country'), key: 'country_code', align: 'start', minWidth: '140' },
+  ])
 
   const onSelectAddr = (row, addressType) => {
     if (!row || typeof row !== 'object') {

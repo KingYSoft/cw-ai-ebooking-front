@@ -3,15 +3,15 @@
     <LayoutWithToolbar :divider="false" :spacer="true" :title="tabTitle">
       <template #actions>
         <v-btn color="primary" :disabled="cardLoading" size="small" variant="flat" @click.stop="handleSave">
-          Save
+          {{ common('save') }}
         </v-btn>
       </template>
     </LayoutWithToolbar>
 
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
-      <v-tab :value="1">Group Detail</v-tab>
-      <v-tab :value="2">Users</v-tab>
-      <v-tab :value="3">Permission</v-tab>
+      <v-tab :value="1">{{ groupEditTab('groupDetail') }}</v-tab>
+      <v-tab :value="2">{{ groupEditTab('users') }}</v-tab>
+      <v-tab :value="3">{{ groupEditTab('permission') }}</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -29,7 +29,10 @@
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesSystemGroupEdit from '@/components/system/PagesSystemGroupEdit.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { common, groupEdit, groupEditTab } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemGroupNew' })
   definePage({
@@ -65,7 +68,7 @@
   const skeletonLoading = ref(false)
   const activedTab = ref(1)
   const inputData = ref(defaultInputData())
-  const tabTitle = ref('New Group')
+  const tabTitle = ref(groupEdit('newTitle'))
   const formRef = ref(null)
 
   const buildPayload = () => ({

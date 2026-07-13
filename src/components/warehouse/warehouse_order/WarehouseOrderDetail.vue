@@ -6,7 +6,7 @@
           <v-col :cols="rescols('c12l4s6')">
             <v-divider>
               <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-                Shipper
+                {{ detailSection('shipper') }}
               </div>
             </v-divider>
 
@@ -28,7 +28,7 @@
                 @row-select="onSelectAddr($event, 'SHIPPER')"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Name:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
                 </template>
               </FRemoteTableMenuWithCode>
 
@@ -43,7 +43,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Address1:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
                 </template>
               </v-text-field>
 
@@ -58,7 +58,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Address2:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
                 </template>
               </v-text-field>
             </div>
@@ -77,7 +77,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">USCI#:</div>
+                      <div class="text-caption text-end w-label-120">{{ detailField('uscl') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -96,7 +96,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label">Contact:</div>
+                      <div class="text-caption text-end w-label">{{ detailField('contact') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -117,7 +117,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">Tel:</div>
+                      <div class="text-caption text-end w-label-120">{{ detailField('tel') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -136,7 +136,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label">Email:</div>
+                      <div class="text-caption text-end w-label">{{ detailField('email') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -157,7 +157,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">Fax:</div>
+                      <div class="text-caption text-end w-label-120">{{ detailField('fax') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -168,7 +168,7 @@
           <v-col :cols="rescols('c12l4s6')">
             <v-divider>
               <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-                Consignee
+                {{ detailSection('consignee') }}
               </div>
             </v-divider>
 
@@ -190,7 +190,7 @@
                 @row-select="onSelectAddr($event, 'CONSIGNEE')"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Name:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
                 </template>
               </FRemoteTableMenuWithCode>
 
@@ -205,7 +205,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Address1:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
                 </template>
               </v-text-field>
 
@@ -220,7 +220,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Address2:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
                 </template>
               </v-text-field>
             </div>
@@ -239,7 +239,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">Switchboard:</div>
+                      <div class="text-caption text-end w-label-120">{{ detailField('switchboard') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -258,7 +258,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label">TAXID:</div>
+                      <div class="text-caption text-end w-label">{{ detailField('taxId') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -279,7 +279,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">Contact:</div>
+                      <div class="text-caption text-end w-label-120">{{ detailField('contact') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -298,7 +298,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label">Tel:</div>
+                      <div class="text-caption text-end w-label">{{ detailField('tel') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -309,7 +309,7 @@
           <v-col :cols="rescols('c12l4s6')">
             <v-divider>
               <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-                Notify Party
+                {{ detailSection('notifyParty') }}
               </div>
             </v-divider>
 
@@ -328,7 +328,7 @@
                 @row-select="onSelectAddr($event, 'NOTIFY_PARTY')"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Name:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
                 </template>
 
                 <template #append>
@@ -353,7 +353,7 @@
                       />
                     </template>
 
-                    <span>SAME AS CONSIGNEE</span>
+                    <span>{{ detailField('sameAsConsignee') }}</span>
                   </v-tooltip>
                 </template>
               </FRemoteTableMenuWithCode>
@@ -369,7 +369,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Address1:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
                 </template>
               </v-text-field>
 
@@ -384,7 +384,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-120">Address2:</div>
+                  <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
                 </template>
               </v-text-field>
             </div>
@@ -403,7 +403,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">Contact:</div>
+                      <div class="text-caption text-end w-label-120">{{ detailField('contact') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -422,7 +422,7 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label">Tel:</div>
+                      <div class="text-caption text-end w-label">{{ detailField('tel') }}</div>
                     </template>
                   </v-text-field>
                 </div>
@@ -456,7 +456,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Container:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('container') }}</div>
                 </template>
               </v-select>
 
@@ -551,7 +551,7 @@
                 </template>
 
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Load:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('load') }}</div>
                 </template>
               </v-autocomplete>
 
@@ -598,7 +598,7 @@
                 </template>
 
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Discharge:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('discharge') }}</div>
                 </template>
               </v-autocomplete>
 
@@ -611,7 +611,7 @@
               >
                 <template #prepend>
                   <div class="text-caption text-end w-label-110">
-                    ETD<span class="text-primary">^</span>:
+                    {{ detailField('etd') }}<span class="text-primary">^</span>:
                   </div>
                 </template>
               </FDatePicker>
@@ -625,7 +625,7 @@
               >
                 <template #prepend>
                   <div class="text-caption text-end w-label-110">
-                    ETA<span class="text-primary">^</span>:
+                    {{ detailField('eta') }}<span class="text-primary">^</span>:
                   </div>
                 </template>
               </FDatePicker>
@@ -637,7 +637,7 @@
                 min="2000-01-01"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Cargo Ready Date:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('cargoReadyDate') }}</div>
                 </template>
               </FDatePicker>
 
@@ -648,7 +648,7 @@
                 min="2000-01-01"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Est. Pickup:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('estPickup') }}</div>
                 </template>
               </FDatePicker>
 
@@ -659,7 +659,7 @@
                 min="2000-01-01"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Est. Delivery:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('estDelivery') }}</div>
                 </template>
               </FDatePicker>
             </div>
@@ -684,7 +684,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Gross Weight:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('grossWeight') }}</div>
                 </template>
 
                 <template #append>
@@ -725,7 +725,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">CBM:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('cbm') }}</div>
                 </template>
 
                 <template #append>
@@ -762,7 +762,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Volume Weight:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('volumeWeight') }}</div>
                 </template>
 
                 <template #append>
@@ -792,7 +792,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Chargeable:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('chargeable') }}</div>
                 </template>
 
                 <template #append>
@@ -826,7 +826,7 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">No. of Package:</div>
+                    <div class="text-caption text-end w-label-110">{{ detailField('noOfPackage') }}</div>
                   </template>
                 </v-number-input>
 
@@ -869,7 +869,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Delivery Mode:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('deliveryMode') }}</div>
                 </template>
               </v-select>
 
@@ -895,7 +895,7 @@
               >
                 <template #prepend>
                   <div class="text-caption text-end w-label-110">
-                    Market<span class="text-error"> *</span>:
+                    {{ detailField('market') }}<span class="text-error"> *</span>:
                   </div>
                 </template>
 
@@ -919,7 +919,7 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Plant ID:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('plantId') }}</div>
                 </template>
               </v-text-field>
             </div>
@@ -935,7 +935,7 @@
                 min-width="100%"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">SO Confirm:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('soConfirm') }}</div>
                 </template>
               </FDatePicker>
 
@@ -947,7 +947,7 @@
                 min-width="100%"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">VGM Cut-Off:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('vgmCutOff') }}</div>
                 </template>
               </FDatePicker>
 
@@ -959,7 +959,7 @@
                 min-width="100%"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">Doc Cut-Off:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('docCutOff') }}</div>
                 </template>
               </FDatePicker>
 
@@ -971,7 +971,7 @@
                 min-width="100%"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">CY Cut-Off:</div>
+                  <div class="text-caption text-end w-label-110">{{ detailField('cyCutOff') }}</div>
                 </template>
               </FDatePicker>
 
@@ -987,7 +987,7 @@
               >
                 <template #prepend>
                   <div class="text-caption text-end w-label-110">
-                    Carrier SO number<span class="text-primary">^</span>:
+                    {{ detailField('carrierSoNumber') }}<span class="text-primary">^</span>:
                   </div>
                 </template>
               </v-text-field>
@@ -1087,6 +1087,7 @@
     fetchPackageTypes,
     packageTypeTableHeaders,
   } from '@/composables/usePackageTypeRemoteMenu'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { WHS_ORDER_CONTAINER_OPTIONS } from '@/constants/warehouseOrderContainerOptions'
   import { useAppStore } from '@/stores/app'
 
@@ -1097,6 +1098,14 @@
   const appStore = useAppStore()
   const { t } = useLocale()
   const { rescols } = useLayoutCols()
+  const {
+    detailSection,
+    detailField,
+    addrTable,
+    validation,
+    validationField,
+    requiredRule,
+  } = useWarehouseOrderPageI18n()
 
   const props = defineProps({
     inputDataRules: {
@@ -1109,12 +1118,11 @@
     },
   })
   const { inputDataRules, queryPortList } = toRefs(props)
-  const convertRequiredRule = fieldLabel => value => String(value ?? '').trim() !== '' || `${fieldLabel} is required.`
 
   const convertRequiredRules = computed(() => ({
-    etd: [convertRequiredRule('ETD')],
-    eta: [convertRequiredRule('ETA')],
-    soNumber: [convertRequiredRule('Carrier SO number')],
+    etd: [requiredRule(validationField('etd'))],
+    eta: [requiredRule(validationField('eta'))],
+    soNumber: [requiredRule(validationField('carrierSoNumber'))],
   }))
 
   /** ETD 须严格晚于 Cargo Ready（yyyy-MM-dd：es > cs，不可同日） */
@@ -1180,7 +1188,7 @@
     const normalized = normalizeWhsMarketObject(value)
     const marketName = String(normalized?.market ?? '').trim()
     if (!marketName) {
-      return 'Market is required.'
+      return validation('marketRequired')
     }
     const matched = marketOptions.value.some(opt => {
       if (normalized?.pk && String(opt.pk ?? '').trim() === String(normalized.pk).trim()) {
@@ -1188,7 +1196,7 @@
       }
       return String(opt.market ?? '').trim() === marketName
     })
-    return matched || 'Please select Market from the list.'
+    return matched || validation('marketSelectFromList')
   }
   const marketRules = [marketRequiredRule]
 
@@ -1262,14 +1270,14 @@
     String(inputData.value?.wso_plant_id ?? inputData.value?.market?.plant_id ?? '').trim(),
   )
 
-  const addrTableHeaders = [
-    { title: 'Code', key: 'code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: 'Company Name', key: 'company_name', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: 'Address Code', key: 'address_code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: 'Address1', key: 'address1', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: 'City', key: 'city', align: 'start', minWidth: '140' },
-    { title: 'Country', key: 'country_code', align: 'start', minWidth: '140' },
-  ]
+  const addrTableHeaders = computed(() => [
+    { title: addrTable('code'), key: 'code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
+    { title: addrTable('companyName'), key: 'company_name', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
+    { title: addrTable('addressCode'), key: 'address_code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
+    { title: addrTable('address1'), key: 'address1', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
+    { title: addrTable('city'), key: 'city', align: 'start', minWidth: '140' },
+    { title: addrTable('country'), key: 'country_code', align: 'start', minWidth: '140' },
+  ])
 
 
   /** Volume Weight 单位跟 Gross Weight；Chargeable Weight 单位跟 CBM */

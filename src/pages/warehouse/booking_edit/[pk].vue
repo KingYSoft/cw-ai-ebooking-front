@@ -5,7 +5,7 @@
         <template #title>
           <div class="d-flex align-center ga-2">
             <div class="d-flex flex-column ga-0">
-              <span class="font-weight-bold text-body-2">Warehouse</span>
+              <span class="font-weight-bold text-body-2">{{ edit('warehouseTitle') }}</span>
 
               <div class="d-flex align-center ga-1">
                 <span class="font-weight-bold text-body-2">
@@ -37,7 +37,7 @@
             variant="flat"
             @click.stop="onSaveHandle"
           >
-            Save
+            {{ editButton('save') }}
           </v-btn>
 
           <v-btn
@@ -47,16 +47,16 @@
             variant="tonal"
             @click.stop="onSubmitClick"
           >
-            Submit
+            {{ editButton('submit') }}
           </v-btn>
         </template>
       </LayoutWithToolbar>
 
       <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
-        <v-tab :value="1">Order Detail</v-tab>
-        <v-tab :value="2">Item Detail</v-tab>
-        <v-tab :value="3">Docs</v-tab>
-        <v-tab :value="5">Logs</v-tab>
+        <v-tab :value="1">{{ editTab('orderDetail') }}</v-tab>
+        <v-tab :value="2">{{ editTab('itemDetail') }}</v-tab>
+        <v-tab :value="3">{{ editTab('docs') }}</v-tab>
+        <v-tab :value="5">{{ editTab('logs') }}</v-tab>
       </v-tabs>
 
       <v-divider />
@@ -73,19 +73,24 @@
         :disabled="cardLoading"
         :loading="cardLoading"
         prepend-icon="mdi-alert-circle"
-        title="Warehouse Order Not Exists."
+        :title="editDialog('orderNotExists', 'title')"
       >
         <template #loader="{ isActive }">
           <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
         </template>
 
         <v-card-text class="pb-2">
-          This warehouse order does not exist. You can create a new order or close the page.
+          {{ editDialog('orderNotExists', 'message') }}
         </v-card-text>
 
         <template #actions>
           <v-spacer />
-          <v-btn color="primary" text="New Order" variant="tonal" @click="newOrderHandle" />
+          <v-btn
+            color="primary"
+            :text="editDialog('orderNotExists', 'newOrder')"
+            variant="tonal"
+            @click="newOrderHandle"
+          />
         </template>
       </v-card>
     </v-dialog>
@@ -95,20 +100,25 @@
         :disabled="cardLoading"
         :loading="cardLoading"
         prepend-icon="mdi-send-check-outline"
-        title="Confirm Submit"
+        :title="editDialog('submitConfirm', 'title')"
       >
         <template #loader="{ isActive }">
           <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
         </template>
 
         <v-card-text class="pb-2">
-          Are you sure you want to submit this warehouse order?
+          {{ editDialog('submitConfirm', 'message') }}
         </v-card-text>
 
         <template #actions>
           <v-spacer />
-          <v-btn text="Cancel" variant="text" @click="submitConfirmVis = false" />
-          <v-btn color="primary" text="Submit" variant="flat" @click="onSubmitConfirm" />
+          <v-btn :text="editButton('cancel')" variant="text" @click="submitConfirmVis = false" />
+          <v-btn
+            color="primary"
+            :text="editButton('submit')"
+            variant="flat"
+            @click="onSubmitConfirm"
+          />
         </template>
       </v-card>
     </v-dialog>
@@ -118,7 +128,6 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  // import { useLocale } from 'vuetify'
   import { whsOrderDetail, whsOrderSubmit } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
@@ -130,6 +139,7 @@
     resolveWhsConsignNo,
     scheduleWhsBookingTabSync,
   } from '@/composables/useWarehouseBookingTab'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'WarehouseBookingEdit' })
@@ -159,7 +169,7 @@
   const router = useRouter()
   const route = useRoute()
   const appStore = useAppStore()
-  // const { t } = useLocale()
+  const { edit, editButton, editTab, editMessage, editDialog } = useWarehouseOrderPageI18n()
 
   // const skeletonLoading = ref(true)
   // const cardLoading = ref(false)
@@ -248,7 +258,7 @@
         }
         default: {
           appStore.openMessage({
-            content: 'Unknown tab.',
+            content: editMessage('unknownTab'),
             color: 'warning',
           })
         }
@@ -281,7 +291,7 @@
     const orderNo = inputData.value.wso_consign_no || inputData.value.wso_consign_no || ''
     navigator.clipboard.writeText(orderNo)
     appStore.openMessage({
-      content: 'Order No. copied to clipboard.',
+      content: editMessage('copySuccess'),
       color: 'success',
     })
   }
@@ -315,7 +325,7 @@
       const { success } = await whsOrderSubmit(pk)
       if (success) {
         appStore.openMessage({
-          content: 'Warehouse order submitted.',
+          content: editMessage('submitted'),
           color: 'success',
         })
         markInputDataSaved()

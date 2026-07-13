@@ -23,6 +23,9 @@
   import { ref, toRefs } from 'vue'
   import UserDetail from './user/UserDetail.vue'
   import UserWarehouse from './user/UserWarehouse.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
+
+  const { userEdit } = useSystemPageI18n()
 
   const props = defineProps({
     activedTab: {
@@ -48,19 +51,19 @@
     login_name: [
       value => {
         if (value) return true
-        return 'Login Name is required.'
+        return userEdit('validation.loginNameRequired')
       },
     ],
     password_hash: [
       value => {
         if (value) return true
-        return 'Password is required.'
+        return userEdit('validation.passwordRequired')
       },
     ],
     org_header: [
       value => {
         if (value) return true
-        return 'Org Header is required.'
+        return userEdit('validation.orgHeaderRequired')
       },
     ],
   })

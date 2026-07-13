@@ -1,3 +1,7 @@
+import bookingPage from './blocks/bookingPage/vi'
+import systemPage from './blocks/systemPage/vi'
+import warehouseOrder from './blocks/warehouseOrder/vi'
+
 export default {
   custom: {
     unsavedInputData: {
@@ -280,5 +284,8 @@ export default {
         exportComingSoon: 'Chức năng xuất sẽ được triển khai',
       },
     },
+    bookingPage,
+    systemPage,
+    warehouseOrder,
   },
 }

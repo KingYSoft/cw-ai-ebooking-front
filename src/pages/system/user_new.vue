@@ -9,14 +9,14 @@
           variant="flat"
           @click.stop="handleSave"
         >
-          Save
+          {{ common('save') }}
         </v-btn>
       </template>
     </LayoutWithToolbar>
 
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
-      <v-tab :value="1">Detail</v-tab>
-      <v-tab :value="2">Warehouse</v-tab>
+      <v-tab :value="1">{{ userEditTab('detail') }}</v-tab>
+      <v-tab :value="2">{{ userEditTab('warehouse') }}</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -34,7 +34,10 @@
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesSystemUserEdit from '@/components/system/PagesSystemUserEdit.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { common, userEdit } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemUserNew' })
   definePage({
@@ -72,7 +75,7 @@
   const activedTab = ref(1)
   const inputData = ref(defaultInputData())
 
-  const tabTitle = ref('New User')
+  const tabTitle = ref(userEdit('newTitle'))
 
   const formRef = ref(null)
 

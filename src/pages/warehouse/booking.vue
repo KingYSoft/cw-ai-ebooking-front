@@ -18,13 +18,13 @@
       :max-height="maxHeight"
       show-select
       striped="even"
-      title="Warehouse Orders"
+      :title="list('pageTitle')"
       virtual
       @row-dblclick="onRowDblClick"
     >
       <template #actions>
         <v-btn color="primary" prepend-icon="$plus" size="small" variant="flat" @click="onNewOrder">
-          New
+          {{ list('new') }}
         </v-btn>
       </template>
 
@@ -52,8 +52,10 @@
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesWarehouseBookingFilter from '@/components/warehouse/PagesWarehouseBookingFilter.vue'
   import { mapWhsOrderListRow } from '@/composables/mapWhsOrderDetail'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
 
+  const { filter, header, list } = useWarehouseOrderPageI18n()
   const appStore = useAppStore()
   const router = useRouter()
   const display = useDisplay()
@@ -82,8 +84,8 @@
   const defaultData = () => ({
     field1: {
       key: 'wso_etd',
-      title: 'ETD',
-      keyItems: [{ key: 'wso_etd', title: 'ETD' }],
+      title: filter('etd'),
+      keyItems: [{ key: 'wso_etd', title: filter('etd') }],
       val: '',
       op: '=',
       start: appStore.utils.formatDate(appStore.utils.addDays(new Date(), -20)),
@@ -91,14 +93,14 @@
     },
     field2: {
       key: 'wso_consign_no',
-      title: 'Job Number',
-      keyItems: [{ key: 'wso_consign_no', title: 'Job Number' }],
+      title: filter('jobNumber'),
+      keyItems: [{ key: 'wso_consign_no', title: filter('jobNumber') }],
       val: '',
       op: '=',
     },
     wso_consign_no: {
       key: 'wso_consign_no',
-      title: 'Job No.',
+      title: filter('jobNo'),
       val: '',
       op: '=',
       componentProps: {},
@@ -107,7 +109,7 @@
     },
     wso_house_bill: {
       key: 'wso_house_bill',
-      title: 'HBL No.',
+      title: filter('hblNo'),
       val: '',
       op: '=',
       componentProps: {},
@@ -116,7 +118,7 @@
     },
     wso_so_number: {
       key: 'wso_so_number',
-      title: 'SO Number',
+      title: filter('soNumber'),
       val: '',
       op: '=',
       componentProps: {},
@@ -125,7 +127,7 @@
     },
     wso_booking_reference: {
       key: 'wso_booking_reference',
-      title: 'Booking No',
+      title: filter('bookingNo'),
       val: '',
       op: '=',
       componentProps: {},
@@ -134,7 +136,7 @@
     },
     wso_origin: {
       key: 'wso_origin',
-      title: 'Origin',
+      title: filter('origin'),
       val: '',
       op: '=',
       componentProps: {},
@@ -143,7 +145,7 @@
     },
     wso_destination: {
       key: 'wso_destination',
-      title: 'Destination',
+      title: filter('destination'),
       val: '',
       op: '=',
       componentProps: {},
@@ -166,34 +168,34 @@
   })
   const totalCount = ref(0)
 
-  const tblHeaders = [
-    { title: 'Status', key: 'wso_status', align: 'start', minWidth: '90px' },
-    { title: 'Order No.', key: 'wso_consign_no', align: 'start', minWidth: '140px' },
-    { title: 'Trans Mode', key: 'wso_transport_mode', align: 'start', minWidth: '110px' },
-    { title: 'Container', key: 'wso_shipment_type', align: 'start', minWidth: '110px' },
-    { title: 'House Bill', key: 'wso_house_bill', align: 'start', minWidth: '120px' },
-    { title: 'SO Number', key: 'wso_so_number', align: 'start', minWidth: '130px' },
-    { title: 'Booking Ref', key: 'wso_booking_reference', align: 'start', minWidth: '120px' },
+  const tblHeaders = computed(() => [
+    { title: header('status'), key: 'wso_status', align: 'start', minWidth: '90px' },
+    { title: header('orderNo'), key: 'wso_consign_no', align: 'start', minWidth: '140px' },
+    { title: header('transMode'), key: 'wso_transport_mode', align: 'start', minWidth: '110px' },
+    { title: header('container'), key: 'wso_shipment_type', align: 'start', minWidth: '110px' },
+    { title: header('houseBill'), key: 'wso_house_bill', align: 'start', minWidth: '120px' },
+    { title: header('soNumber'), key: 'wso_so_number', align: 'start', minWidth: '130px' },
+    { title: header('bookingRef'), key: 'wso_booking_reference', align: 'start', minWidth: '120px' },
     {
-      title: 'Description of Goods',
+      title: header('descriptionOfGoods'),
       key: 'wso_goods_description',
       align: 'start',
       minWidth: '180px',
       cellProps: { class: 'text-truncate' },
     },
-    { title: 'Origin', key: 'wso_origin', align: 'start', minWidth: '100px' },
-    { title: 'Destination', key: 'wso_destination', align: 'start', minWidth: '100px' },
-    { title: 'Target Delivery', key: 'wso_delivery_due_date', align: 'start', minWidth: '120px' },
-    { title: 'CRD', key: 'wso_cargo_ready', align: 'start', minWidth: '100px' },
-    { title: 'ETD', key: 'wso_etd', align: 'start', minWidth: '100px' },
-    { title: 'ETA', key: 'wso_eta', align: 'start', minWidth: '100px' },
-    { title: 'Gross Weight', key: 'wso_actual_weight', align: 'end', minWidth: '140px' },
-    { title: 'CBM', key: 'wso_actual_volume', align: 'end', minWidth: '100px' },
-    { title: 'Chargeable', key: 'wso_actual_chargeable', align: 'end', minWidth: '100px' },
-    { title: 'Packages', key: 'wso_total_package_count', align: 'end', minWidth: '100px' },
-    { title: 'Create User', key: 'create_user', align: 'start', minWidth: '100px' },
-    { title: 'Modify User', key: 'last_modify_user', align: 'start', minWidth: '100px' },
-  ]
+    { title: header('origin'), key: 'wso_origin', align: 'start', minWidth: '100px' },
+    { title: header('destination'), key: 'wso_destination', align: 'start', minWidth: '100px' },
+    { title: header('targetDelivery'), key: 'wso_delivery_due_date', align: 'start', minWidth: '120px' },
+    { title: header('crd'), key: 'wso_cargo_ready', align: 'start', minWidth: '100px' },
+    { title: header('etd'), key: 'wso_etd', align: 'start', minWidth: '100px' },
+    { title: header('eta'), key: 'wso_eta', align: 'start', minWidth: '100px' },
+    { title: header('grossWeight'), key: 'wso_actual_weight', align: 'end', minWidth: '140px' },
+    { title: header('cbm'), key: 'wso_actual_volume', align: 'end', minWidth: '100px' },
+    { title: header('chargeable'), key: 'wso_actual_chargeable', align: 'end', minWidth: '100px' },
+    { title: header('packages'), key: 'wso_total_package_count', align: 'end', minWidth: '100px' },
+    { title: header('createUser'), key: 'create_user', align: 'start', minWidth: '100px' },
+    { title: header('modifyUser'), key: 'last_modify_user', align: 'start', minWidth: '100px' },
+  ])
 
   const buildListFilters = () => {
     const vvv = [

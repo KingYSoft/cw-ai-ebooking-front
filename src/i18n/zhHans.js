@@ -1,3 +1,7 @@
+import bookingPageEdit from './blocks/bookingPage/editZhHans'
+import systemPage from './blocks/systemPage/zhHans'
+import warehouseOrder from './blocks/warehouseOrder/zhHans'
+
 export default {
   custom: {
     unsavedInputData: {
@@ -390,7 +394,104 @@ export default {
         pac_actual_volume: {
           err: 'Volume 必须大于 0。',
         },
+        wso_transport_mode: {
+          err: 'Transport Mode 不能为空。',
+        },
+        wso_packing_mode: {
+          err: 'Container 不能为空。',
+        },
+        wso_load_port: {
+          err: 'Load 不能为空。',
+        },
+        wso_etd: {
+          err: 'ETD 不能为空。',
+        },
+        wso_cargo_ready: {
+          err: 'Cargo Ready Date 不能为空。',
+        },
+        wso_actual_weight: {
+          err: 'Gross Weight 必须大于 0。',
+        },
+        wso_actual_volume: {
+          err: 'CBM 必须大于 0。',
+        },
+        wso_volume_weight: {
+          err: 'Volume Weight 必须大于 0。',
+        },
+        wso_actual_chargeable: {
+          err: 'Chargeable Weight 必须大于 0。',
+        },
+        wso_total_package_count: {
+          err: 'No. of Package 必须大于 0。',
+        },
+        wso_inco: {
+          err: 'Inco Term 不能为空。',
+        },
+        wso_transit_time: {
+          err: 'Transit Time 必须大于 0。',
+        },
+        wso_goods_value: {
+          err: 'Cargo Value 必须大于 0。',
+        },
+        wso_insurance_value: {
+          err: 'Ins. Value 必须大于 0。',
+        },
+        wso_freight_terms: {
+          err: 'Freight Terms 不能为空。',
+        },
+        wso_release_type: {
+          err: 'Release Type 不能为空。',
+        },
+        wso_commodity: {
+          err: 'Commodity 不能为空。',
+        },
+        wso_goods_description: {
+          err: 'Good Desc. 不能为空。',
+        },
+        wso_marks_nos: {
+          err: 'Marks & No. 不能为空。',
+        },
+      },
+      edit: bookingPageEdit,
+      list: {
+        pageTitle: '订舱明细',
+        new: '新建',
+        status: '状态：',
+        startDate: '开始日期',
+        endDate: '结束日期',
+        jobNumber: '工作号',
+        tableHeaders: {
+          bookingNo: '订舱号',
+          status: '状态',
+          transMode: '运输方式',
+          containerMode: '装箱方式',
+          houseBill: '分单号',
+          shipperName: '发货人名称',
+          consigneeName: '收货人名称',
+          origin: '起运地',
+          destination: '目的地',
+          crd: 'CRD',
+          etd: 'ETD',
+          eta: 'ETA',
+          grossWeight: '毛重',
+          cbm: 'CBM',
+          freightTerm: '运费条款',
+          inco: 'Inco',
+        },
+        menu: {
+          copy: '复制',
+          deactivate: '停用',
+        },
+        listStatus: {
+          submitted: '已提交',
+          under_review: '审核中',
+          confirmed: '已确认',
+          cancelled: '已取消',
+          rejected: '已拒绝',
+        },
       },
     },
+    systemPage,
+    warehouseOrder,
   },
 }

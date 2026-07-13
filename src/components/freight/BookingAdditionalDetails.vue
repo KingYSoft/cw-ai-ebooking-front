@@ -8,7 +8,7 @@
               class="text-center text-caption text-uppercase text-on-surface opacity-70"
               style="width: 120px"
             >
-              PICKUP
+              {{ detailSection('pickup') }}
             </div>
           </v-divider>
 
@@ -29,7 +29,7 @@
               @row-select="onSelectAddr($event, 'PICKUP')"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Name:</div>
+                <div class="text-caption text-end w-label">{{ detailField('name') }}:</div>
               </template>
             </FRemoteTableMenu>
 
@@ -44,7 +44,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address1:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address1') }}:</div>
               </template>
             </v-text-field>
 
@@ -59,7 +59,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address2:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address2') }}:</div>
               </template>
             </v-text-field>
 
@@ -74,7 +74,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address3:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address3') }}:</div>
               </template>
             </v-text-field>
           </div>
@@ -85,12 +85,12 @@
 </template>
 
 <script setup>
-  import { useLocale } from 'vuetify'
   import { organizationQueryOrgAddress } from '@/api/organization'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
   import { useAppStore } from '@/stores/app'
 
-  const { t } = useLocale()
+  const { detailSection, detailField } = useBookingPageI18n()
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
 

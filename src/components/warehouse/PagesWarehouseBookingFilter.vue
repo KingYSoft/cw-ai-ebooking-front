@@ -31,7 +31,7 @@
           <f-date-picker
             v-model:date-value="inputSearchData.field1.start"
             :date-props="{
-              placeholder: 'Start Date',
+              placeholder: filter('startDate'),
               clearable: false,
             }"
             :max="inputSearchData.field1.end ?? '2099-12-31'"
@@ -43,7 +43,7 @@
           <f-date-picker
             v-model:date-value="inputSearchData.field1.end"
             :date-props="{
-              placeholder: 'End Date',
+              placeholder: filter('endDate'),
               clearable: false,
             }"
             max="2099-12-31"
@@ -87,7 +87,7 @@
             density="compact"
             hide-details
             min-width="auto"
-            placeholder="Shipper / Job Number"
+            :placeholder="filter('shipperJobPlaceholder')"
             type="input"
             variant="outlined"
             width="auto"
@@ -118,7 +118,9 @@
 
   import PageFilterBar from '@/components/PageFilterBar.vue'
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
 
+  const { filter } = useWarehouseOrderPageI18n()
   const { rescols } = useLayoutCols()
 
   defineOptions({

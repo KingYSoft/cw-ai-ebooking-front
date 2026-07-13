@@ -14,13 +14,13 @@
       :items="tblItems"
       :max-height="maxHeight"
       striped="even"
-      title="Groups"
+      :title="groupList('title')"
       virtual
       @row-dblclick="onRowDblClick"
     >
       <template #actions>
         <v-btn color="primary" prepend-icon="$plus" size="small" variant="flat" @click="onNewGroup">
-          New
+          {{ common('new') }}
         </v-btn>
       </template>
 
@@ -31,7 +31,7 @@
           size="small"
           variant="tonal"
         >
-          {{ item.is_admin === 'Y' ? 'Yes' : 'No' }}
+          {{ item.is_admin === 'Y' ? common('yes') : common('no') }}
         </v-chip>
       </template>
 
@@ -42,7 +42,7 @@
           size="small"
           variant="tonal"
         >
-          {{ item.is_active === 1 ? 'Active' : 'Inactive' }}
+          {{ item.is_active === 1 ? common('active') : common('inactive') }}
         </v-chip>
       </template>
 
@@ -68,6 +68,9 @@
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesSystemGroupFilter from '@/components/system/PagesSystemGroupFilter.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
+
+  const { common, groupList } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemGroup' })
   definePage({
@@ -93,10 +96,10 @@
   const defaultFilterData = () => ({
     field1: {
       key: 'code',
-      title: 'Code',
+      title: groupList('filter.code'),
       keyItems: [
-        { key: 'code', title: 'Code' },
-        { key: 'desc', title: 'Description' },
+        { key: 'code', title: groupList('filter.code') },
+        { key: 'desc', title: groupList('filter.description') },
       ],
       val: '',
       op: 'Contain',
@@ -125,10 +128,10 @@
 
   const tblHeaders = computed(() => [
     { title: '#', key: 'index', align: 'center', sortable: false, width: '50px' },
-    { title: 'Code', key: 'code', align: 'start', minWidth: '180px' },
-    { title: 'Description', key: 'desc', align: 'start', minWidth: '260px' },
-    { title: 'Admin', key: 'is_admin', align: 'center', minWidth: '100px' },
-    { title: 'Status', key: 'is_active', align: 'center', minWidth: '110px' },
+    { title: groupList('headers.code'), key: 'code', align: 'start', minWidth: '180px' },
+    { title: groupList('headers.description'), key: 'desc', align: 'start', minWidth: '260px' },
+    { title: groupList('headers.admin'), key: 'is_admin', align: 'center', minWidth: '100px' },
+    { title: groupList('headers.status'), key: 'is_active', align: 'center', minWidth: '110px' },
   ])
 
   const buildFilter = () => {

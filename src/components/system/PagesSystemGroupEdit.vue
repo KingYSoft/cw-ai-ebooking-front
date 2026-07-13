@@ -25,6 +25,9 @@
   import GroupDetail from './group/GroupDetail.vue'
   import GroupPermission from './group/GroupPermission.vue'
   import GroupUsers from './group/GroupUsers.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
+
+  const { groupEdit } = useSystemPageI18n()
 
   const props = defineProps({
     activedTab: {
@@ -48,7 +51,7 @@
     code: [
       value => {
         if (value) return true
-        return 'Group Code is required.'
+        return groupEdit('validation.codeRequired')
       },
     ],
   })
