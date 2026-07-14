@@ -830,7 +830,7 @@
                   </template>
                 </v-number-input>
 
-                <FRemoteTableMenuWithCode
+                <FRemoteTableMenu
                   v-model="inputData.wso_pack_type"
                   display-key="code"
                   :fetch-method="fetchPackageTypes"
@@ -847,7 +847,12 @@
                   virtual
                   @row-select="
                     row =>
-                      assignPackageTypeFromRow(row, inputData.value, 'wso_pack_type', 'wso_pack_type')
+                      assignPackageTypeFromRow(
+                        row,
+                        inputData,
+                        'wso_pack_type',
+                        'wso_pack_type_desc',
+                      )
                   "
                 />
               </div>
@@ -878,6 +883,42 @@
                 auto-select-first
                 autocomplete="off"
                 clearable
+                :custom-filter="filterMarketOption"
+                density="compact"
+                hide-details
+                item-title="market"
+                item-value="pk"
+                :items="marketOptions"
+                :menu-props="{ maxWidth: '320px' }"
+                min-width="100%"
+                :model-value="inputData.wso_market"
+                return-object
+                :rules="marketRules"
+                variant="outlined"
+                @update:model-value="onOrderMarketChange"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">
+                    Market<span class="text-error"> *</span>:
+                  </div>
+                </template>
+
+                <template #item="{ props: itemProps, item: option }">
+                  <v-list-item
+                    v-bind="itemProps"
+                    :subtitle="
+                      [option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')
+                    "
+                    :title="option.raw.market"
+                  />
+                </template>
+              </v-autocomplete>
+
+              <!-- <v-autocomplete
+                id="1@market"
+                auto-select-first
+                autocomplete="off"
+                clearable
                 color="primary"
                 :custom-filter="filterMarketOption"
                 density="compact"
@@ -902,11 +943,13 @@
                 <template #item="{ props: itemProps, item: option }">
                   <v-list-item
                     v-bind="itemProps"
-                    :subtitle="[option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')"
+                    :subtitle="
+                      [option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')
+                    "
                     :title="option.raw.market"
                   />
                 </template>
-              </v-autocomplete>
+              </v-autocomplete> -->
 
               <v-text-field
                 color="primary"
@@ -1109,7 +1152,8 @@
     },
   })
   const { inputDataRules, queryPortList } = toRefs(props)
-  const convertRequiredRule = fieldLabel => value => String(value ?? '').trim() !== '' || `${fieldLabel} is required.`
+  const convertRequiredRule = fieldLabel => value =>
+    String(value ?? '').trim() !== '' || `${fieldLabel} is required.`
 
   const convertRequiredRules = computed(() => ({
     etd: [convertRequiredRule('ETD')],
@@ -1176,21 +1220,31 @@
 
   const marketOptions = ref([])
 
-  const marketRequiredRule = value => {
-    const normalized = normalizeWhsMarketObject(value)
-    const marketName = String(normalized?.market ?? '').trim()
-    if (!marketName) {
-      return 'Market is required.'
-    }
-    const matched = marketOptions.value.some(opt => {
-      if (normalized?.pk && String(opt.pk ?? '').trim() === String(normalized.pk).trim()) {
+  // const marketRequiredRule = value => {
+  //   const normalized = normalizeWhsMarketObject(value)
+  //   console.log(normalized)
+
+  //   const marketName = String(normalized?.market ?? '').trim()
+  //   if (!marketName) {
+  //     return 'Market is required.'
+  //   }
+  //   const matched = marketOptions.value.some(opt => {
+  //     if (normalized?.pk && String(opt.pk ?? '').trim() === String(normalized.pk).trim()) {
+  //       return true
+  //     }
+  //     return String(opt.market ?? '').trim() === marketName
+  //   })
+  //   return matched || 'Please select Market from the list.'
+  // }
+  const marketRules = [
+    v => {
+      if (v) {
         return true
+      } else {
+        return 'Market is required.'
       }
-      return String(opt.market ?? '').trim() === marketName
-    })
-    return matched || 'Please select Market from the list.'
-  }
-  const marketRules = [marketRequiredRule]
+    },
+  ]
 
   const filterMarketOption = (_value, query, item) => {
     const q = String(query ?? '')
@@ -1214,11 +1268,17 @@
     )
   }
 
-  const onOrderMarketChange = market => {
-    if (!inputData.value) {
-      return
-    }
-    syncMarketDerivedFields(inputData.value, market ?? defaultWhsMarketObject())
+  const onOrderMarketChange = $event => {
+    inputData.value.wso_market_pk = $event?.pk ?? null
+    inputData.value.wso_market = $event?.market ?? null
+    inputData.value.wso_plant_id = $event?.plant_id ?? null
+
+    const aa = inputData.value.item_list ?? []
+    aa.forEach(row => {
+      row.woi_market = $event?.market ?? null
+      row.woi_market_pk = $event?.pk ?? null
+      row.woi_plant_id = $event?.plant_id ?? null
+    })
   }
 
   const reconcileMarketSelection = () => {
@@ -1263,14 +1323,41 @@
   )
 
   const addrTableHeaders = [
-    { title: 'Code', key: 'code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: 'Company Name', key: 'company_name', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: 'Address Code', key: 'address_code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: 'Address1', key: 'address1', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
+    {
+      title: 'Code',
+      key: 'code',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
+    {
+      title: 'Company Name',
+      key: 'company_name',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
+    {
+      title: 'Address Code',
+      key: 'address_code',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
+    {
+      title: 'Address1',
+      key: 'address1',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
     { title: 'City', key: 'city', align: 'start', minWidth: '140' },
     { title: 'Country', key: 'country_code', align: 'start', minWidth: '140' },
   ]
-
 
   /** Volume Weight 单位跟 Gross Weight；Chargeable Weight 单位跟 CBM */
   const syncDerivedWeightUnits = () => {
