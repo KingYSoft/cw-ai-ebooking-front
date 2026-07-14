@@ -151,7 +151,7 @@
               item-value="code"
               :items="appStore.appCombobox.getCombobox('cbmUnit')"
               variant="underlined"
-              width="50px"
+              width="70px"
             />
           </div>
         </div>
@@ -300,7 +300,7 @@
                     :model-value="totalVolumeUnit"
                     readonly
                     variant="underlined"
-                    width="50px"
+                    width="70px"
                   />
                 </div>
               </div>
