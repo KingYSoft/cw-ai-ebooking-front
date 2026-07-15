@@ -1,224 +1,236 @@
 <template>
-  <v-card-text class="py-2">
-    <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat">
-      {{ itemDetailLabel('upload') }}
-    </v-btn>
+  <div>
+    <v-card-text class="py-2">
+      <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat">
+        {{ itemDetailLabel('upload') }}
+      </v-btn>
 
-    <v-text-field
-      id="2@container_rows_required"
-      class="d-none"
-      density="compact"
-      hide-details
-      :model-value="itemList.length"
-      :rules="[v => Number(v || 0) > 0 || validation('atLeastOneLine')]"
-    />
-  </v-card-text>
-
-  <v-data-table
-    class="table-filter"
-    disable-sort
-    :headers="tblContainerHeaders"
-    hide-default-footer
-    item-value="rowKey"
-    :items="itemList"
-    :items-per-page="-1"
-    :show-select="false"
-    striped="even"
-  >
-    <template #header.actions>
-      <v-btn
-        color="primary"
-        density="comfortable"
-        icon="mdi-plus-circle"
-        size="small"
-        variant="text"
-        @click.stop="addNewContainer"
-      />
-    </template>
-
-    <template #item.actions="{ index }">
-      <v-btn
-        color="red"
-        density="comfortable"
-        icon="mdi-minus-circle"
-        size="small"
-        variant="text"
-        @click.stop="removeNewContainer(index)"
-      />
-    </template>
-
-    <template #item.woi_invoice_no="{ item }">
       <v-text-field
-        v-model="item.woi_invoice_no"
+        id="2@container_rows_required"
+        class="d-none"
         density="compact"
         hide-details
-        variant="outlined"
+        :model-value="itemList.length"
+        :rules="[v => Number(v || 0) > 0 || validation('atLeastOneLine')]"
       />
-    </template>
+    </v-card-text>
 
-    <template #item.woi_packlist_no="{ item }">
-      <v-text-field
-        v-model="item.woi_packlist_no"
-        density="compact"
-        hide-details
-        variant="outlined"
-      />
-    </template>
-
-    <template #item.woi_desc="{ item }">
-      <v-text-field v-model="item.woi_desc" density="compact" hide-details variant="outlined" />
-    </template>
-
-    <template #item.woi_item="{ item }">
-      <v-text-field v-model="item.woi_item" density="compact" hide-details variant="outlined" />
-    </template>
-
-    <template #item.woi_gross_wt="{ item }">
-      <div class="d-flex align-center ga-0 w-100">
-        <v-number-input
-          v-model="item.woi_gross_wt"
-          class="flex-1-1"
+    <v-data-table
+      class="table-filter"
+      disable-sort
+      :headers="tblContainerHeaders"
+      hide-default-footer
+      item-value="rowKey"
+      :items="itemList"
+      :items-per-page="-1"
+      :show-select="false"
+      striped="even"
+    >
+      <template #header.actions>
+        <v-btn
           color="primary"
+          density="comfortable"
+          icon="mdi-plus-circle"
+          size="small"
+          variant="text"
+          @click.stop="addNewContainer"
+        />
+      </template>
+
+      <template #item.actions="{ index }">
+        <v-btn
+          color="red"
+          density="comfortable"
+          icon="mdi-minus-circle"
+          size="small"
+          variant="text"
+          @click.stop="removeNewContainer(index)"
+        />
+      </template>
+
+      <template #item.woi_invoice_no="{ item }">
+        <v-text-field
+          v-model="item.woi_invoice_no"
+          density="compact"
+          hide-details
+          variant="outlined"
+        />
+      </template>
+
+      <template #item.woi_packlist_no="{ item }">
+        <v-text-field
+          v-model="item.woi_packlist_no"
+          density="compact"
+          hide-details
+          variant="outlined"
+        />
+      </template>
+
+      <template #item.woi_desc="{ item }">
+        <v-text-field v-model="item.woi_desc" density="compact" hide-details variant="outlined" />
+      </template>
+
+      <template #item.woi_item="{ item }">
+        <v-text-field v-model="item.woi_item" density="compact" hide-details variant="outlined" />
+      </template>
+
+      <template #item.woi_gross_wt="{ item }">
+        <div class="d-flex align-center ga-0 w-100">
+          <v-number-input
+            v-model="item.woi_gross_wt"
+            class="flex-1-1"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :precision="WAREHOUSE_MEASURE_DECIMALS"
+            variant="outlined"
+          />
+
+          <div>
+            <v-select
+              v-model="item.woi_gw_unit"
+              density="compact"
+              hide-details
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('weightUnit')"
+              variant="underlined"
+              width="50px"
+              @update:model-value="item.woi_nw_unit = item.woi_gw_unit"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #item.woi_net_wt="{ item }">
+        <div class="d-flex align-center ga-0 w-100">
+          <v-number-input
+            v-model="item.woi_net_wt"
+            class="flex-1-1"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :precision="WAREHOUSE_MEASURE_DECIMALS"
+            variant="outlined"
+          />
+
+          <div>
+            <v-select
+              v-model="item.woi_gw_unit"
+              density="compact"
+              hide-details
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('weightUnit')"
+              variant="underlined"
+              width="50px"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #item.woi_volume="{ item }">
+        <div class="d-flex align-center ga-0 w-100">
+          <v-number-input
+            v-model="item.woi_volume"
+            class="flex-1-1"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :precision="WAREHOUSE_MEASURE_DECIMALS"
+            variant="outlined"
+          />
+
+          <div>
+            <v-select
+              v-model="item.woi_vol_unit"
+              density="compact"
+              hide-details
+              item-title="code"
+              item-value="code"
+              :items="appStore.appCombobox.getCombobox('cbmUnit')"
+              variant="underlined"
+              width="70px"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #item.woi_outer_pack="{ item }">
+        <div class="d-flex align-center ga-0 w-100">
+          <v-number-input
+            v-model="item.woi_outer_pack"
+            class="flex-1-1"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :min-fraction-digits="0"
+            :precision="0"
+            variant="outlined"
+          />
+
+          <div>
+            <FRemoteTableMenu
+              v-model="item.woi_outpack_unit"
+              display-key="code"
+              :fetch-method="fetchPackageTypes"
+              :headers="packageTypeTableHeaders"
+              item-value="code"
+              :text-field-props="{
+                variant: 'underlined',
+                width: '78',
+              }"
+              virtual
+              @row-select="row => assignPackageTypeFromRow(row, item, 'woi_outpack_unit')"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #item.woi_pieces="{ item }">
+        <v-number-input
+          v-model="item.woi_pieces"
           control-variant="hidden"
           density="compact"
           hide-details
           :precision="WAREHOUSE_MEASURE_DECIMALS"
           variant="outlined"
         />
+      </template>
 
-        <v-select
-          v-model="item.woi_gw_unit"
-          density="compact"
-          hide-details
-          item-title="code"
-          item-value="code"
-          :items="appStore.appCombobox.getCombobox('weightUnit')"
-          variant="underlined"
-          width="50px"
-          @update:model-value="item.woi_nw_unit = item.woi_gw_unit"
-        />
-      </div>
-    </template>
-
-    <template #item.woi_net_wt="{ item }">
-      <div class="d-flex align-center ga-0 w-100">
-        <v-number-input
-          v-model="item.woi_net_wt"
-          class="flex-1-1"
+      <template #item.woi_is_palletization="{ item }">
+        <v-checkbox-btn
+          v-model="item.woi_is_palletization"
           color="primary"
-          control-variant="hidden"
           density="compact"
+          :false-value="0"
           hide-details
-          :precision="WAREHOUSE_MEASURE_DECIMALS"
-          variant="outlined"
+          :true-value="1"
         />
+      </template>
 
-        <v-select
-          v-model="item.woi_gw_unit"
-          density="compact"
-          hide-details
-          item-title="code"
-          item-value="code"
-          :items="appStore.appCombobox.getCombobox('weightUnit')"
-          variant="underlined"
-          width="50px"
-        />
-      </div>
-    </template>
-
-    <template #item.woi_volume="{ item }">
-      <div class="d-flex align-center ga-0 w-100">
-        <v-number-input
-          v-model="item.woi_volume"
-          class="flex-1-1"
+      <template #item.woi_is_battery_included="{ item }">
+        <v-checkbox-btn
+          v-model="item.woi_is_battery_included"
           color="primary"
-          control-variant="hidden"
           density="compact"
+          :false-value="0"
           hide-details
-          :precision="WAREHOUSE_MEASURE_DECIMALS"
-          variant="outlined"
+          :true-value="1"
         />
+      </template>
 
-        <v-select
-          v-model="item.woi_vol_unit"
-          density="compact"
-          hide-details
-          item-title="code"
-          item-value="code"
-          :items="appStore.appCombobox.getCombobox('cbmUnit')"
-          variant="underlined"
-          width="50px"
-        />
-      </div>
-    </template>
-
-    <template #item.woi_outer_pack="{ item }">
-      <div class="d-flex align-center ga-0 w-100">
-        <v-number-input
-          v-model="item.woi_outer_pack"
-          class="flex-1-1"
-          color="primary"
-          control-variant="hidden"
-          density="compact"
-          hide-details
-          :min-fraction-digits="0"
-          :precision="0"
-          variant="outlined"
-        />
-
-        <FRemoteTableMenu
-          v-model="item.woi_outpack_unit"
-          display-key="code"
-          :fetch-method="fetchPackageTypes"
-          :headers="packageTypeTableHeaders"
-          item-value="code"
-          :text-field-props="{
-            variant: 'underlined',
-            width: '70',
-          }"
-          virtual
-          @row-select="row => assignPackageTypeFromRow(row, item, 'woi_outpack_unit')"
-        />
-      </div>
-    </template>
-
-    <template #item.woi_pieces="{ item }">
-      <v-number-input
-        v-model="item.woi_pieces"
-        control-variant="hidden"
-        density="compact"
-        hide-details
-        :precision="WAREHOUSE_MEASURE_DECIMALS"
-        variant="outlined"
-      />
-    </template>
-
-    <template #item.woi_is_palletization="{ item }">
-      <v-checkbox-btn
-        v-model="item.woi_is_palletization"
-        color="primary"
-        density="compact"
-        :false-value="0"
-        hide-details
-        :true-value="1"
-      />
-    </template>
-
-    <template #item.woi_is_battery_included="{ item }">
-      <v-checkbox-btn
-        v-model="item.woi_is_battery_included"
-        color="primary"
-        density="compact"
-        :false-value="0"
-        hide-details
-        :true-value="1"
-      />
-    </template>
-
-    <template #body.append="{ columns }">
-      <tr v-if="itemList.length > 0">
-        <td v-for="column in columns" :key="column.key">
-          <v-row class="ref-form-pre" dense>
+      <template #body.append="{ columns }">
+        <tr v-if="itemList.length > 0" class="v-data-table__tr">
+          <td
+            v-for="column in columns"
+            :key="column.key"
+            class="v-data-table__td v-data-table-column--align-start"
+          >
             <template v-if="column.key === 'woi_invoice_no'">
               <span class="font-weight-bold">{{ itemDetailLabel('total') }} :</span>
             </template>
@@ -234,14 +246,17 @@
                   variant="outlined"
                 />
 
-                <v-text-field
-                  density="compact"
-                  hide-details
-                  :model-value="totalWeightUnit"
-                  readonly
-                  variant="underlined"
-                  width="50px"
-                />
+                <div>
+                  <v-text-field
+                    class="flex-1-1 input-numeric"
+                    density="compact"
+                    hide-details
+                    :model-value="totalWeightUnit"
+                    readonly
+                    variant="underlined"
+                    width="50"
+                  />
+                </div>
               </div>
             </template>
 
@@ -256,14 +271,16 @@
                   variant="outlined"
                 />
 
-                <v-text-field
-                  density="compact"
-                  hide-details
-                  :model-value="totalWeightUnit"
-                  readonly
-                  variant="underlined"
-                  width="50px"
-                />
+                <div>
+                  <v-text-field
+                    density="compact"
+                    hide-details
+                    :model-value="totalWeightUnit"
+                    readonly
+                    variant="underlined"
+                    width="50px"
+                  />
+                </div>
               </div>
             </template>
 
@@ -278,14 +295,16 @@
                   variant="outlined"
                 />
 
-                <v-text-field
-                  density="compact"
-                  hide-details
-                  :model-value="totalVolumeUnit"
-                  readonly
-                  variant="underlined"
-                  width="50px"
-                />
+                <div>
+                  <v-text-field
+                    density="compact"
+                    hide-details
+                    :model-value="totalVolumeUnit"
+                    readonly
+                    variant="underlined"
+                    width="70px"
+                  />
+                </div>
               </div>
             </template>
 
@@ -300,14 +319,16 @@
                   variant="outlined"
                 />
 
-                <v-text-field
-                  density="compact"
-                  hide-details
-                  :model-value="totalPackageType"
-                  readonly
-                  variant="underlined"
-                  width="70px"
-                />
+                <div>
+                  <v-text-field
+                    density="compact"
+                    hide-details
+                    :model-value="totalPackageType"
+                    readonly
+                    variant="underlined"
+                    width="78px"
+                  />
+                </div>
               </div>
             </template>
 
@@ -321,11 +342,11 @@
                 variant="outlined"
               />
             </template>
-          </v-row>
-        </td>
-      </tr>
-    </template>
-  </v-data-table>
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
+  </div>
 </template>
 
 <script setup>
@@ -374,7 +395,8 @@
 
   const itemTotals = computed(() => {
     const rows = itemList.value
-    const sum = key => rows.reduce((total, row) => total.plus(toDecimal(row?.[key])), new Decimal(0))
+    const sum = key =>
+      rows.reduce((total, row) => total.plus(toDecimal(row?.[key])), new Decimal(0))
 
     return {
       gross_weight: formatWarehouseMeasureNumber(sum('woi_gross_wt')),
@@ -394,8 +416,9 @@
   )
 
   const totalPackageType = computed(() => {
-    const fromRow = itemList.value.find(row => String(row?.woi_outpack_unit ?? '').trim())
-      ?.woi_outpack_unit
+    const fromRow = itemList.value.find(row =>
+      String(row?.woi_outpack_unit ?? '').trim(),
+    )?.woi_outpack_unit
     return String(fromRow ?? inputData.value?.wso_pack_type ?? '').trim()
   })
 

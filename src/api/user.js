@@ -49,6 +49,9 @@ export const userQuerySwitchTbl = params => {
   })
 }
 
+export const userQueryOrgHeader = (params, signal) =>
+  service({ url: '/user/query-org-header', method: 'get', params, signal })
+
 export const userSwitchBranch = data =>
   service({ url: '/user/switch-branch', method: 'post', data })
 
@@ -57,6 +60,3 @@ export const userChangePassword = data =>
 
 export const userChangeSetting = data =>
   service({ url: '/user/change-setting', method: 'post', data })
-
-export const userQueryOrgHeader = (params, signal) =>
-  service({ url: '/user/query-org-header', method: 'get', params, signal })

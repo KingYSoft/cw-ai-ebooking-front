@@ -155,7 +155,9 @@ export function mapWhsOrderDetailToForm(el) {
   }
 
   const rawItems = el.item_list ?? el.pac_list ?? []
-  mapped.pac_list = Array.isArray(rawItems) ? rawItems.map((row, index) => mapPacListItem(row, index)) : []
+  mapped.pac_list = Array.isArray(rawItems)
+    ? rawItems.map((row, index) => mapPacListItem(row, index))
+    : []
   mapped.inbound_list = Array.isArray(el.inbound_list) ? el.inbound_list : []
   mapped.outbound_list = Array.isArray(el.outbound_list) ? el.outbound_list : []
   mapped.eDocs_list = el.eDocs_list ?? []
@@ -174,8 +176,7 @@ export function mapWhsOrderDetailToForm(el) {
   mapped.whsOrderRelationOutput = normalizeWhsOrderRelationOutput(el.whsOrderRelationOutput)
 
   // Volume Weight 单位 = Gross Weight；Chargeable Weight 单位 = CBM
-  mapped.bkg_volume_weight_unit =
-    mapped.bkg_unit_of_weight ?? mapped.bkg_volume_weight_unit ?? 'KG'
+  mapped.bkg_volume_weight_unit = mapped.bkg_unit_of_weight ?? mapped.bkg_volume_weight_unit ?? 'KG'
   mapped.bkg_actual_chargeable_unit =
     mapped.bkg_unit_of_volume ?? mapped.bkg_actual_chargeable_unit ?? 'M3'
   mapped.wso_volume_weight_unit = mapped.bkg_volume_weight_unit
@@ -215,27 +216,27 @@ export function defaultWhsOrderRelationOutput() {
   }
 }
 
-function normalizeWhsOrderRelationOrderRow(raw) {
-  if (!raw || typeof raw !== 'object') {
-    return null
-  }
-  return {
-    id: raw.id ?? null,
-    pk: raw.pk ?? '',
-    sys_number: raw.sys_number ?? '',
-    order_no: raw.order_no ?? '',
-    status: raw.status ?? '',
-    date: raw.date ?? '',
-    truck_number: raw.truck_number ?? '',
-    container_number: raw.container_number ?? '',
-  }
-}
-
 function normalizeWhsOrderRelationOrders(raw) {
   if (!Array.isArray(raw)) {
     return []
   }
-  return raw.map(row => normalizeWhsOrderRelationOrderRow(row)).filter(Boolean)
+  return raw
+    .map(raw => {
+      if (!raw || typeof raw !== 'object') {
+        return null
+      }
+      return {
+        id: raw.id ?? null,
+        pk: raw.pk ?? '',
+        sys_number: raw.sys_number ?? '',
+        order_no: raw.order_no ?? '',
+        status: raw.status ?? '',
+        date: raw.date ?? '',
+        truck_number: raw.truck_number ?? '',
+        container_number: raw.container_number ?? '',
+      }
+    })
+    .filter(Boolean)
 }
 
 function normalizeWhsOrderRelationOutput(raw) {

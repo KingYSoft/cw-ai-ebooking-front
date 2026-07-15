@@ -239,7 +239,9 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">{{ detailField('switchboard') }}</div>
+                      <div class="text-caption text-end w-label-120">
+                        {{ detailField('switchboard') }}
+                      </div>
                     </template>
                   </v-text-field>
                 </div>
@@ -279,7 +281,9 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">{{ detailField('contact') }}</div>
+                      <div class="text-caption text-end w-label-120">
+                        {{ detailField('contact') }}
+                      </div>
                     </template>
                   </v-text-field>
                 </div>
@@ -403,7 +407,9 @@
                     variant="outlined"
                   >
                     <template #prepend>
-                      <div class="text-caption text-end w-label-120">{{ detailField('contact') }}</div>
+                      <div class="text-caption text-end w-label-120">
+                        {{ detailField('contact') }}
+                      </div>
                     </template>
                   </v-text-field>
                 </div>
@@ -456,7 +462,9 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('container') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('container') }}
+                  </div>
                 </template>
               </v-select>
 
@@ -598,7 +606,9 @@
                 </template>
 
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('discharge') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('discharge') }}
+                  </div>
                 </template>
               </v-autocomplete>
 
@@ -637,7 +647,9 @@
                 min="2000-01-01"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('cargoReadyDate') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('cargoReadyDate') }}
+                  </div>
                 </template>
               </FDatePicker>
 
@@ -648,7 +660,9 @@
                 min="2000-01-01"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('estPickup') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('estPickup') }}
+                  </div>
                 </template>
               </FDatePicker>
 
@@ -659,7 +673,9 @@
                 min="2000-01-01"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('estDelivery') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('estDelivery') }}
+                  </div>
                 </template>
               </FDatePicker>
             </div>
@@ -684,7 +700,9 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('grossWeight') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('grossWeight') }}
+                  </div>
                 </template>
 
                 <template #append>
@@ -762,7 +780,9 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('volumeWeight') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('volumeWeight') }}
+                  </div>
                 </template>
 
                 <template #append>
@@ -792,7 +812,9 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('chargeable') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('chargeable') }}
+                  </div>
                 </template>
 
                 <template #append>
@@ -826,11 +848,13 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('noOfPackage') }}</div>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('noOfPackage') }}
+                    </div>
                   </template>
                 </v-number-input>
 
-                <FRemoteTableMenuWithCode
+                <FRemoteTableMenu
                   v-model="inputData.wso_pack_type"
                   display-key="code"
                   :fetch-method="fetchPackageTypes"
@@ -847,7 +871,12 @@
                   virtual
                   @row-select="
                     row =>
-                      assignPackageTypeFromRow(row, inputData.value, 'wso_pack_type', 'wso_pack_type')
+                      assignPackageTypeFromRow(
+                        row,
+                        inputData,
+                        'wso_pack_type',
+                        'wso_pack_type_desc',
+                      )
                   "
                 />
               </div>
@@ -869,11 +898,49 @@
                 variant="outlined"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('deliveryMode') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('deliveryMode') }}
+                  </div>
                 </template>
               </v-select>
 
               <v-autocomplete
+                id="1@market"
+                auto-select-first
+                autocomplete="off"
+                clearable
+                :custom-filter="filterMarketOption"
+                density="compact"
+                hide-details
+                item-title="market"
+                item-value="pk"
+                :items="marketOptions"
+                :menu-props="{ maxWidth: '320px' }"
+                min-width="100%"
+                :model-value="inputData.wso_market"
+                return-object
+                :rules="marketRules"
+                variant="outlined"
+                @update:model-value="onOrderMarketChange"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('market') }}<span class="text-error"> *</span>:
+                  </div>
+                </template>
+
+                <template #item="{ props: itemProps, item: option }">
+                  <v-list-item
+                    v-bind="itemProps"
+                    :subtitle="
+                      [option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')
+                    "
+                    :title="option.raw.market"
+                  />
+                </template>
+              </v-autocomplete>
+
+              <!-- <v-autocomplete
                 id="1@market"
                 auto-select-first
                 autocomplete="off"
@@ -902,11 +969,13 @@
                 <template #item="{ props: itemProps, item: option }">
                   <v-list-item
                     v-bind="itemProps"
-                    :subtitle="[option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')"
+                    :subtitle="
+                      [option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')
+                    "
                     :title="option.raw.market"
                   />
                 </template>
-              </v-autocomplete>
+              </v-autocomplete> -->
 
               <v-text-field
                 color="primary"
@@ -935,7 +1004,9 @@
                 min-width="100%"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('soConfirm') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('soConfirm') }}
+                  </div>
                 </template>
               </FDatePicker>
 
@@ -947,7 +1018,9 @@
                 min-width="100%"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('vgmCutOff') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('vgmCutOff') }}
+                  </div>
                 </template>
               </FDatePicker>
 
@@ -959,7 +1032,9 @@
                 min-width="100%"
               >
                 <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('docCutOff') }}</div>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('docCutOff') }}
+                  </div>
                 </template>
               </FDatePicker>
 
@@ -1098,14 +1173,8 @@
   const appStore = useAppStore()
   const { t } = useLocale()
   const { rescols } = useLayoutCols()
-  const {
-    detailSection,
-    detailField,
-    addrTable,
-    validation,
-    validationField,
-    requiredRule,
-  } = useWarehouseOrderPageI18n()
+  const { detailSection, detailField, addrTable, validation, validationField, requiredRule } =
+    useWarehouseOrderPageI18n()
 
   const props = defineProps({
     inputDataRules: {
@@ -1184,21 +1253,31 @@
 
   const marketOptions = ref([])
 
-  const marketRequiredRule = value => {
-    const normalized = normalizeWhsMarketObject(value)
-    const marketName = String(normalized?.market ?? '').trim()
-    if (!marketName) {
-      return validation('marketRequired')
-    }
-    const matched = marketOptions.value.some(opt => {
-      if (normalized?.pk && String(opt.pk ?? '').trim() === String(normalized.pk).trim()) {
+  // const marketRequiredRule = value => {
+  //   const normalized = normalizeWhsMarketObject(value)
+  //   console.log(normalized)
+
+  //   const marketName = String(normalized?.market ?? '').trim()
+  //   if (!marketName) {
+  //     return 'Market is required.'
+  //   }
+  //   const matched = marketOptions.value.some(opt => {
+  //     if (normalized?.pk && String(opt.pk ?? '').trim() === String(normalized.pk).trim()) {
+  //       return true
+  //     }
+  //     return String(opt.market ?? '').trim() === marketName
+  //   })
+  //   return matched || 'Please select Market from the list.'
+  // }
+  const marketRules = [
+    v => {
+      if (v) {
         return true
+      } else {
+        return validation('marketRequired')
       }
-      return String(opt.market ?? '').trim() === marketName
-    })
-    return matched || validation('marketSelectFromList')
-  }
-  const marketRules = [marketRequiredRule]
+    },
+  ]
 
   const filterMarketOption = (_value, query, item) => {
     const q = String(query ?? '')
@@ -1222,11 +1301,17 @@
     )
   }
 
-  const onOrderMarketChange = market => {
-    if (!inputData.value) {
-      return
-    }
-    syncMarketDerivedFields(inputData.value, market ?? defaultWhsMarketObject())
+  const onOrderMarketChange = $event => {
+    inputData.value.wso_market_pk = $event?.pk ?? null
+    inputData.value.wso_market = $event?.market ?? null
+    inputData.value.wso_plant_id = $event?.plant_id ?? null
+
+    const aa = inputData.value.item_list ?? []
+    aa.forEach(row => {
+      row.woi_market = $event?.market ?? null
+      row.woi_market_pk = $event?.pk ?? null
+      row.woi_plant_id = $event?.plant_id ?? null
+    })
   }
 
   const reconcileMarketSelection = () => {
@@ -1270,14 +1355,42 @@
     String(inputData.value?.wso_plant_id ?? inputData.value?.market?.plant_id ?? '').trim(),
   )
 
-  const addrTableHeaders = computed(() => [
-    { title: addrTable('code'), key: 'code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: addrTable('companyName'), key: 'company_name', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: addrTable('addressCode'), key: 'address_code', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: addrTable('address1'), key: 'address1', align: 'start', maxWidth: '200', cellProps: { class: 'text-truncate' }, minWidth: '140' },
-    { title: addrTable('city'), key: 'city', align: 'start', minWidth: '140' },
-    { title: addrTable('country'), key: 'country_code', align: 'start', minWidth: '140' },
-  ])
+  const addrTableHeaders = [
+    {
+      title: 'Code',
+      key: 'code',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
+    {
+      title: 'Company Name',
+      key: 'company_name',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
+    {
+      title: 'Address Code',
+      key: 'address_code',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
+    {
+      title: 'Address1',
+      key: 'address1',
+      align: 'start',
+      maxWidth: '200',
+      cellProps: { class: 'text-truncate' },
+      minWidth: '140',
+    },
+    { title: 'City', key: 'city', align: 'start', minWidth: '140' },
+    { title: 'Country', key: 'country_code', align: 'start', minWidth: '140' },
+  ]
 
   /** Volume Weight 单位跟 Gross Weight；Chargeable Weight 单位跟 CBM */
   const syncDerivedWeightUnits = () => {
