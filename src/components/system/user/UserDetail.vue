@@ -5,7 +5,7 @@
       <v-card-text class="py-2">
         <v-divider>
           <div class="text-center text-caption text-uppercase text-on-surface opacity-70 mb-8">
-            Login Info
+            {{ userSection('loginInfo') }}
           </div>
         </v-divider>
 
@@ -25,7 +25,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-120">
-                  Login Name
+                  {{ userField('loginName') }}
                   <span class="text-red">*</span>
                   :
                 </div>
@@ -47,7 +47,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-120">
-                  Password
+                  {{ userField('password') }}
                   <span class="text-red">*</span>
                   :
                 </div>
@@ -70,7 +70,7 @@
       <v-card-text class="py-2">
         <v-divider>
           <div class="text-center text-caption text-uppercase text-on-surface opacity-70 mb-8">
-            Employee Details
+            {{ userSection('employeeDetails') }}
           </div>
         </v-divider>
 
@@ -86,7 +86,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">Full Name:</div>
+                <div class="text-caption text-end w-label-120">{{ userField('fullName') }}:</div>
               </template>
             </v-text-field>
           </v-col>
@@ -102,7 +102,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">Short Code:</div>
+                <div class="text-caption text-end w-label-120">{{ userField('shortCode') }}:</div>
               </template>
             </v-text-field>
           </v-col>
@@ -118,7 +118,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">Email Address:</div>
+                <div class="text-caption text-end w-label-120">{{ userField('emailAddress') }}:</div>
               </template>
             </v-text-field>
           </v-col>
@@ -134,7 +134,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">Mobile Phone:</div>
+                <div class="text-caption text-end w-label-120">{{ userField('mobilePhone') }}:</div>
               </template>
             </v-text-field>
           </v-col>
@@ -149,7 +149,7 @@
               :true-value="1"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">Can Login:</div>
+                <div class="text-caption text-end w-label-120 mr-2">{{ userField('canLogin') }}:</div>
               </template>
             </v-switch>
           </v-col>
@@ -166,7 +166,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">Last Logon Date:</div>
+                <div class="text-caption text-end w-label-120">{{ userField('lastLogonDate') }}:</div>
               </template>
             </v-text-field>
           </v-col>
@@ -220,7 +220,7 @@
 
               <template #prepend>
                 <div class="text-caption text-end w-label-120">
-                  Org Header<span class="text-red">*</span>:
+                  {{ userField('orgHeader') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-autocomplete>
@@ -231,7 +231,7 @@
       <v-card-text class="py-2">
         <v-divider>
           <div class="text-center text-caption text-uppercase text-on-surface opacity-70 mb-8">
-            Employee Status
+            {{ userSection('employeeStatus') }}
           </div>
         </v-divider>
 
@@ -246,7 +246,7 @@
               :true-value="1"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">Is Active:</div>
+                <div class="text-caption text-end w-label-120 mr-2">{{ userField('isActive') }}:</div>
               </template>
             </v-switch>
           </v-col>
@@ -261,9 +261,11 @@
   import { userQueryOrgHeader } from '@/api/user'
   import { debounceFn } from '@/api/utils'
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
 
   defineOptions({ name: 'UserDetail' })
 
+  const { userField, userSection } = useSystemPageI18n()
   const { rescols } = useLayoutCols()
 
   defineProps({

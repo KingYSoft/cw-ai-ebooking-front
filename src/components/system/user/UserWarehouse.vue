@@ -2,7 +2,7 @@
   <v-sheet color="transparent">
     <v-card-text>
       <v-btn color="primary" size="small" variant="flat" @click="openWarehouseDialog">
-        Select Warehouses
+        {{ userEdit('warehouse.selectWarehouses') }}
       </v-btn>
     </v-card-text>
 
@@ -31,7 +31,7 @@
 
           <v-list activatable density="compact">
             <v-list-item prepend-icon="mdi-delete" @click.prevent="removeSelectedWarehouse(item)">
-              <v-list-item-title>Delete</v-list-item-title>
+              <v-list-item-title>{{ common('delete') }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -44,7 +44,7 @@
           size="small"
           variant="tonal"
         >
-          {{ item.is_active === 1 ? 'Yes' : 'No' }}
+          {{ item.is_active === 1 ? common('yes') : common('no') }}
         </v-chip>
       </template>
 
@@ -54,11 +54,11 @@
     <v-dialog v-model="warehouseDialogVisible" max-width="900" persistent>
       <v-card>
         <v-card-title class="d-flex align-center">
-          Select Warehouses
+          {{ userEdit('warehouse.selectWarehouses') }}
           <v-spacer />
 
           <v-chip color="primary" size="small" variant="tonal">
-            {{ warehouseDialogSelected.length }} selected
+            {{ common('selected', warehouseDialogSelected.length) }}
           </v-chip>
         </v-card-title>
 
@@ -71,12 +71,12 @@
                   clearable
                   density="compact"
                   hide-details
-                  placeholder="input query keywords"
+                  :placeholder="common('queryKeywordsPlaceholder')"
                   single-line
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end">Query Warehouse:</div>
+                    <div class="text-caption text-end">{{ userEdit('warehouse.queryWarehouse') }}</div>
                   </template>
                 </v-text-field>
               </v-col>
@@ -109,7 +109,7 @@
                 size="small"
                 variant="tonal"
               >
-                {{ item.is_active === 1 ? 'Yes' : 'No' }}
+                {{ item.is_active === 1 ? common('yes') : common('no') }}
               </v-chip>
             </template>
           </v-data-table>
@@ -119,10 +119,10 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="warehouseDialogVisible = false">Cancel</v-btn>
+          <v-btn variant="text" @click="warehouseDialogVisible = false">{{ common('cancel') }}</v-btn>
 
           <v-btn color="primary" variant="tonal" @click="warehouseDialogVisible = false">
-            Apply
+            {{ common('apply') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -131,12 +131,15 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useDisplay } from 'vuetify'
   import { queryWarehouseList } from '@/api/user'
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
 
   defineOptions({ name: 'UserWarehouse' })
+
+  const { common, userEdit } = useSystemPageI18n()
 
   const props = defineProps({
     activedTab: {
@@ -153,15 +156,15 @@
   const { rescols } = useLayoutCols()
 
   const maxHeight = computed(() => display.height.value - 320)
-  const warehouseHeaders = [
-    { title: 'Code', key: 'code', align: 'start', minWidth: '160px' },
-    { title: 'Name', key: 'name', align: 'start', minWidth: '220px' },
-    { title: 'Active', key: 'is_active', align: 'start', minWidth: '120px' },
-  ]
-  const selectedWarehouseHeaders = [
+  const warehouseHeaders = computed(() => [
+    { title: userEdit('warehouse.headers.code'), key: 'code', align: 'start', minWidth: '160px' },
+    { title: userEdit('warehouse.headers.name'), key: 'name', align: 'start', minWidth: '220px' },
+    { title: userEdit('warehouse.headers.active'), key: 'is_active', align: 'start', minWidth: '120px' },
+  ])
+  const selectedWarehouseHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', width: '60px', sortable: false },
-    ...warehouseHeaders,
-  ]
+    ...warehouseHeaders.value,
+  ])
   const warehouseList = ref([])
   const loading = ref(false)
   const warehouseDialogVisible = ref(false)

@@ -14,13 +14,13 @@
       :items="tblItems"
       :max-height="maxHeight"
       striped="even"
-      title="Users"
+      :title="userList('title')"
       virtual
       @row-dblclick="onRowDblClick"
     >
       <template #actions>
         <v-btn color="primary" prepend-icon="$plus" size="small" variant="flat" @click="onNewUser">
-          New
+          {{ common('new') }}
         </v-btn>
       </template>
 
@@ -31,7 +31,7 @@
           size="small"
           variant="tonal"
         >
-          {{ item.can_login === 1 ? 'Yes' : 'No' }}
+          {{ item.can_login === 1 ? common('yes') : common('no') }}
         </v-chip>
       </template>
 
@@ -42,7 +42,7 @@
           size="small"
           variant="tonal"
         >
-          {{ item.is_admin === 1 ? 'Yes' : 'No' }}
+          {{ item.is_admin === 1 ? common('yes') : common('no') }}
         </v-chip>
       </template>
 
@@ -53,7 +53,7 @@
           size="small"
           variant="tonal"
         >
-          {{ item.is_active === 1 ? 'Active' : 'Inactive' }}
+          {{ item.is_active === 1 ? common('active') : common('inactive') }}
         </v-chip>
       </template>
 
@@ -79,6 +79,9 @@
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesSystemUserFilter from '@/components/system/PagesSystemUserFilter.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
+
+  const { common, userList } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemUser' })
   definePage({
@@ -104,12 +107,12 @@
   const defaultFilterData = () => ({
     field1: {
       key: 'login_name',
-      title: 'Login Name',
+      title: userList('filter.loginName'),
       keyItems: [
-        { key: 'login_name', title: 'Login Name' },
-        { key: 'full_name', title: 'Full Name' },
-        { key: 'email_address', title: 'Email' },
-        { key: 'mobile_phone', title: 'Mobile Phone' },
+        { key: 'login_name', title: userList('filter.loginName') },
+        { key: 'full_name', title: userList('filter.fullName') },
+        { key: 'email_address', title: userList('filter.email') },
+        { key: 'mobile_phone', title: userList('filter.mobilePhone') },
       ],
       val: '',
       op: 'Contain',
@@ -138,13 +141,13 @@
 
   const tblHeaders = computed(() => [
     { title: '#', key: 'index', align: 'center', sortable: false, width: '50px' },
-    { title: 'Login Name', key: 'login_name', align: 'start', minWidth: '160px' },
-    { title: 'Full Name', key: 'full_name', align: 'start', minWidth: '160px' },
-    { title: 'Email', key: 'email_address', align: 'start', minWidth: '220px' },
-    { title: 'Mobile Phone', key: 'mobile_phone', align: 'start', minWidth: '150px' },
-    { title: 'Can Login', key: 'can_login', align: 'center', minWidth: '120px' },
-    { title: 'Admin', key: 'is_admin', align: 'center', minWidth: '100px' },
-    { title: 'Status', key: 'is_active', align: 'center', minWidth: '110px' },
+    { title: userList('headers.loginName'), key: 'login_name', align: 'start', minWidth: '160px' },
+    { title: userList('headers.fullName'), key: 'full_name', align: 'start', minWidth: '160px' },
+    { title: userList('headers.email'), key: 'email_address', align: 'start', minWidth: '220px' },
+    { title: userList('headers.mobilePhone'), key: 'mobile_phone', align: 'start', minWidth: '150px' },
+    { title: userList('headers.canLogin'), key: 'can_login', align: 'center', minWidth: '120px' },
+    { title: userList('headers.admin'), key: 'is_admin', align: 'center', minWidth: '100px' },
+    { title: userList('headers.status'), key: 'is_active', align: 'center', minWidth: '110px' },
   ])
 
   const buildFilter = () => {

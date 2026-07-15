@@ -9,7 +9,7 @@
     :max-height="maxHeight"
     :show-select="true"
     striped="even"
-    title="Docs"
+    :title="eDocs('title')"
     @row-dblclick="onRowDblClick"
     @update:items-per-page="handleItemsPerPageChange"
     @update:page="handlePageChange"
@@ -24,7 +24,7 @@
           variant="flat"
           @click="openShowUpload"
         >
-          Upload
+          {{ eDocs('upload') }}
         </v-btn>
       </div>
     </template>
@@ -61,7 +61,7 @@
   <v-dialog v-model="showUpload" max-width="800" persistent>
     <v-card>
       <v-card-title class="d-flex align-center justify-space-between">
-        <span>Upload eDoc</span>
+        <span>{{ eDocs('uploadDialogTitle') }}</span>
 
         <v-btn icon size="small" variant="text" @click="showUpload = false">
           <v-icon>mdi-close</v-icon>
@@ -76,7 +76,7 @@
           :job-type="'BKG'"
           :max-files="1"
           :readonly="true"
-          upload-button-text="Upload Files"
+          :upload-button-text="eDocs('uploadButtonText')"
           @clear="handleClear"
           @upload="handleUpload"
         />
@@ -98,7 +98,10 @@
   import { edocDownloadFiles, edocSave, edocSearch } from '@/api/edoc'
   import FTableLayout from '@/components/FTableLayout.vue'
   import FUpload from '@/components/FUpload.vue'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { t, eDocs } = useBookingPageI18n()
 
   const inputData = defineModel('input-data', {
     type: Object,
@@ -140,52 +143,6 @@
   const pdfDiaVis = ref(false)
   const pdfTemplateName = ref('eDoc')
 
-  const resolveEdocFileUrl = item => {
-    if (!item || typeof item !== 'object') {
-      return ''
-    }
-    const path = item.file_url ?? item.file_path ?? item.url ?? item.path ?? ''
-    if (!path) {
-      return ''
-    }
-    if (/^https?:\/\//i.test(path)) {
-      return path
-    }
-    const base = import.meta.env.VITE_APP_BASE_API || ''
-    return path.startsWith('/') ? `${base}${path}` : `${base}/${path}`
-  }
-
-  const handlePreview = item => {
-    const url = resolveEdocFileUrl(item)
-    if (!url) {
-      appStore.openMessage({
-        content: 'No file URL available for preview.',
-        color: 'warning',
-      })
-      return
-    }
-    pdfTemplateName.value = item.file_name || item.file_type || 'eDoc'
-    pdfUrl.value = url
-    pdfDiaVis.value = true
-  }
-
-  const handleDownload = (item = null) => {
-    const rows = item ? [item] : tblSelectedEDoc.value || []
-    if (rows.length === 0) {
-      appStore.openMessage({
-        content: 'Please select at least one file.',
-        color: 'warning',
-      })
-      return
-    }
-    for (const row of rows) {
-      const url = resolveEdocFileUrl(row)
-      if (url) {
-        window.open(url, '_blank')
-      }
-    }
-  }
-
   const currentPage = ref(1)
   const itemsPerPage = ref(100)
   const maxHeight = computed(() => {
@@ -204,28 +161,28 @@
     initTable()
   })
 
-  const tblEDocHeaders = ref([
+  const tblEDocHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
     {
-      title: 'File Name',
+      title: eDocs('fileName'),
       key: 'file_name',
       align: 'start',
       minWidth: '140',
     },
     {
-      title: 'File Path',
+      title: eDocs('filePath'),
       key: 'file_path',
       align: 'start',
       minWidth: '200',
     },
     {
-      title: 'Ref No.',
+      title: eDocs('refNo'),
       key: 'ref_no',
       align: 'start',
       minWidth: '140',
     },
     {
-      title: 'Received Time',
+      title: eDocs('receivedTime'),
       key: 'received_time',
       align: 'start',
       minWidth: '140',
@@ -234,8 +191,8 @@
 
   // #region Row Actions Menu
   const getRowMenuItems = () => [
-    { title: 'download', prependIcon: 'mdi-download', code: 'download' },
-    { title: 'preview', prependIcon: 'mdi-eye', code: 'preview' },
+    { title: eDocs('download'), prependIcon: 'mdi-download', code: 'download' },
+    { title: eDocs('preview'), prependIcon: 'mdi-eye', code: 'preview' },
   ]
   const handleRowMenuSelect = (e, item) => {
     switch (e.id) {

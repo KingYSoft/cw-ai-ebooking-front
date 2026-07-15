@@ -9,14 +9,14 @@
           variant="flat"
           @click.stop="handleSave"
         >
-          Save
+          {{ common('save') }}
         </v-btn>
       </template>
     </LayoutWithToolbar>
 
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
-      <v-tab :value="1">Detail</v-tab>
-      <v-tab :value="2">Warehouse</v-tab>
+      <v-tab :value="1">{{ userEditTab('detail') }}</v-tab>
+      <v-tab :value="2">{{ userEditTab('warehouse') }}</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -34,19 +34,25 @@
         :disabled="cardLoading"
         :loading="cardLoading"
         prepend-icon="mdi-alert-circle"
-        title="User Not Exists."
+        :title="userDialog('notExists', 'title')"
       >
         <template #loader="{ isActive }">
           <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
         </template>
 
         <v-card-text class="pb-2">
-          This user not exists. You can new user or close page.
+          {{ userDialog('notExists', 'message') }}
         </v-card-text>
 
         <template #actions>
           <v-spacer />
-          <v-btn color="primary" text="New User" variant="tonal" @click="newUserHandle" />
+
+          <v-btn
+            color="primary"
+            :text="userDialog('notExists', 'newUser')"
+            variant="tonal"
+            @click="newUserHandle"
+          />
         </template>
       </v-card>
     </v-dialog>
@@ -55,12 +61,15 @@
 
 <script setup>
   import { computed, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { getUserById, saveUser } from '@/api/user'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesSystemUserEdit from '@/components/system/PagesSystemUserEdit.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { common, userDialog, userEditTab } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemUserEdit' })
   definePage({
@@ -77,7 +86,6 @@
   })
 
   const route = useRoute()
-  const router = useRouter()
   const appStore = useAppStore()
 
   const defaultInputData = () => ({

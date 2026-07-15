@@ -1,7 +1,7 @@
 <template>
   <div>
     <FPageLayout :card-loading="cardLoading" :skeleton-loading="skeletonLoading">
-      <LayoutWithToolbar :divider="false" :height="68" :spacer="true" title="New Warehouse">
+      <LayoutWithToolbar :divider="false" :height="68" :spacer="true" :title="edit('newPageTitle')">
         <template v-if="activedTab === 1 || activedTab === 2" #actions>
           <v-btn
             color="primary"
@@ -10,16 +10,16 @@
             variant="flat"
             @click.stop="onSaveHandle"
           >
-            Save
+            {{ editButton('save') }}
           </v-btn>
         </template>
       </LayoutWithToolbar>
 
       <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
-        <v-tab :value="1">Order Detail</v-tab>
-        <v-tab :value="2">Item Detail</v-tab>
-        <v-tab :value="3">Docs</v-tab>
-        <v-tab :value="5">Logs</v-tab>
+        <v-tab :value="1">{{ editTab('orderDetail') }}</v-tab>
+        <v-tab :value="2">{{ editTab('itemDetail') }}</v-tab>
+        <v-tab :value="3">{{ editTab('docs') }}</v-tab>
+        <v-tab :value="5">{{ editTab('logs') }}</v-tab>
       </v-tabs>
 
       <v-divider />
@@ -35,12 +35,13 @@
 
 <script setup>
   import { onActivated, onMounted, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
   import { useWarehouseBookingForm } from '@/composables/useWarehouseBookingForm'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'WarehouseBookingNew' })
@@ -69,8 +70,7 @@
 
   const appStore = useAppStore()
   const router = useRouter()
-  const route = useRoute()
-  // const { t } = useLocale()
+  const { edit, editButton, editTab, editMessage } = useWarehouseOrderPageI18n()
 
   // // 注册 inputData 未保存检查；查询完成或保存成功后刷新已保存快照。
   // const { markInputDataSaved } = useUnsavedInputDataGuard(inputData)
@@ -122,7 +122,7 @@
         }
         default: {
           appStore.openMessage({
-            content: 'Unknown tab.',
+            content: editMessage('unknownTab'),
             color: 'warning',
           })
         }

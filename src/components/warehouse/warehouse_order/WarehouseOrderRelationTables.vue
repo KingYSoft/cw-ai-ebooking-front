@@ -53,6 +53,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import {
     WHS_ORDER_RELATION_ORDER_COLUMNS,
     WHS_ORDER_RELATION_OUTBOUND_COLUMNS,
@@ -70,6 +71,31 @@
 
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
+  const { relation: relationLabel } = useWarehouseOrderPageI18n()
+
+  const INBOUND_HEADER_KEYS = {
+    sys_number: 'inboundNo',
+    order_no: 'goodsReceiptNumber',
+    status: 'status',
+    date: 'receiveDate',
+    truck_number: 'truckNo',
+    container_number: 'containerNumber',
+  }
+
+  const OUTBOUND_HEADER_KEYS = {
+    sys_number: 'outboundNo',
+    order_no: 'goodsOutboundNumber',
+    status: 'status',
+    date: 'outboundDate',
+    truck_number: 'truckNo',
+    container_number: 'containerNumber',
+  }
+
+  const mapRelationHeaders = (columns, headerKeys) =>
+    columns.map(col => ({
+      ...col,
+      title: relationLabel(headerKeys[col.key]),
+    }))
 
   const mapRelationRows = rows =>
     (Array.isArray(rows) ? rows : []).map((row, index) => ({
@@ -83,14 +109,14 @@
   const relationSections = computed(() => [
     {
       key: 'inbound',
-      title: 'Inbound',
-      headers: WHS_ORDER_RELATION_ORDER_COLUMNS,
+      title: relationLabel('inbound'),
+      headers: mapRelationHeaders(WHS_ORDER_RELATION_ORDER_COLUMNS, INBOUND_HEADER_KEYS),
       items: inboundOrders.value,
     },
     {
       key: 'outbound',
-      title: 'Outbound',
-      headers: WHS_ORDER_RELATION_OUTBOUND_COLUMNS,
+      title: relationLabel('outbound'),
+      headers: mapRelationHeaders(WHS_ORDER_RELATION_OUTBOUND_COLUMNS, OUTBOUND_HEADER_KEYS),
       items: outboundOrders.value,
     },
   ])

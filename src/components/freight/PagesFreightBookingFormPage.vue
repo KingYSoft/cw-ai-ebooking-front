@@ -4,7 +4,7 @@
       <template v-if="isEditMode" #title>
         <div class="d-flex align-center ga-2">
           <div class="d-flex flex-column ga-0">
-            <span class="font-weight-bold text-body-2">Booking</span>
+            <span class="font-weight-bold text-body-2">{{ edit('bookingTitle') }}</span>
 
             <div class="d-flex align-center ga-1">
               <span class="font-weight-bold text-body-2">
@@ -36,7 +36,7 @@
           variant="flat"
           @click="onSaveHandle"
         >
-          Save
+          {{ editButton('save') }}
         </v-btn>
       </template>
     </LayoutWithToolbar>
@@ -45,10 +45,10 @@
     <v-divider />
 
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
-      <v-tab :value="1">Booking</v-tab>
-      <v-tab :value="2">Additional Details</v-tab>
-      <v-tab :value="3">Docs</v-tab>
-      <v-tab :value="4">Log</v-tab>
+      <v-tab :value="1">{{ editTab('booking') }}</v-tab>
+      <v-tab :value="2">{{ editTab('additionalDetails') }}</v-tab>
+      <v-tab :value="3">{{ editTab('docs') }}</v-tab>
+      <v-tab :value="4">{{ editTab('log') }}</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -67,13 +67,14 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { bookingDetail } from '@/api/booking'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
   import BookingFreightStepper from '@/components/freight/BookingFreightStepper.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
   import { useFreightBookingForm } from '@/composables/useFreightBookingForm'
   import { useAppStore } from '@/stores/app'
@@ -87,6 +88,8 @@
     pageTitle: { type: String, default: undefined },
   })
   const { isEditMode, pageTitle } = toRefs(props)
+
+  const { edit, editButton, editTab } = useBookingPageI18n()
 
   const router = useRouter()
   const route = useRoute()
@@ -239,7 +242,7 @@
         }
         default: {
           appStore.openMessage({
-            content: 'Unknown tab.',
+            content: edit('unknownTab'),
             color: 'warning',
           })
         }
@@ -256,7 +259,7 @@
   }
 
   const tabTitle = computed(() => {
-    return inputData.value.bkg_consign_no ? `BKG-${inputData.value.bkg_consign_no}` : 'Booking'
+    return inputData.value.bkg_consign_no ? `BKG-${inputData.value.bkg_consign_no}` : edit('bookingTitle')
   })
   const handleCopyBookingNo = () => {
     const bookingNo = inputData.value.bkg_consign_no || ''
@@ -265,7 +268,7 @@
     }
     navigator.clipboard.writeText(bookingNo)
     appStore.openMessage({
-      content: 'Booking No. copied to clipboard.',
+      content: edit('copySuccess'),
       color: 'success',
     })
   }

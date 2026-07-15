@@ -19,7 +19,10 @@
 <script setup>
   import { computed } from 'vue'
 
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { BOOKING_FREIGHT_STEPS, getFreightStepIndex } from '@/constants/bookingFreightSteps'
+
+  const { freightStep } = useBookingPageI18n()
 
   const status = defineModel('status', { type: String, default: 'draft' })
 
@@ -28,7 +31,7 @@
 
   const stepperItems = computed(() =>
     BOOKING_FREIGHT_STEPS.map((step, index) => ({
-      title: step.title,
+      title: freightStep(step.value),
       value: index + 1,
       icon: step.icon,
       color: 'primary',

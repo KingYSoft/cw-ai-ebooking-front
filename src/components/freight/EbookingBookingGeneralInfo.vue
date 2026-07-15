@@ -5,7 +5,7 @@
         <v-col :cols="rescols('c12l4s6')">
           <v-divider>
             <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-              Shipper
+              {{ detailSection('shipper') }}
             </div>
           </v-divider>
 
@@ -30,7 +30,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label">
-                  Name<span class="text-red">*</span>:
+                  {{ detailField('name') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </FRemoteTableMenu>
@@ -46,7 +46,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address1:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address1') }}:</div>
               </template>
             </v-text-field>
 
@@ -61,7 +61,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address2:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address2') }}:</div>
               </template>
             </v-text-field>
 
@@ -76,7 +76,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address3:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address3') }}:</div>
               </template>
             </v-text-field>
           </div>
@@ -85,7 +85,7 @@
         <v-col :cols="rescols('c12l4s6')">
           <v-divider>
             <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-              Consignee
+              {{ detailSection('consignee') }}
             </div>
           </v-divider>
 
@@ -109,7 +109,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label">
-                  Name<span class="text-red">*</span>:
+                  {{ detailField('name') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </FRemoteTableMenu>
@@ -125,7 +125,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address1:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address1') }}:</div>
               </template>
             </v-text-field>
 
@@ -140,7 +140,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address2:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address2') }}:</div>
               </template>
             </v-text-field>
 
@@ -155,7 +155,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address3:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address3') }}:</div>
               </template>
             </v-text-field>
           </div>
@@ -167,7 +167,7 @@
               class="text-center text-caption text-uppercase text-on-surface opacity-70"
               style="width: 120px"
             >
-              NOTIFY PARTY
+              {{ detailSection('notifyParty') }}
             </div>
           </v-divider>
 
@@ -188,7 +188,7 @@
               @row-select="onSelectAddr($event, 'NOTIFY_PARTY')"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Name:</div>
+                <div class="text-caption text-end w-label">{{ detailField('name') }}:</div>
               </template>
 
               <template #append>
@@ -215,7 +215,7 @@
                     />
                   </template>
 
-                  <span>SAME AS CONSIGNEE</span>
+                  <span>{{ detailField('sameAsConsignee') }}</span>
                 </v-tooltip>
               </template>
             </FRemoteTableMenu>
@@ -231,7 +231,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address1:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address1') }}:</div>
               </template>
             </v-text-field>
 
@@ -246,7 +246,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address2:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address2') }}:</div>
               </template>
             </v-text-field>
 
@@ -261,7 +261,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label">Address3:</div>
+                <div class="text-caption text-end w-label">{{ detailField('address3') }}:</div>
               </template>
             </v-text-field>
           </div>
@@ -323,7 +323,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Transport<span class="text-red">*</span>:
+                  {{ detailField('transport') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-select>
@@ -349,7 +349,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Container<span class="text-red">*</span>:
+                  {{ detailField('container') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-select>
@@ -400,7 +400,7 @@
 
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Origin<span class="text-red">*</span>:
+                  {{ detailField('origin') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-autocomplete>
@@ -451,7 +451,7 @@
 
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Destination<span class="text-red">*</span>:
+                  {{ detailField('destination') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-autocomplete>
@@ -476,7 +476,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Gross Weight<span class="text-red">*</span>:
+                  {{ detailField('grossWeight') }}<span class="text-red">*</span>:
                 </div>
               </template>
 
@@ -521,7 +521,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  CBM<span class="text-red">*</span>:
+                  {{ detailField('cbm') }}<span class="text-red">*</span>:
                 </div>
               </template>
 
@@ -562,7 +562,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Volume Weight:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('volumeWeight') }}:</div>
               </template>
 
               <template #append>
@@ -602,7 +602,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Chargeable Weight:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('chargeableWeight') }}:</div>
               </template>
 
               <template #append>
@@ -645,7 +645,7 @@
               >
                 <template #prepend>
                   <div class="text-caption text-end w-label-100">
-                    No. of Package<span class="text-red">*</span>:
+                    {{ detailField('noOfPackage') }}<span class="text-red">*</span>:
                   </div>
                 </template>
               </v-number-input>
@@ -683,7 +683,7 @@
               min="2000-01-01"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">ETD:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('etd') }}:</div>
               </template>
             </FDatePicker>
 
@@ -694,7 +694,7 @@
               min="2000-01-01"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">ETA:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('eta') }}:</div>
               </template>
             </FDatePicker>
 
@@ -705,7 +705,7 @@
               min="2000-01-01"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Cargo Ready Date:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('cargoReadyDate') }}:</div>
               </template>
             </FDatePicker>
 
@@ -728,7 +728,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Release Type:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('releaseType') }}:</div>
               </template>
             </v-select>
 
@@ -751,7 +751,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Service Level:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('serviceLevel') }}:</div>
               </template>
             </v-select>
 
@@ -772,7 +772,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Delivery Mode:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('deliveryMode') }}:</div>
               </template>
             </v-select>
 
@@ -788,7 +788,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Commodity<span class="text-red">*</span>:
+                  {{ detailField('commodity') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-text-field>
@@ -819,7 +819,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Inco Term<span class="text-red">*</span>:
+                  {{ detailField('incoTerm') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-select>
@@ -845,7 +845,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
-                  Freight Terms<span class="text-red">*</span>:
+                  {{ detailField('freightTerms') }}<span class="text-red">*</span>:
                 </div>
               </template>
             </v-select>
@@ -880,7 +880,7 @@
               "
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Cargo Value:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('cargoValue') }}:</div>
               </template>
 
               <template #append>
@@ -935,7 +935,7 @@
               "
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Ins. Value:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('insValue') }}:</div>
               </template>
 
               <template #append>
@@ -963,20 +963,20 @@
             <FTextInput
               v-model:text-value="inputData.bkg_goods_description"
               min-width="100%"
-              :textarea-props="{ label: 'Good Desc.' }"
+              :textarea-props="{ label: detailField('goodDesc') }"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Good Desc.:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('goodDesc') }}:</div>
               </template>
             </FTextInput>
 
             <FTextInput
               v-model:text-value="inputData.bkg_marks_nos"
               min-width="100%"
-              :textarea-props="{ label: 'Marks & No.' }"
+              :textarea-props="{ label: detailField('marksNos') }"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Marks & No.:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('marksNos') }}:</div>
               </template>
             </FTextInput>
 
@@ -990,7 +990,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Shipper Ref.:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('shipperRef') }}:</div>
               </template>
             </v-text-field>
 
@@ -1004,7 +1004,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">Additional Terms:</div>
+                <div class="text-caption text-end w-label-100">{{ detailField('additionalTerms') }}:</div>
               </template>
             </v-text-field>
           </div>
@@ -1014,7 +1014,7 @@
           <v-divider>
             <div class="my-1 text-center text-caption text-uppercase text-on-surface opacity-70">
               <v-icon color="primary" icon="mdi-calendar-clock" size="18" />
-              <span class="ml-2">Cut-off Dates</span>
+              <span class="ml-2">{{ detailSection('cutOffDates') }}</span>
             </div>
           </v-divider>
 
@@ -1045,7 +1045,7 @@
 
       <v-card-text class="py-2">
         <v-btn color="primary" size="small" variant="flat" @click="emit('add-container')">
-          Container
+          {{ detailSection('container') }}
         </v-btn>
       </v-card-text>
 
@@ -1301,7 +1301,7 @@
           <FTextInput
             v-model:text-value="item.pac_description"
             min-width="100%"
-            :textarea-props="{ label: 'Description' }"
+            :textarea-props="{ label: containerHeader('description') }"
           />
         </template>
       </v-data-table>
@@ -1312,9 +1312,9 @@
 <script setup>
   import Decimal from 'decimal.js'
   import { computed, ref } from 'vue'
-  import { useLocale } from 'vuetify'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { queryServiceLevelOptions } from '@/api/service_level'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import {
     assignContainerTypeFromRow,
     containerTypeTableHeaders,
@@ -1329,7 +1329,12 @@
   import { BOOKING_CUT_OFF_FIELDS } from '@/constants/bookingPartyFields'
   import { useAppStore } from '@/stores/app'
 
-  const { t } = useLocale()
+  const {
+    detailSection,
+    detailField,
+    cutOffLabel,
+    containerHeader,
+  } = useBookingPageI18n()
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
 
@@ -1370,7 +1375,21 @@
     emit('query-port', value)
   }
   // const partyBlocks = BOOKING_PARTY_BLOCKS
-  const cutOffFields = BOOKING_CUT_OFF_FIELDS
+  const CUT_OFF_I18N_KEYS = {
+    bkg_fcl_cut_off_date: 'fcl',
+    bkg_oog_cut_off_date: 'oog',
+    bkg_reefer_cut_off_date: 'reefer',
+    bkg_dg_cut_off_date: 'dg',
+    bkg_vgm_cut_off_date: 'vgm',
+    bkg_doc_cut_off_date: 'documentClosure',
+  }
+
+  const cutOffFields = computed(() =>
+    BOOKING_CUT_OFF_FIELDS.map(item => ({
+      ...item,
+      label: cutOffLabel(CUT_OFF_I18N_KEYS[item.key]),
+    })),
+  )
 
   // const transportModes = [{ code: 'SEA' }, { code: 'AIR' }, { code: 'RAIL' }]
   // const containerModes = [{ code: 'FCL' }, { code: 'LCL' }, { code: 'LSE' }]
@@ -1392,20 +1411,20 @@
     }
   }
 
-  const containerHeaders = [
+  const containerHeaders = computed(() => [
     { title: '', key: 'actions', width: '40px', align: 'center', sortable: false },
-    { title: 'Container', key: 'pac_container_type', minWidth: '90px' },
-    { title: 'Count', key: 'pac_container_count', minWidth: '80px' },
-    { title: 'Container No', key: 'pac_container_num', minWidth: '120px' },
-    { title: 'Seal No', key: 'pac_seal_num', minWidth: '120px' },
-    { title: 'SOC', key: 'pac_is_soc', width: '50px', align: 'center' },
-    { title: 'Commodity', key: 'pac_commodity', minWidth: '100px' },
-    { title: 'Gross Weight', key: 'pac_gross_weight', minWidth: '120px' },
-    { title: 'Volume', key: 'pac_actual_volume', minWidth: '100px' },
-    { title: 'No. of Package', key: 'pac_package_count', minWidth: '120px' },
-    { title: 'HS Code', key: 'pac_harmonised_code', minWidth: '100px' },
-    { title: 'Description', key: 'pac_description', minWidth: '140px' },
-  ]
+    { title: containerHeader('container'), key: 'pac_container_type', minWidth: '90px' },
+    { title: containerHeader('count'), key: 'pac_container_count', minWidth: '80px' },
+    { title: containerHeader('containerNo'), key: 'pac_container_num', minWidth: '120px' },
+    { title: containerHeader('sealNo'), key: 'pac_seal_num', minWidth: '120px' },
+    { title: containerHeader('soc'), key: 'pac_is_soc', width: '50px', align: 'center' },
+    { title: containerHeader('commodity'), key: 'pac_commodity', minWidth: '100px' },
+    { title: containerHeader('grossWeight'), key: 'pac_gross_weight', minWidth: '120px' },
+    { title: containerHeader('volume'), key: 'pac_actual_volume', minWidth: '100px' },
+    { title: containerHeader('noOfPackage'), key: 'pac_package_count', minWidth: '120px' },
+    { title: containerHeader('hsCode'), key: 'pac_harmonised_code', minWidth: '100px' },
+    { title: containerHeader('description'), key: 'pac_description', minWidth: '140px' },
+  ])
 
   const js_w = () => {
     // 避免在 inputData 未完全初始化时调用，防止递归更新

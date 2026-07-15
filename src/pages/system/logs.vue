@@ -14,7 +14,7 @@
       :items="tblItems"
       :max-height="maxHeight"
       striped="even"
-      title="Audit Logs"
+      :title="logsList('title')"
       virtual
       @row-dblclick="onRowDblClick"
     >
@@ -59,7 +59,7 @@
     <v-dialog v-model="previewDialogVisible" max-width="1100">
       <v-card>
         <v-card-title class="d-flex align-center justify-space-between">
-          <span>Audit Log Preview</span>
+          <span>{{ logsPreview('title') }}</span>
 
           <v-btn
             icon="mdi-close"
@@ -79,7 +79,7 @@
                   v-model="previewForm.id"
                   density="compact"
                   hide-details
-                  label="ID"
+                  :label="logsPreview('field.id')"
                   readonly
                   variant="outlined"
                 />
@@ -90,7 +90,7 @@
                   v-model="previewForm.servicename"
                   density="compact"
                   hide-details
-                  label="Service Name"
+                  :label="logsPreview('field.serviceName')"
                   readonly
                   variant="outlined"
                 />
@@ -101,7 +101,7 @@
                   v-model="previewForm.user_name"
                   density="compact"
                   hide-details
-                  label="User Name"
+                  :label="logsPreview('field.userName')"
                   readonly
                   variant="outlined"
                 />
@@ -112,7 +112,7 @@
                   v-model="previewForm.methodname"
                   density="compact"
                   hide-details
-                  label="Method Name"
+                  :label="logsPreview('field.methodName')"
                   readonly
                   variant="outlined"
                 />
@@ -123,7 +123,7 @@
                   v-model="previewForm.executiontime"
                   density="compact"
                   hide-details
-                  label="Execution Time"
+                  :label="logsPreview('field.executionTime')"
                   readonly
                   variant="outlined"
                 />
@@ -134,7 +134,7 @@
                   v-model="previewForm.executionduration"
                   density="compact"
                   hide-details
-                  label="Execution Duration (ms)"
+                  :label="logsPreview('field.executionDuration')"
                   readonly
                   variant="outlined"
                 />
@@ -145,7 +145,7 @@
                   v-model="previewForm.clientipaddress"
                   density="compact"
                   hide-details
-                  label="Client IP Address"
+                  :label="logsPreview('field.clientIpAddress')"
                   readonly
                   variant="outlined"
                 />
@@ -156,7 +156,7 @@
                   v-model="previewForm.browserinfo"
                   density="compact"
                   hide-details
-                  label="Browser Info"
+                  :label="logsPreview('field.browserInfo')"
                   readonly
                   variant="outlined"
                 />
@@ -168,7 +168,7 @@
                   :auto-grow="false"
                   density="compact"
                   hide-details
-                  label="Parameters"
+                  :label="logsPreview('field.parameters')"
                   no-resize
                   readonly
                   rows="3"
@@ -182,7 +182,7 @@
                   :auto-grow="false"
                   density="compact"
                   hide-details
-                  label="Return Value"
+                  :label="logsPreview('field.returnValue')"
                   no-resize
                   readonly
                   rows="8"
@@ -196,7 +196,7 @@
                   :auto-grow="false"
                   density="compact"
                   hide-details
-                  label="Exception Message"
+                  :label="logsPreview('field.exceptionMessage')"
                   no-resize
                   readonly
                   rows="2"
@@ -210,7 +210,7 @@
                   :auto-grow="false"
                   density="compact"
                   hide-details
-                  label="Exception"
+                  :label="logsPreview('field.exception')"
                   no-resize
                   readonly
                   rows="2"
@@ -247,13 +247,16 @@
 
 <script setup>
   import { computed, nextTick, ref } from 'vue'
-  import { useDisplay, useLocale } from 'vuetify'
+  import { useDisplay } from 'vuetify'
   import { queryAuditLog } from '@/api/logs'
   import FDataTableFooter from '@/components/FDataTableFooter.vue'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesSystemLogsFilter from '@/components/system/PagesSystemLogsFilter.vue'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { logsList, logsPreview, t } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemLogs' })
   definePage({
@@ -270,7 +273,6 @@
 
   const display = useDisplay()
   const appStore = useAppStore()
-  const { t } = useLocale()
 
   const contentHeight = computed(() => display.height.value - 65 - 35)
   const maxHeight = computed(() => contentHeight.value - 12 - 65 - 52 - 14)
@@ -280,8 +282,8 @@
   const defaultFilterData = () => ({
     field1: {
       key: 'executionTime',
-      title: 'Execution Time',
-      keyItems: [{ key: 'executionTime', title: 'Execution Time' }],
+      title: logsList('filter.executionTime'),
+      keyItems: [{ key: 'executionTime', title: logsList('filter.executionTime') }],
       val: '',
       op: 'between',
       start: appStore.utils.formatDate(new Date()),
@@ -289,17 +291,17 @@
     },
     field2: {
       key: 'methodName',
-      title: 'Method Name',
+      title: logsList('filter.methodName'),
       keyItems: [
-        { key: 'methodName', title: 'Method Name' },
-        { key: 'serviceName', title: 'Service Name' },
+        { key: 'methodName', title: logsList('filter.methodName') },
+        { key: 'serviceName', title: logsList('filter.serviceName') },
       ],
       val: '',
       op: 'Contain',
     },
     clientIpAddress: {
       key: 'clientIpAddress',
-      title: 'Client IP',
+      title: logsList('filter.clientIp'),
       val: '',
       op: 'Contain',
       componentProps: {},
@@ -308,7 +310,7 @@
     },
     clientName: {
       key: 'clientName',
-      title: 'Client Name',
+      title: logsList('filter.clientName'),
       val: '',
       op: 'Contain',
       componentProps: {},
@@ -317,7 +319,7 @@
     },
     executionDuration: {
       key: 'executionDuration',
-      title: 'Execution Duration',
+      title: logsList('filter.executionDuration'),
       val: '',
       op: '>=',
       componentProps: {},
@@ -348,12 +350,12 @@
   const tblHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '40px' },
     { title: '#', key: 'index', align: 'center', sortable: false, minWidth: '40px' },
-    { title: 'Service Name', key: 'servicename', align: 'start', minWidth: '180px' },
-    { title: 'Method Name', key: 'methodname', align: 'start', minWidth: '180px' },
-    { title: 'Client IP', key: 'clientipaddress', align: 'start', minWidth: '140px' },
-    { title: 'User Name', key: 'user_name', align: 'start', minWidth: '140px' },
-    { title: 'Execution Time', key: 'executiontime', align: 'start', minWidth: '180px' },
-    { title: 'Duration (ms)', key: 'executionduration', align: 'start', minWidth: '130px' },
+    { title: logsList('headers.serviceName'), key: 'servicename', align: 'start', minWidth: '180px' },
+    { title: logsList('headers.methodName'), key: 'methodname', align: 'start', minWidth: '180px' },
+    { title: logsList('headers.clientIp'), key: 'clientipaddress', align: 'start', minWidth: '140px' },
+    { title: logsList('headers.userName'), key: 'user_name', align: 'start', minWidth: '140px' },
+    { title: logsList('headers.executionTime'), key: 'executiontime', align: 'start', minWidth: '180px' },
+    { title: logsList('headers.durationMs'), key: 'executionduration', align: 'start', minWidth: '130px' },
   ])
 
   const buildFilter = () => {
@@ -476,7 +478,9 @@
     }
     openPreview(item)
   }
-  const getRowMenuItems = () => [{ title: 'Preview', prependIcon: 'mdi-preview', code: 'preview' }]
+  const getRowMenuItems = () => [
+    { title: logsList('menu.preview'), prependIcon: 'mdi-preview', code: 'preview' },
+  ]
   const handleRowMenuSelect = (e, item) => {
     switch (e.id) {
       case 'preview': {

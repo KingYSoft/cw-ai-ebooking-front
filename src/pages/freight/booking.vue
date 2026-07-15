@@ -23,7 +23,7 @@
 
               <FDatePicker
                 v-model:date-value="inputSearchData.field1.start"
-                :date-props="{ placeholder: 'Start Date', clearable: false }"
+                :date-props="{ placeholder: list('startDate'), clearable: false }"
                 :max="inputSearchData.field1.end ?? '2099-12-31'"
                 min="2000-01-01"
                 min-width="auto"
@@ -32,7 +32,7 @@
               -
               <FDatePicker
                 v-model:date-value="inputSearchData.field1.end"
-                :date-props="{ placeholder: 'End Date', clearable: false }"
+                :date-props="{ placeholder: list('endDate'), clearable: false }"
                 max="2099-12-31"
                 :min="inputSearchData.field1.start ?? '2000-01-01'"
                 min-width="auto"
@@ -61,7 +61,7 @@
                 v-model="inputSearchData.field2.val"
                 density="compact"
                 hide-details
-                placeholder="Job Number"
+                :placeholder="list('jobNumber')"
                 variant="outlined"
               />
             </div>
@@ -71,7 +71,7 @@
         <v-card-text class="booking-status-filter py-2">
           <div class="d-flex align-center flex-wrap ga-2">
             <div class="d-flex align-center text-caption text-medium-emphasis">
-              <span>Status:</span>
+              <span>{{ list('status') }}</span>
               <v-icon class="ml-1" icon="mdi-information-outline" size="14" />
             </div>
 
@@ -101,7 +101,7 @@
       :max-height="maxHeight"
       setting-name="EBOOKING_BOOKING_TBL"
       striped="even"
-      title="Booking Details"
+      :title="list('pageTitle')"
       virtual
       @row-dblclick="onRowDblClick"
     >
@@ -113,7 +113,7 @@
           variant="flat"
           @click="router.push({ name: 'booking_new' })"
         >
-          New
+          {{ list('new') }}
         </v-btn>
       </template>
 
@@ -146,7 +146,7 @@
           size="small"
           v-bind="getBookingListStatusChipProps(item.booking_status)"
         >
-          {{ getBookingListStatusLabel(item.booking_status) }}
+          {{ displayBookingStatus(item.booking_status) }}
         </v-chip>
       </template>
 
@@ -178,12 +178,12 @@
     buildBookingStatusFilters,
     mapBookingListRow,
   } from '@/composables/mapEbookingBooking'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
   import {
     BOOKING_LIST_STATUS_OPTIONS,
     defaultBookingListStatusSelection,
     getBookingListStatusChipProps,
-    getBookingListStatusLabel,
   } from '@/constants/bookingListStatus'
   import { useAppStore } from '@/stores/app'
 
@@ -204,6 +204,7 @@
   const display = useDisplay()
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
+  const { list, tableHeader, menu, listStatus } = useBookingPageI18n()
 
   const contentHeight = computed(() => display.height.value - 65 - 35)
   const refFilter = ref(null)
@@ -219,7 +220,20 @@
   const totalCount = ref(0)
   const pageObj = ref({ pageSize: 2000, pageIndex: 1 })
   const selectedStatuses = ref(defaultBookingListStatusSelection())
-  const statusOptions = BOOKING_LIST_STATUS_OPTIONS
+  const statusOptions = computed(() =>
+    BOOKING_LIST_STATUS_OPTIONS.map(item => ({
+      ...item,
+      title: listStatus(item.value),
+    })),
+  )
+
+  const displayBookingStatus = status => {
+    if (!status) {
+      return ''
+    }
+    const matched = BOOKING_LIST_STATUS_OPTIONS.find(item => item.value === status)
+    return matched ? listStatus(matched.value) : status
+  }
 
   const defaultSearchData = () => ({
     field1: {
@@ -231,8 +245,8 @@
     },
     field2: {
       key: 'bkg_consign_no',
-      title: 'Job Number',
-      keyItems: [{ key: 'bkg_consign_no', title: 'Job Number' }],
+      title: list('jobNumber'),
+      keyItems: [{ key: 'bkg_consign_no', title: list('jobNumber') }],
       val: '',
     },
   })
@@ -261,16 +275,16 @@
     queryDataByStatus()
   }
 
-  const tblHeaders = [
+  const tblHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
-    { title: 'Booking No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
-    { title: 'Status', key: 'bkg_status', align: 'start', minWidth: '100px' },
-    { title: 'Trans Mode', key: 'bkg_transport_mode', align: 'start', minWidth: '120px' },
-    { title: 'Container Mode', key: 'bkg_packing_mode', align: 'start', minWidth: '140px' },
+    { title: tableHeader('bookingNo'), key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
+    { title: tableHeader('status'), key: 'bkg_status', align: 'start', minWidth: '100px' },
+    { title: tableHeader('transMode'), key: 'bkg_transport_mode', align: 'start', minWidth: '120px' },
+    { title: tableHeader('containerMode'), key: 'bkg_packing_mode', align: 'start', minWidth: '140px' },
     // { title: 'Shipment No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
-    { title: 'House Bill', key: 'bkg_house_bill', align: 'start', minWidth: '120px' },
+    { title: tableHeader('houseBill'), key: 'bkg_house_bill', align: 'start', minWidth: '120px' },
     {
-      title: 'Shipper Name',
+      title: tableHeader('shipperName'),
       key: 'shipper_name',
       align: 'start',
       minWidth: '140px',
@@ -278,28 +292,28 @@
       cellProps: { class: 'text-truncate' },
     },
     {
-      title: 'Consignee Name',
+      title: tableHeader('consigneeName'),
       key: 'consignee_name',
       align: 'start',
       minWidth: '140px',
       maxWidth: '200px',
       cellProps: { class: 'text-truncate' },
     },
-    { title: 'Origin', key: 'bkg_origin', align: 'start', minWidth: '100px' },
-    { title: 'Destination', key: 'bkg_destination', align: 'start', minWidth: '100px' },
-    { title: 'CRD', key: 'bkg_cargo_ready', align: 'start', minWidth: '100px' },
-    { title: 'ETD', key: 'bkg_etd', align: 'start', minWidth: '100px' },
-    { title: 'ETA', key: 'bkg_eta', align: 'start', minWidth: '100px' },
-    { title: 'Gross Weight', key: 'bkg_actual_weight', align: 'start', minWidth: '120px' },
-    { title: 'CBM', key: 'bkg_actual_volume', align: 'start', minWidth: '80px' },
-    { title: 'Freight Term', key: 'bkg_freight_terms', align: 'start', minWidth: '120px' },
-    { title: 'Inco', key: 'bkg_inco', align: 'start', minWidth: '80px' },
-  ]
+    { title: tableHeader('origin'), key: 'bkg_origin', align: 'start', minWidth: '100px' },
+    { title: tableHeader('destination'), key: 'bkg_destination', align: 'start', minWidth: '100px' },
+    { title: tableHeader('crd'), key: 'bkg_cargo_ready', align: 'start', minWidth: '100px' },
+    { title: tableHeader('etd'), key: 'bkg_etd', align: 'start', minWidth: '100px' },
+    { title: tableHeader('eta'), key: 'bkg_eta', align: 'start', minWidth: '100px' },
+    { title: tableHeader('grossWeight'), key: 'bkg_actual_weight', align: 'start', minWidth: '120px' },
+    { title: tableHeader('cbm'), key: 'bkg_actual_volume', align: 'start', minWidth: '80px' },
+    { title: tableHeader('freightTerm'), key: 'bkg_freight_terms', align: 'start', minWidth: '120px' },
+    { title: tableHeader('inco'), key: 'bkg_inco', align: 'start', minWidth: '80px' },
+  ])
 
   const getRowMenuItems = () => [
-    { title: 'Copy', prependIcon: 'mdi-content-copy', code: 'copy' },
+    { title: menu('copy'), prependIcon: 'mdi-content-copy', code: 'copy' },
     { type: 'divider' },
-    { title: 'Deactivate', prependIcon: 'mdi-delete', code: 'deactivate', color: 'red' },
+    { title: menu('deactivate'), prependIcon: 'mdi-delete', code: 'deactivate', color: 'red' },
   ]
 
   const handleRowMenuSelect = (e, item) => {
@@ -328,7 +342,7 @@
       const { success, data } = await bookingQueryPage({
         filters: [
           ...buildBookingListFilters(inputSearchData.value),
-          ...buildBookingStatusFilters(selectedStatuses.value, statusOptions.length),
+          ...buildBookingStatusFilters(selectedStatuses.value, BOOKING_LIST_STATUS_OPTIONS.length),
         ],
         skipCount: (pageObj.value.pageIndex - 1) * pageObj.value.pageSize,
         maxResultCount: pageObj.value.pageSize,

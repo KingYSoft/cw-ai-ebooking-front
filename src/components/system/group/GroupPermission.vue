@@ -25,7 +25,7 @@
   import { queryGroupAllPermission } from '@/api/group'
 
   defineOptions({ name: 'GroupPermission' })
-  const props = defineProps({
+  defineProps({
     maxDisplayHeight: {
       type: Number,
       default: 0,

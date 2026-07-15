@@ -4,7 +4,7 @@
       <v-card-text class="py-2">
         <v-divider>
           <div class="text-center text-caption text-uppercase text-on-surface opacity-70 mb-8">
-            Group Detail
+            {{ groupEdit('detail.section.groupDetail') }}
           </div>
         </v-divider>
 
@@ -23,7 +23,7 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-120">
-                  Code
+                  {{ groupField('code') }}
                   <span class="text-red">*</span>
                   :
                 </div>
@@ -41,7 +41,7 @@
               :true-value="1"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">Is Active:</div>
+                <div class="text-caption text-end w-label-120 mr-2">{{ groupField('isActive') }}:</div>
               </template>
             </v-switch>
           </v-col>
@@ -58,7 +58,7 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">Description:</div>
+                <div class="text-caption text-end w-label-120">{{ groupField('description') }}:</div>
               </template>
             </v-textarea>
           </v-col>
@@ -70,9 +70,11 @@
 
 <script setup>
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
 
   defineOptions({ name: 'GroupDetail' })
 
+  const { groupEdit, groupField } = useSystemPageI18n()
   const { rescols } = useLayoutCols()
 
   defineProps({

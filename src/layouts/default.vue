@@ -472,7 +472,7 @@
 </template>
 
 <script setup>
-  import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
+  import { inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useDisplay, useLocale } from 'vuetify'
   import logoSrc from '@/assets/images/login/logo.png'
@@ -1042,47 +1042,6 @@
   const privacyPolicyValue = ref(false)
   if (localStorage.getItem('privacy_policy_accepted') !== '1') {
     privacyPolicyValue.value = true
-  }
-
-  const drawerValSec = ref(false)
-
-  const hasChildren = item => (item.children ?? []).length > 0
-  const activeParent = ref({})
-  const activeChildren = computed(() => {
-    if (!activeParent.value) return []
-    return (activeParent.value.children ?? []).filter(item => !!item?.path)
-  })
-
-  // 检查菜单项是否为当前展开的父菜单
-  const isActiveParent = item => {
-    return drawerValSec.value && activeParent.value && activeParent.value.code === item.code
-  }
-
-  let timerTemp = null
-  const onDrawerValSecEnter = (e, item) => {
-    clearTimeout(timerTemp)
-    timerTemp = setTimeout(() => {
-      drawerValSec.value = true
-    }, 120)
-
-    if (item) {
-      if (!hasChildren(item)) {
-        return
-      }
-      activeParent.value = item
-    }
-  }
-  const onDrawerValSecLeave = () => {
-    clearTimeout(timerTemp)
-    timerTemp = setTimeout(() => {
-      drawerValSec.value = false
-    }, 120)
-  }
-  const clickNavigateTo = item => {
-    if (item && item.path) {
-      onDrawerValSecLeave()
-      router.push(item.path)
-    }
   }
 
   const switchBranchVis = ref(false)

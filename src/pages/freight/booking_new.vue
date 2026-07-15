@@ -1,8 +1,12 @@
 <template>
-  <PagesFreightBookingFormPage page-title="New Booking" />
+  <PagesFreightBookingFormPage :page-title="edit('newTitle')" />
 </template>
 
 <script setup>
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
+
+  const { edit } = useBookingPageI18n()
+
   defineOptions({ name: 'BookingNew' })
   definePage({
     name: 'booking_new',
