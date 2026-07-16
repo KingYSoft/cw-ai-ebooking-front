@@ -18,6 +18,7 @@ export function useWarehouseOrderPageI18n() {
   const itemHeader = key => wo(`itemDetail.headers.${key}`)
   const itemDetailLabel = key => wo(`edit.itemDetail.${key}`)
   const inboundHeader = key => wo(`inboundOrder.${key}`)
+  const importI18n = key => wo(`import.${key}`)
   const validation = (key, ...args) => t(`$vuetify.custom.warehouseOrder.edit.validation.${key}`, args)
   const validationField = key => wo(`edit.validationFields.${key}`)
   const requiredRule = fieldLabel => value =>
@@ -41,6 +42,7 @@ export function useWarehouseOrderPageI18n() {
     itemHeader,
     itemDetailLabel,
     inboundHeader,
+    import: importI18n,
     validation,
     validationField,
     requiredRule,

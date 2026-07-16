@@ -35,7 +35,7 @@
 
 <script setup>
   import { onActivated, onMounted, ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
@@ -66,9 +66,11 @@
     whsOrderSaveHandle,
     handleValidationErrors,
     markInputDataSaved,
+    applyRecognizePrefill,
   } = useWarehouseBookingForm()
 
   const appStore = useAppStore()
+  const route = useRoute()
   const router = useRouter()
   const { edit, editButton, editTab, editMessage } = useWarehouseOrderPageI18n()
 
@@ -157,6 +159,9 @@
 
   const initNewBookingPage = async () => {
     await queryData()
+    if (applyRecognizePrefill(route)) {
+      markInputDataSaved()
+    }
   }
 
   onMounted(initNewBookingPage)

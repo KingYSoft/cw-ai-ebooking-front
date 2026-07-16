@@ -3,6 +3,15 @@ export default {
     new: '新建',
     pageTitle: '仓库订单',
   },
+  import: {
+    action: '导入',
+    title: '导入 Booking 文件',
+    selectFile: '选择 PDF 或 Excel 文件',
+    uploading: '正在识别...',
+    failed: '导入识别失败。',
+    noFile: '请选择 PDF 或 Excel 文件。',
+    missingData: '识别结果缺少订单数据。',
+  },
   filter: {
     etd: 'ETD',
     creationTime: '创建时间',

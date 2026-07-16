@@ -1,23 +1,14 @@
 import { ref } from 'vue'
 import { useLocale } from 'vuetify'
 import { whsOrderSave } from '@/api/whs-order'
+import { mapWhsOrderDetailToForm } from '@/composables/mapWhsOrderDetail'
 import { useUnsavedInputDataGuard } from '@/composables/useUnsavedInputDataGuard'
 import { useAppStore } from '@/stores/app'
 
-/**
- * 编辑 和 新增，公共部分写在这里。
- * @param {*} options
- * @returns
- */
-export function useWarehouseBookingForm() {
-  const appStore = useAppStore()
-  const { t } = useLocale()
+export const WHS_ORDER_RECOGNIZE_STORAGE_KEY = 'warehouse_order_recognize_prefill'
 
-  const skeletonLoading = ref(true)
-  const cardLoading = ref(false)
-  const activedTab = ref(1)
-
-  const defaultData = () => ({
+function createDefaultWhsOrderFormData() {
+  return {
     id: 0,
     pk: '',
     wso_transport_mode: 'SEA',
@@ -42,7 +33,71 @@ export function useWarehouseBookingForm() {
     wso_po_number: '',
     wso_actual_chargeable: null,
     wso_volume_weight: null,
-  })
+  }
+}
+
+export function applyRecognizePrefillToInputData(inputDataRef, route) {
+  if (route?.query?.source !== 'recognize') {
+    return false
+  }
+
+  const rawRecognize = sessionStorage.getItem(WHS_ORDER_RECOGNIZE_STORAGE_KEY)
+  if (!rawRecognize) {
+    return false
+  }
+
+  try {
+    const parsed = JSON.parse(rawRecognize)
+    const order = Array.isArray(parsed?.orders) ? parsed.orders[0] : parsed
+    const mapped = mapWhsOrderDetailToForm(order) ?? order
+    const itemList = mapped?.item_list ?? mapped?.pac_list ?? []
+    const notifyParty = mapped?.notify_party ?? { add_address_name: 'SAME AS CONSIGNEE' }
+
+    inputDataRef.value = {
+      ...createDefaultWhsOrderFormData(),
+      ...mapped,
+      id: 0,
+      pk: '',
+      shipper: mapped?.shipper || {},
+      consignee: mapped?.consignee || {},
+      notify_party: notifyParty,
+      item_list: itemList,
+      inbound_list: mapped?.inbound_list || [],
+      outbound_list: mapped?.outbound_list || [],
+      e_docs_list: mapped?.e_docs_list ?? mapped?.eDocs_list ?? [],
+      wso_unit_of_weight: mapped?.wso_unit_of_weight ?? mapped?.bkg_unit_of_weight ?? 'KG',
+      wso_unit_of_volume: mapped?.wso_unit_of_volume ?? mapped?.bkg_unit_of_volume ?? 'M3',
+      wso_actual_chargeable_unit:
+        mapped?.wso_actual_chargeable_unit ?? mapped?.bkg_actual_chargeable_unit ?? 'KG',
+      wso_volume_weight_unit: mapped?.wso_volume_weight_unit ?? mapped?.bkg_volume_weight_unit ?? 'KG',
+      wso_pack_type: mapped?.wso_pack_type ?? mapped?.bkg_pack_type ?? 'CTN',
+      wso_pack_type_desc: mapped?.wso_pack_type_desc ?? mapped?.bkg_pack_type_desc ?? 'Carton',
+      notify_party_same_as_consignee:
+        notifyParty.add_address_name === 'SAME AS CONSIGNEE' ? 'Y' : 'N',
+    }
+    return true
+  } catch (error) {
+    console.error('Failed to parse recognize warehouse order data:', error)
+    return false
+  } finally {
+    sessionStorage.removeItem(WHS_ORDER_RECOGNIZE_STORAGE_KEY)
+  }
+}
+
+/**
+ * 编辑 和 新增，公共部分写在这里。
+ * @param {*} options
+ * @returns
+ */
+export function useWarehouseBookingForm() {
+  const appStore = useAppStore()
+  const { t } = useLocale()
+
+  const skeletonLoading = ref(true)
+  const cardLoading = ref(false)
+  const activedTab = ref(1)
+
+  const defaultData = () => createDefaultWhsOrderFormData()
   // 初始化 表单
   const inputData = ref(defaultData())
 
@@ -110,6 +165,8 @@ export function useWarehouseBookingForm() {
     return false
   }
 
+  const applyRecognizePrefill = route => applyRecognizePrefillToInputData(inputData, route)
+
   return {
     inputData,
     skeletonLoading,
@@ -118,5 +175,6 @@ export function useWarehouseBookingForm() {
     whsOrderSaveHandle,
     handleValidationErrors,
     markInputDataSaved,
+    applyRecognizePrefill,
   }
 }

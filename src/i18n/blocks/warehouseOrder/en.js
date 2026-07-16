@@ -3,6 +3,15 @@ export default {
     new: 'New',
     pageTitle: 'Warehouse Orders',
   },
+  import: {
+    action: 'Import',
+    title: 'Import Booking File',
+    selectFile: 'Select PDF or Excel file',
+    uploading: 'Recognizing...',
+    failed: 'Import recognition failed.',
+    noFile: 'Please select a PDF or Excel file.',
+    missingData: 'Recognition response missing order data.',
+  },
   filter: {
     etd: 'ETD',
     creationTime: 'Creation Time',

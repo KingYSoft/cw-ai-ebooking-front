@@ -3,6 +3,15 @@ export default {
     new: 'Mới',
     pageTitle: 'Đơn kho',
   },
+  import: {
+    action: 'Import',
+    title: 'Import Booking File',
+    selectFile: 'Chọn tệp PDF hoặc Excel',
+    uploading: 'Đang nhận dạng...',
+    failed: 'Nhận dạng import thất bại.',
+    noFile: 'Vui lòng chọn tệp PDF hoặc Excel.',
+    missingData: 'Phản hồi nhận dạng thiếu dữ liệu đơn hàng.',
+  },
   filter: {
     etd: 'ETD',
     creationTime: 'Thời gian tạo',

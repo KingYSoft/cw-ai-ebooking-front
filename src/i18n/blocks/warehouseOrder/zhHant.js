@@ -3,6 +3,15 @@ export default {
     new: '新建',
     pageTitle: '倉庫訂單',
   },
+  import: {
+    action: '匯入',
+    title: '匯入 Booking 文件',
+    selectFile: '選擇 PDF 或 Excel 文件',
+    uploading: '正在識別...',
+    failed: '匯入識別失敗。',
+    noFile: '請選擇 PDF 或 Excel 文件。',
+    missingData: '識別結果缺少訂單資料。',
+  },
   filter: {
     etd: 'ETD',
     creationTime: '建立時間',

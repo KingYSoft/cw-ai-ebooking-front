@@ -32,6 +32,20 @@ export const whsOrderSubmit = pk =>
     data: { pk },
   })
 
+/**
+ * 上传 PDF/XLSX Booking 文件识别，回填新建仓库订单
+ * @param {FormData} formData 字段 file
+ */
+export const recognizeWhsBookingFile = formData =>
+  service({
+    url: '/whs-order/recognize-whs-booking-file',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+
 /** @deprecated 使用 whsOrderQueryPage */
 export const pageWhsOrder = whsOrderQueryPage
 

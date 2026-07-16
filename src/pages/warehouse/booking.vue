@@ -23,6 +23,17 @@
       @row-dblclick="onRowDblClick"
     >
       <template #actions>
+        <v-btn
+          color="primary"
+          :disabled="cardLoading || importLoading"
+          prepend-icon="mdi-upload"
+          size="small"
+          variant="flat"
+          @click="importDialogOpen = true"
+        >
+          {{ importI18n('action') }}
+        </v-btn>
+
         <v-btn color="primary" prepend-icon="$plus" size="small" variant="flat" @click="onNewOrder">
           {{ list('new') }}
         </v-btn>
@@ -38,6 +49,12 @@
         />
       </template>
     </FTableLayout>
+
+    <WarehouseOrderImportDialog
+      v-model="importDialogOpen"
+      :loading="importLoading"
+      @upload="onImportUpload"
+    />
   </FPageLayout>
 </template>
 
@@ -46,16 +63,18 @@
   import { useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
 
-  // import { pageWhsOrder } from '@/api/whs-order'
-  import { whsOrderQueryPage } from '@/api/whs-order'
+  import { recognizeWhsBookingFile, whsOrderQueryPage } from '@/api/whs-order'
+  import FDataTableFooter from '@/components/FDataTableFooter.vue'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesWarehouseBookingFilter from '@/components/warehouse/PagesWarehouseBookingFilter.vue'
+  import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
+  import { WHS_ORDER_RECOGNIZE_STORAGE_KEY } from '@/composables/useWarehouseBookingForm'
   import { mapWhsOrderListRow } from '@/composables/mapWhsOrderDetail'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
 
-  const { filter, header, list } = useWarehouseOrderPageI18n()
+  const { filter, header, list, import: importI18n } = useWarehouseOrderPageI18n()
   const appStore = useAppStore()
   const router = useRouter()
   const display = useDisplay()
@@ -269,6 +288,47 @@
 
   const onNewOrder = () => {
     router.push({ name: 'warehouse_booking_new' })
+  }
+
+  const importDialogOpen = ref(false)
+  const importLoading = ref(false)
+
+  const onImportUpload = async ({ files }) => {
+    if (!files?.length) {
+      appStore.openMessage({
+        content: importI18n('noFile'),
+        color: 'warning',
+      })
+      return
+    }
+
+    importLoading.value = true
+    try {
+      appStore.openGlobalLoadingWithIcon(importI18n('uploading'), '$upload', 'info')
+      const formData = new FormData()
+      formData.append('file', files[0])
+      const { success, data } = await recognizeWhsBookingFile(formData)
+      const order = Array.isArray(data?.orders) ? data.orders[0] : null
+      if (!success || !order || typeof order !== 'object') {
+        throw new Error(importI18n('missingData'))
+      }
+
+      sessionStorage.setItem(WHS_ORDER_RECOGNIZE_STORAGE_KEY, JSON.stringify(order))
+      importDialogOpen.value = false
+      router.push({
+        name: 'warehouse_booking_new',
+        query: { source: 'recognize' },
+      })
+    } catch (error) {
+      console.error(error)
+      appStore.openMessage({
+        content: error.message || importI18n('failed'),
+        color: 'error',
+      })
+    } finally {
+      importLoading.value = false
+      appStore.closeGlobalLoading()
+    }
   }
 </script>
 
