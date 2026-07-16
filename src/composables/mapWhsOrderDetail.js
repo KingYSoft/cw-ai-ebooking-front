@@ -61,6 +61,7 @@ const WSO_TO_BKG_FIELDS = [
   ['wso_vgm_cut_off_date', 'bkg_vgm_cut_off_date'],
   ['wso_so_number', 'bkg_so_number'],
   ['wso_po_number', 'bkg_po_number'],
+  ['wso_intended_vessel', 'bkg_intended_vessel'],
 ]
 
 /** Item Detail 表格 UI 字段 ↔ 接口 woi_* */

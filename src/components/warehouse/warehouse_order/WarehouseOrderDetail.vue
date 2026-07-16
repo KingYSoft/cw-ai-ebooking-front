@@ -3,6 +3,59 @@
     <v-form class="ref-form-pre" color="background">
       <v-card-text class="py-2">
         <v-row dense>
+          <v-col cols="12">
+            <div class="market-plant-row d-flex align-start ga-2">
+              <v-autocomplete
+                id="1@market"
+                autocomplete="off"
+                class="market-plant-row__field"
+                clearable
+                color="primary"
+                density="compact"
+                hide-details="auto"
+                :items="uniqueMarketNames"
+                :menu-props="{ maxWidth: '320px' }"
+                min-width="0"
+                :model-value="selectedMarketName"
+                :rules="marketRules"
+                variant="outlined"
+                @update:model-value="onOrderMarketNameChange"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('market') }}<span class="text-error"> *</span>:
+                  </div>
+                </template>
+              </v-autocomplete>
+
+              <v-select
+                id="1@plant_id"
+                class="market-plant-row__field"
+                clearable
+                color="primary"
+                density="compact"
+                :disabled="!selectedMarketName || plantIdOptionsLoading"
+                hide-details="auto"
+                item-title="title"
+                item-value="value"
+                :items="plantIdOptionItems"
+                :loading="plantIdOptionsLoading"
+                :menu-props="{ maxWidth: '320px' }"
+                min-width="0"
+                :model-value="selectedPlantId"
+                :rules="plantIdRules"
+                variant="outlined"
+                @update:model-value="onOrderPlantIdChange"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">{{ detailField('plantId') }}</div>
+                </template>
+              </v-select>
+            </div>
+          </v-col>
+        </v-row>
+
+        <v-row dense>
           <v-col :cols="rescols('c12l4s6')">
             <v-divider>
               <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
@@ -671,10 +724,11 @@
                 v-model:date-value="inputData.wso_est_delivery"
                 max="2099-12-31"
                 min="2000-01-01"
+                :rules="convertRequiredRules.estDelivery"
               >
                 <template #prepend>
                   <div class="text-caption text-end w-label-110">
-                    {{ detailField('estDelivery') }}
+                    {{ detailField('estDelivery') }}<span class="text-primary">^</span>:
                   </div>
                 </template>
               </FDatePicker>
@@ -904,93 +958,6 @@
                 </template>
               </v-select>
 
-              <v-autocomplete
-                id="1@market"
-                auto-select-first
-                autocomplete="off"
-                clearable
-                :custom-filter="filterMarketOption"
-                density="compact"
-                hide-details
-                item-title="market"
-                item-value="pk"
-                :items="marketOptions"
-                :menu-props="{ maxWidth: '320px' }"
-                min-width="100%"
-                :model-value="inputData.wso_market"
-                return-object
-                :rules="marketRules"
-                variant="outlined"
-                @update:model-value="onOrderMarketChange"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('market') }}<span class="text-error"> *</span>:
-                  </div>
-                </template>
-
-                <template #item="{ props: itemProps, item: option }">
-                  <v-list-item
-                    v-bind="itemProps"
-                    :subtitle="
-                      [option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')
-                    "
-                    :title="option.raw.market"
-                  />
-                </template>
-              </v-autocomplete>
-
-              <!-- <v-autocomplete
-                id="1@market"
-                auto-select-first
-                autocomplete="off"
-                clearable
-                color="primary"
-                :custom-filter="filterMarketOption"
-                density="compact"
-                hide-details="auto"
-                item-title="market"
-                item-value="pk"
-                :items="marketOptions"
-                :menu-props="{ maxWidth: '320px' }"
-                min-width="100%"
-                :model-value="inputData.market"
-                return-object
-                :rules="marketRules"
-                variant="outlined"
-                @update:model-value="onOrderMarketChange"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('market') }}<span class="text-error"> *</span>:
-                  </div>
-                </template>
-
-                <template #item="{ props: itemProps, item: option }">
-                  <v-list-item
-                    v-bind="itemProps"
-                    :subtitle="
-                      [option.raw.plant_id, option.raw.destination].filter(Boolean).join(' / ')
-                    "
-                    :title="option.raw.market"
-                  />
-                </template>
-              </v-autocomplete> -->
-
-              <v-text-field
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                :model-value="orderPlantId"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('plantId') }}</div>
-                </template>
-              </v-text-field>
             </div>
           </v-col>
 
@@ -1066,6 +1033,69 @@
                   </div>
                 </template>
               </v-text-field>
+
+              <v-text-field
+                id="1@intended_vessel"
+                v-model="inputData.wso_intended_vessel"
+                color="primary"
+                density="compact"
+                hide-details
+                min-width="100%"
+                type="input"
+                variant="outlined"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">{{ detailField('intendedVessel') }}</div>
+                </template>
+              </v-text-field>
+
+              <v-autocomplete
+                id="1@place_of_delivery"
+                auto-select-first
+                autocomplete="off"
+                clearable
+                color="primary"
+                density="compact"
+                hide-details
+                item-title="rl_code"
+                item-value="rl_code"
+                :items="queryPortList"
+                :menu-props="{
+                  'max-width': '100%',
+                }"
+                min-width="100%"
+                :model-value="inputData.wso_place_of_delivery"
+                no-data-text="$vuetify.custom.app.searchMore"
+                no-filter
+                return-object
+                variant="outlined"
+                @update:focused="
+                  $event => {
+                    if ($event) {
+                      queryPort(inputData.wso_place_of_delivery)
+                    }
+                  }
+                "
+                @update:model-value="
+                  $event => {
+                    inputData.wso_place_of_delivery = $event?.rl_code ?? null
+                    inputData.wso_place_of_delivery_name = $event?.rl_port_name ?? null
+                  }
+                "
+                @update:search="queryPort"
+              >
+                <template #item="scope">
+                  <v-list-item
+                    v-bind="scope.props"
+                    :subtitle="scope.item.raw.rl_port_name"
+                    :title="scope.item.raw.rl_code"
+                  />
+                </template>
+
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">{{ detailField('placeOfDelivery') }}</div>
+                </template>
+              </v-autocomplete>
               <!-- <v-select
               v-model="inputData.job.job_direction"
               auto-select-first
@@ -1139,7 +1169,6 @@
       </v-card-text>
     </v-form>
 
-    <WarehouseOrderRelationTables :relation="inputData.whsOrderRelationOutput" />
   </div>
 </template>
 <script setup>
@@ -1150,7 +1179,6 @@
   import { getWhsMarketOptions } from '@/api/whs-market'
   import FDatePicker from '@/components/FDatePicker.vue'
   import FRemoteTableMenuWithCode from '@/components/FRemoteTableMenuWithCode.vue'
-  import WarehouseOrderRelationTables from '@/components/warehouse/warehouse_order/WarehouseOrderRelationTables.vue'
   import {
     defaultWhsMarketObject,
     normalizeWhsMarketObject,
@@ -1162,6 +1190,7 @@
     fetchPackageTypes,
     packageTypeTableHeaders,
   } from '@/composables/usePackageTypeRemoteMenu'
+  import { mapWarehouseAddrTableHeaders } from '@/composables/mapWarehouseOrderTableHeaders'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { WHS_ORDER_CONTAINER_OPTIONS } from '@/constants/warehouseOrderContainerOptions'
   import { useAppStore } from '@/stores/app'
@@ -1191,6 +1220,7 @@
   const convertRequiredRules = computed(() => ({
     etd: [requiredRule(validationField('etd'))],
     eta: [requiredRule(validationField('eta'))],
+    estDelivery: [requiredRule(validationField('estDelivery'))],
     soNumber: [requiredRule(validationField('carrierSoNumber'))],
   }))
 
@@ -1252,145 +1282,281 @@
   }
 
   const marketOptions = ref([])
+  const plantIdOptionItems = ref([])
+  const plantIdOptionsLoading = ref(false)
 
-  // const marketRequiredRule = value => {
-  //   const normalized = normalizeWhsMarketObject(value)
-  //   console.log(normalized)
+  const selectedMarketName = computed(() => {
+    return String(inputData.value?.market?.market ?? inputData.value?.wso_market ?? '').trim()
+  })
 
-  //   const marketName = String(normalized?.market ?? '').trim()
-  //   if (!marketName) {
-  //     return 'Market is required.'
-  //   }
-  //   const matched = marketOptions.value.some(opt => {
-  //     if (normalized?.pk && String(opt.pk ?? '').trim() === String(normalized.pk).trim()) {
-  //       return true
-  //     }
-  //     return String(opt.market ?? '').trim() === marketName
-  //   })
-  //   return matched || 'Please select Market from the list.'
-  // }
-  const marketRules = [
-    v => {
-      if (v) {
-        return true
-      } else {
-        return validation('marketRequired')
-      }
-    },
-  ]
+  const selectedPlantId = computed(() => {
+    return String(inputData.value?.market?.plant_id ?? inputData.value?.wso_plant_id ?? '').trim()
+  })
 
-  const filterMarketOption = (_value, query, item) => {
-    const q = String(query ?? '')
-      .trim()
-      .toLowerCase()
-    if (!q) {
-      return true
+  const resolveMarketOptionMarket = opt => String(opt?.market ?? opt?.Market ?? '').trim()
+
+  const resolveMarketOptionPlantId = opt =>
+    String(opt?.plant_id ?? opt?.PlantId ?? opt?.plantId ?? '').trim()
+
+  const mergeMarketOptions = (existing, incoming) => {
+    const keyOf = opt =>
+      [
+        String(opt?.pk ?? '').trim(),
+        resolveMarketOptionMarket(opt),
+        resolveMarketOptionPlantId(opt),
+      ].join('|')
+    const map = new Map((existing ?? []).map(opt => [keyOf(opt), opt]))
+    for (const opt of incoming ?? []) {
+      map.set(keyOf(opt), opt)
     }
-    const raw = item?.raw ?? {}
-    return [
-      raw.market,
-      raw.plant_id,
-      raw.shipping_mode,
-      raw.port_code,
-      raw.port_of_discharge,
-      raw.destination,
-    ].some(field =>
-      String(field ?? '')
-        .toLowerCase()
-        .includes(q),
+    return [...map.values()]
+  }
+
+  const buildPlantIdOptionItems = (options, marketName = '', { matchMarket = true } = {}) => {
+    const market = String(marketName ?? '').trim()
+    const seen = new Set()
+    const items = []
+    for (const opt of options ?? []) {
+      const optionMarket = resolveMarketOptionMarket(opt)
+      if (matchMarket && market && optionMarket && optionMarket !== market) {
+        continue
+      }
+      const plantId = resolveMarketOptionPlantId(opt)
+      if (!plantId || seen.has(plantId)) {
+        continue
+      }
+      seen.add(plantId)
+      items.push({
+        title: plantId,
+        value: plantId,
+        raw: opt,
+      })
+    }
+    return items
+  }
+
+  const uniqueMarketNames = computed(() => {
+    const seen = new Set()
+    const names = []
+    for (const opt of marketOptions.value) {
+      const name = resolveMarketOptionMarket(opt)
+      if (!name || seen.has(name)) {
+        continue
+      }
+      seen.add(name)
+      names.push(name)
+    }
+    return names
+  })
+
+  const marketRequiredRule = value => {
+    const marketName = String(value ?? selectedMarketName.value ?? '').trim()
+    if (!marketName) {
+      return validation('marketRequired')
+    }
+    const matched = marketOptions.value.some(
+      opt => resolveMarketOptionMarket(opt) === marketName,
+    )
+    return matched || validation('marketSelectFromList')
+  }
+  const marketRules = [marketRequiredRule]
+  const plantIdRules = []
+
+  const findMarketOption = (marketName, plantId) => {
+    const name = String(marketName ?? '').trim()
+    const pid = String(plantId ?? '').trim()
+    if (!name || !pid) {
+      return null
+    }
+    const fromDropdown = plantIdOptionItems.value.find(item => item.value === pid)?.raw
+    if (fromDropdown) {
+      return fromDropdown
+    }
+    return (
+      marketOptions.value.find(opt => {
+        if (resolveMarketOptionPlantId(opt) !== pid) {
+          return false
+        }
+        const optionMarket = resolveMarketOptionMarket(opt)
+        return !optionMarket || optionMarket === name
+      }) ?? null
     )
   }
 
-  const onOrderMarketChange = $event => {
-    inputData.value.wso_market_pk = $event?.pk ?? null
-    inputData.value.wso_market = $event?.market ?? null
-    inputData.value.wso_plant_id = $event?.plant_id ?? null
+  const loadPlantIdOptions = async marketName => {
+    const name = String(marketName ?? '').trim()
+    if (!name) {
+      plantIdOptionItems.value = []
+      return
+    }
 
-    const aa = inputData.value.item_list ?? []
-    aa.forEach(row => {
-      row.woi_market = $event?.market ?? null
-      row.woi_market_pk = $event?.pk ?? null
-      row.woi_plant_id = $event?.plant_id ?? null
+    plantIdOptionsLoading.value = true
+    try {
+      const { data } = await getWhsMarketOptions({ query: name })
+      const list = Array.isArray(data) ? data : []
+      marketOptions.value = mergeMarketOptions(marketOptions.value, list)
+      plantIdOptionItems.value = buildPlantIdOptionItems(list, name, { matchMarket: false })
+    } catch (error) {
+      console.error('loadPlantIdOptions failed:', error)
+      plantIdOptionItems.value = buildPlantIdOptionItems(marketOptions.value, name)
+    } finally {
+      plantIdOptionsLoading.value = false
+    }
+  }
+
+  const onOrderMarketNameChange = marketName => {
+    if (!inputData.value) {
+      return
+    }
+    const name = String(marketName ?? '').trim()
+    syncMarketDerivedFields(inputData.value, {
+      ...defaultWhsMarketObject(),
+      market: name,
+      plant_id: '',
     })
   }
 
-  const reconcileMarketSelection = () => {
+  const onOrderPlantIdChange = plantId => {
+    if (!inputData.value) {
+      return
+    }
+    const name = selectedMarketName.value
+    const pid = String(plantId ?? '').trim()
+    const matched = findMarketOption(name, pid)
+    if (matched) {
+      syncMarketDerivedFields(inputData.value, matched)
+      return
+    }
+    syncMarketDerivedFields(inputData.value, {
+      ...defaultWhsMarketObject(),
+      market: name,
+      plant_id: pid,
+    })
+  }
+
+  const ensureMarketOptionVisible = () => {
+    const current = normalizeWhsMarketObject(inputData.value?.market)
+    if (!current?.market) {
+      return
+    }
+    const exists = marketOptions.value.some(opt => {
+      if (current.pk && String(opt.pk ?? '').trim() === current.pk) {
+        return true
+      }
+      if (current.plant_id) {
+        return (
+          resolveMarketOptionMarket(opt) === current.market &&
+          resolveMarketOptionPlantId(opt) === current.plant_id
+        )
+      }
+      return resolveMarketOptionMarket(opt) === current.market
+    })
+    if (!exists) {
+      marketOptions.value = [...marketOptions.value, current]
+    }
+  }
+
+  const reconcileMarketSelection = async () => {
     if (!inputData.value) {
       return
     }
     const current = normalizeWhsMarketObject(inputData.value.market)
     if (!current?.market) {
+      plantIdOptionItems.value = []
       return
     }
-    const matched = marketOptions.value.find(opt => {
-      if (current.pk && String(opt.pk ?? '').trim() === current.pk) {
-        return true
+    await loadPlantIdOptions(current.market)
+    if (current.plant_id) {
+      const matched = findMarketOption(current.market, current.plant_id)
+      if (matched) {
+        syncMarketDerivedFields(inputData.value, matched)
+        return
       }
-      return String(opt.market ?? '').trim() === current.market
-    })
-    if (matched) {
-      syncMarketDerivedFields(inputData.value, matched)
     }
+    ensureMarketOptionVisible()
   }
 
   const loadMarketOptions = async () => {
     try {
       const { data } = await getWhsMarketOptions()
       marketOptions.value = Array.isArray(data) ? data : []
-      reconcileMarketSelection()
+      await reconcileMarketSelection()
     } catch (error) {
       console.error('loadMarketOptions failed:', error)
       marketOptions.value = []
+      plantIdOptionItems.value = []
     }
   }
   loadMarketOptions()
 
   watch(
-    () => inputData.value?.market,
-    () => reconcileMarketSelection(),
-    { deep: true },
+    () => selectedMarketName.value,
+    async (marketName, previousMarketName) => {
+      if (!marketName) {
+        plantIdOptionItems.value = []
+        return
+      }
+      if (marketName === previousMarketName) {
+        return
+      }
+      await loadPlantIdOptions(marketName)
+    },
   )
 
-  const orderPlantId = computed(() =>
-    String(inputData.value?.wso_plant_id ?? inputData.value?.market?.plant_id ?? '').trim(),
+  watch(
+    () => inputData.value?.market?.plant_id,
+    () => {
+      if (!inputData.value) {
+        return
+      }
+      const current = normalizeWhsMarketObject(inputData.value.market)
+      if (!current?.market || !current.plant_id) {
+        return
+      }
+      const matched = findMarketOption(current.market, current.plant_id)
+      if (matched) {
+        syncMarketDerivedFields(inputData.value, matched)
+      }
+    },
   )
 
-  const addrTableHeaders = [
-    {
-      title: 'Code',
-      key: 'code',
-      align: 'start',
-      maxWidth: '200',
-      cellProps: { class: 'text-truncate' },
-      minWidth: '140',
-    },
-    {
-      title: 'Company Name',
-      key: 'company_name',
-      align: 'start',
-      maxWidth: '200',
-      cellProps: { class: 'text-truncate' },
-      minWidth: '140',
-    },
-    {
-      title: 'Address Code',
-      key: 'address_code',
-      align: 'start',
-      maxWidth: '200',
-      cellProps: { class: 'text-truncate' },
-      minWidth: '140',
-    },
-    {
-      title: 'Address1',
-      key: 'address1',
-      align: 'start',
-      maxWidth: '200',
-      cellProps: { class: 'text-truncate' },
-      minWidth: '140',
-    },
-    { title: 'City', key: 'city', align: 'start', minWidth: '140' },
-    { title: 'Country', key: 'country_code', align: 'start', minWidth: '140' },
-  ]
+  const addrTableHeaders = computed(() =>
+    mapWarehouseAddrTableHeaders(
+      [
+        {
+          key: 'code',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        {
+          key: 'company_name',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        {
+          key: 'address_code',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        {
+          key: 'address1',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        { key: 'city', align: 'start', minWidth: '140' },
+        { key: 'country_code', align: 'start', minWidth: '140' },
+      ],
+      addrTable,
+    ),
+  )
 
   /** Volume Weight 单位跟 Gross Weight；Chargeable Weight 单位跟 CBM */
   const syncDerivedWeightUnits = () => {
@@ -1472,6 +1638,26 @@
 </script>
 
 <style lang="scss" scoped>
+  .market-plant-row {
+    width: 100%;
+  }
+
+  .market-plant-row__field {
+    flex: 0 0 25%;
+    max-width: 25%;
+    min-width: 0;
+  }
+
+  .market-plant-row :deep(.v-input.v-input--horizontal) {
+    width: 100%;
+    max-width: 100%;
+
+    .v-input__control {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
   .address-fields-col,
   .address-pair-row {
     width: 100%;
