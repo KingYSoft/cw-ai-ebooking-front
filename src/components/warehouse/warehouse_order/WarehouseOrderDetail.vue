@@ -1,527 +1,538 @@
 <template>
-  <div>
-    <v-form class="ref-form-pre" color="background">
-      <v-card-text class="py-2">
-        <v-row dense>
-          <v-col cols="12">
-            <div class="market-plant-row d-flex align-start ga-2">
-              <v-autocomplete
-                id="1@market"
-                autocomplete="off"
-                class="market-plant-row__field"
-                clearable
-                color="primary"
-                density="compact"
-                hide-details="auto"
-                :items="uniqueMarketNames"
-                :menu-props="{ maxWidth: '320px' }"
-                min-width="0"
-                :model-value="selectedMarketName"
-                :rules="marketRules"
-                variant="outlined"
-                @update:model-value="onOrderMarketNameChange"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('market') }}<span class="text-error"> *</span>:
+  <div class="whs-order-detail" :class="{ 'whs-order-detail--readonly': readonly }">
+    <fieldset class="whs-order-detail-fieldset" :disabled="readonly">
+      <v-form class="ref-form-pre" color="background" :disabled="readonly">
+        <v-card-text class="py-2">
+          <v-row dense>
+            <v-col :cols="rescols('c12l3s6')">
+              <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <v-select
+                  id="1@wso_trade_type"
+                  v-model="inputData.wso_trade_type"
+                  density="compact"
+                  hide-details
+                  :items="tradeTypeOptions"
+                  min-width="100%"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('tradeType') }}</div>
+                  </template>
+                </v-select>
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="9">
+              <div class="market-plant-row d-flex align-start ga-2">
+                <v-autocomplete
+                  id="1@market"
+                  autocomplete="off"
+                  class="market-plant-row__field"
+                  clearable
+                  color="primary"
+                  density="compact"
+                  hide-details="auto"
+                  :items="uniqueMarketNames"
+                  :menu-props="{ maxWidth: '320px' }"
+                  min-width="0"
+                  :model-value="selectedMarketName"
+                  :rules="marketRules"
+                  variant="outlined"
+                  @update:model-value="onOrderMarketNameChange"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('market') }}<span class="text-error"> *</span>:
+                    </div>
+                  </template>
+                </v-autocomplete>
+
+                <v-select
+                  id="1@plant_id"
+                  class="market-plant-row__field"
+                  clearable
+                  color="primary"
+                  density="compact"
+                  :disabled="readonly || !selectedMarketName || plantIdOptionsLoading"
+                  hide-details="auto"
+                  item-title="title"
+                  item-value="value"
+                  :items="plantIdOptionItems"
+                  :loading="plantIdOptionsLoading"
+                  :menu-props="{ maxWidth: '320px' }"
+                  min-width="0"
+                  :model-value="selectedPlantId"
+                  :rules="plantIdRules"
+                  variant="outlined"
+                  @update:model-value="onOrderPlantIdChange"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('plantId') }}</div>
+                  </template>
+                </v-select>
+              </div>
+            </v-col>
+          </v-row>
+
+          <v-row dense>
+            <v-col :cols="rescols('c12l4s6')">
+              <v-divider>
+                <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
+                  {{ detailSection('shipper') }}
+                </div>
+              </v-divider>
+
+              <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                <FRemoteTableMenuWithCode
+                  id="1@shipper_name"
+                  v-model="inputData.shipper.add_address_name"
+                  bind-key="code"
+                  :bind-value="inputData.shipper.add_address_code"
+                  display-key="company_name"
+                  :fetch-method="organizationQueryOrgAddress"
+                  :headers="addrTableHeaders"
+                  :query-extra="{ address_type: 'SHIPPER' }"
+                  :text-field-props="{
+                    'min-width': '100%',
+                  }"
+                  virtual
+                  @click-clear="OnClearAddr('SHIPPER')"
+                  @row-select="onSelectAddr($event, 'SHIPPER')"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
+                  </template>
+                </FRemoteTableMenuWithCode>
+
+                <v-text-field
+                  v-model="inputData.shipper.add_address1"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  readonly
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
+                  </template>
+                </v-text-field>
+
+                <v-text-field
+                  v-model="inputData.shipper.add_address2"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  readonly
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
+                  </template>
+                </v-text-field>
+              </div>
+
+              <v-row class="address-pair-row" dense>
+                <v-col :cols="rescols('c6')">
+                  <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.shipper.add_uscl"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label-120">{{ detailField('uscl') }}</div>
+                      </template>
+                    </v-text-field>
                   </div>
-                </template>
-              </v-autocomplete>
+                </v-col>
 
-              <v-select
-                id="1@plant_id"
-                class="market-plant-row__field"
-                clearable
-                color="primary"
-                density="compact"
-                :disabled="!selectedMarketName || plantIdOptionsLoading"
-                hide-details="auto"
-                item-title="title"
-                item-value="value"
-                :items="plantIdOptionItems"
-                :loading="plantIdOptionsLoading"
-                :menu-props="{ maxWidth: '320px' }"
-                min-width="0"
-                :model-value="selectedPlantId"
-                :rules="plantIdRules"
-                variant="outlined"
-                @update:model-value="onOrderPlantIdChange"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('plantId') }}</div>
-                </template>
-              </v-select>
-            </div>
-          </v-col>
-        </v-row>
+                <v-col :cols="rescols('c6')">
+                  <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.shipper.add_contact"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label">{{ detailField('contact') }}</div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
 
-        <v-row dense>
-          <v-col :cols="rescols('c12l4s6')">
-            <v-divider>
-              <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-                {{ detailSection('shipper') }}
+              <v-row class="address-pair-row" dense>
+                <v-col :cols="rescols('c6')">
+                  <div class="d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.shipper.add_mobile"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label-120">{{ detailField('tel') }}</div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
+
+                <v-col :cols="rescols('c6')">
+                  <div class="d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.shipper.add_email"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label">{{ detailField('email') }}</div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
+
+              <v-row class="address-pair-row" dense>
+                <v-col :cols="rescols('c6')">
+                  <div class="d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.shipper.add_fax"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label-120">{{ detailField('fax') }}</div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <v-col :cols="rescols('c12l4s6')">
+              <v-divider>
+                <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
+                  {{ detailSection('consignee') }}
+                </div>
+              </v-divider>
+
+              <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                <FRemoteTableMenuWithCode
+                  id="1@consignee_name"
+                  v-model="inputData.consignee.add_address_name"
+                  bind-key="code"
+                  :bind-value="inputData.consignee.add_address_code"
+                  display-key="company_name"
+                  :fetch-method="organizationQueryOrgAddress"
+                  :headers="addrTableHeaders"
+                  :query-extra="{ address_type: 'CONSIGNEE' }"
+                  :text-field-props="{
+                    'min-width': '100%',
+                  }"
+                  virtual
+                  @click-clear="OnClearAddr('CONSIGNEE')"
+                  @row-select="onSelectAddr($event, 'CONSIGNEE')"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
+                  </template>
+                </FRemoteTableMenuWithCode>
+
+                <v-text-field
+                  v-model="inputData.consignee.add_address1"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  readonly
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
+                  </template>
+                </v-text-field>
+
+                <v-text-field
+                  v-model="inputData.consignee.add_address2"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  readonly
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
+                  </template>
+                </v-text-field>
               </div>
-            </v-divider>
 
-            <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
-              <FRemoteTableMenuWithCode
-                id="1@shipper_name"
-                v-model="inputData.shipper.add_address_name"
-                bind-key="code"
-                :bind-value="inputData.shipper.add_address_code"
-                display-key="company_name"
-                :fetch-method="organizationQueryOrgAddress"
-                :headers="addrTableHeaders"
-                :query-extra="{ address_type: 'SHIPPER' }"
-                :text-field-props="{
-                  'min-width': '100%',
-                }"
-                virtual
-                @click-clear="OnClearAddr('SHIPPER')"
-                @row-select="onSelectAddr($event, 'SHIPPER')"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
-                </template>
-              </FRemoteTableMenuWithCode>
+              <v-row class="address-pair-row" dense>
+                <v-col :cols="rescols('c6')">
+                  <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.consignee.add_switchboard"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label-120">
+                          {{ detailField('switchboard') }}
+                        </div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
 
-              <v-text-field
-                v-model="inputData.shipper.add_address1"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
-                </template>
-              </v-text-field>
+                <v-col :cols="rescols('c6')">
+                  <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.consignee.add_taxId"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label">{{ detailField('taxId') }}</div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
 
-              <v-text-field
-                v-model="inputData.shipper.add_address2"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
-                </template>
-              </v-text-field>
-            </div>
+              <v-row class="address-pair-row" dense>
+                <v-col :cols="rescols('c6')">
+                  <div class="d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.consignee.add_contact"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label-120">
+                          {{ detailField('contact') }}
+                        </div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
 
-            <v-row class="address-pair-row" dense>
-              <v-col :cols="rescols('c6')">
-                <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.shipper.add_uscl"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label-120">{{ detailField('uscl') }}</div>
-                    </template>
-                  </v-text-field>
+                <v-col :cols="rescols('c6')">
+                  <div class="d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.consignee.add_mobile"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label">{{ detailField('tel') }}</div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <v-col :cols="rescols('c12l4s6')">
+              <v-divider>
+                <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
+                  {{ detailSection('notifyParty') }}
                 </div>
-              </v-col>
+              </v-divider>
 
-              <v-col :cols="rescols('c6')">
-                <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.shipper.add_contact"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label">{{ detailField('contact') }}</div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-            </v-row>
+              <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                <FRemoteTableMenuWithCode
+                  v-model="inputData.notify_party.add_address_name"
+                  bind-key="code"
+                  :bind-value="inputData.notify_party.add_address_code"
+                  display-key="company_name"
+                  :fetch-method="organizationQueryOrgAddress"
+                  :headers="addrTableHeaders"
+                  :query-extra="{ address_type: 'NOTIFY_PARTY' }"
+                  :text-field-props="{ 'min-width': '100%' }"
+                  virtual
+                  @click-clear="OnClearAddr('NOTIFY_PARTY')"
+                  @row-select="onSelectAddr($event, 'NOTIFY_PARTY')"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
+                  </template>
 
-            <v-row class="address-pair-row" dense>
-              <v-col :cols="rescols('c6')">
-                <div class="d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.shipper.add_mobile"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label-120">{{ detailField('tel') }}</div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-
-              <v-col :cols="rescols('c6')">
-                <div class="d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.shipper.add_email"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label">{{ detailField('email') }}</div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-            </v-row>
-
-            <v-row class="address-pair-row" dense>
-              <v-col :cols="rescols('c6')">
-                <div class="d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.shipper.add_fax"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label-120">{{ detailField('fax') }}</div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-            </v-row>
-          </v-col>
-
-          <v-col :cols="rescols('c12l4s6')">
-            <v-divider>
-              <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-                {{ detailSection('consignee') }}
-              </div>
-            </v-divider>
-
-            <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
-              <FRemoteTableMenuWithCode
-                id="1@consignee_name"
-                v-model="inputData.consignee.add_address_name"
-                bind-key="code"
-                :bind-value="inputData.consignee.add_address_code"
-                display-key="company_name"
-                :fetch-method="organizationQueryOrgAddress"
-                :headers="addrTableHeaders"
-                :query-extra="{ address_type: 'CONSIGNEE' }"
-                :text-field-props="{
-                  'min-width': '100%',
-                }"
-                virtual
-                @click-clear="OnClearAddr('CONSIGNEE')"
-                @row-select="onSelectAddr($event, 'CONSIGNEE')"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
-                </template>
-              </FRemoteTableMenuWithCode>
-
-              <v-text-field
-                v-model="inputData.consignee.add_address1"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
-                </template>
-              </v-text-field>
-
-              <v-text-field
-                v-model="inputData.consignee.add_address2"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
-                </template>
-              </v-text-field>
-            </div>
-
-            <v-row class="address-pair-row" dense>
-              <v-col :cols="rescols('c6')">
-                <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.consignee.add_switchboard"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label-120">
-                        {{ detailField('switchboard') }}
-                      </div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-
-              <v-col :cols="rescols('c6')">
-                <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.consignee.add_taxId"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label">{{ detailField('taxId') }}</div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-            </v-row>
-
-            <v-row class="address-pair-row" dense>
-              <v-col :cols="rescols('c6')">
-                <div class="d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.consignee.add_contact"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label-120">
-                        {{ detailField('contact') }}
-                      </div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-
-              <v-col :cols="rescols('c6')">
-                <div class="d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.consignee.add_mobile"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label">{{ detailField('tel') }}</div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-            </v-row>
-          </v-col>
-
-          <v-col :cols="rescols('c12l4s6')">
-            <v-divider>
-              <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
-                {{ detailSection('notifyParty') }}
-              </div>
-            </v-divider>
-
-            <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
-              <FRemoteTableMenuWithCode
-                v-model="inputData.notify_party.add_address_name"
-                bind-key="code"
-                :bind-value="inputData.notify_party.add_address_code"
-                display-key="company_name"
-                :fetch-method="organizationQueryOrgAddress"
-                :headers="addrTableHeaders"
-                :query-extra="{ address_type: 'NOTIFY_PARTY' }"
-                :text-field-props="{ 'min-width': '100%' }"
-                virtual
-                @click-clear="OnClearAddr('NOTIFY_PARTY')"
-                @row-select="onSelectAddr($event, 'NOTIFY_PARTY')"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
-                </template>
-
-                <template #append>
-                  <v-tooltip location="bottom">
-                    <template #activator="ssss">
-                      <v-checkbox-btn
-                        v-bind="ssss.props"
-                        v-model="inputData.notify_party_same_as_consignee"
-                        color="primary"
-                        density="compact"
-                        hide-details
-                        value="Y"
-                        @update:model-value="
-                          $event => {
-                            if ($event === 'Y') {
-                              inputData.notify_party = { add_address_name: 'SAME AS CONSIGNEE' }
-                            } else {
-                              inputData.notify_party = {}
+                  <template #append>
+                    <v-tooltip location="bottom">
+                      <template #activator="ssss">
+                        <v-checkbox-btn
+                          v-bind="ssss.props"
+                          v-model="inputData.notify_party_same_as_consignee"
+                          color="primary"
+                          density="compact"
+                          hide-details
+                          value="Y"
+                          @update:model-value="
+                            $event => {
+                              if ($event === 'Y') {
+                                inputData.notify_party = { add_address_name: 'SAME AS CONSIGNEE' }
+                              } else {
+                                inputData.notify_party = {}
+                              }
                             }
-                          }
-                        "
-                      />
-                    </template>
+                          "
+                        />
+                      </template>
 
-                    <span>{{ detailField('sameAsConsignee') }}</span>
-                  </v-tooltip>
-                </template>
-              </FRemoteTableMenuWithCode>
+                      <span>{{ detailField('sameAsConsignee') }}</span>
+                    </v-tooltip>
+                  </template>
+                </FRemoteTableMenuWithCode>
 
-              <v-text-field
-                v-model="inputData.notify_party.add_address1"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
-                </template>
-              </v-text-field>
+                <v-text-field
+                  v-model="inputData.notify_party.add_address1"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  readonly
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
+                  </template>
+                </v-text-field>
 
-              <v-text-field
-                v-model="inputData.notify_party.add_address2"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
-                </template>
-              </v-text-field>
-            </div>
+                <v-text-field
+                  v-model="inputData.notify_party.add_address2"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  readonly
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
+                  </template>
+                </v-text-field>
+              </div>
 
-            <v-row class="address-pair-row" dense>
-              <v-col :cols="rescols('c6')">
-                <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.notify_party.add_contact"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label-120">
-                        {{ detailField('contact') }}
-                      </div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-
-              <v-col :cols="rescols('c6')">
-                <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                  <v-text-field
-                    v-model="inputData.notify_party.add_mobile"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    min-width="100%"
-                    readonly
-                    type="input"
-                    variant="outlined"
-                  >
-                    <template #prepend>
-                      <div class="text-caption text-end w-label">{{ detailField('tel') }}</div>
-                    </template>
-                  </v-text-field>
-                </div>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-        <!-- <v-row class="mt-2" dense> -->
-        <!-- </v-row> -->
-        <v-divider class="my-2" />
-
-        <v-row dense>
-          <v-col :cols="rescols('c12l3s6')">
-            <div class="d-flex align-start flex-column flex-wrap ga-1">
-              <v-select
-                id="1@wso_packing_mode"
-                v-model="inputData.wso_packing_mode"
-                auto-select-first
-                autocomplete="off"
-                density="compact"
-                hide-details
-                item-title="code"
-                item-value="code"
-                :items="WHS_ORDER_CONTAINER_OPTIONS"
-                :menu-props="{
-                  'max-width': '100%',
-                }"
-                min-width="100%"
-                no-data-text="$vuetify.custom.app.searchMore"
-                no-filter
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('container') }}
+              <v-row class="address-pair-row" dense>
+                <v-col :cols="rescols('c6')">
+                  <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.notify_party.add_contact"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label-120">
+                          {{ detailField('contact') }}
+                        </div>
+                      </template>
+                    </v-text-field>
                   </div>
-                </template>
-              </v-select>
+                </v-col>
 
-              <!-- <v-autocomplete
+                <v-col :cols="rescols('c6')">
+                  <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
+                    <v-text-field
+                      v-model="inputData.notify_party.add_mobile"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      min-width="100%"
+                      readonly
+                      type="input"
+                      variant="outlined"
+                    >
+                      <template #prepend>
+                        <div class="text-caption text-end w-label">{{ detailField('tel') }}</div>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+          <!-- <v-row class="mt-2" dense> -->
+          <!-- </v-row> -->
+          <v-divider class="my-2" />
+
+          <v-row dense>
+            <v-col :cols="rescols('c12l3s6')">
+              <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <v-text-field
+                  v-model="inputData.wso_so_number"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  :rules="convertRequiredRules.soNumber"
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('carrierSoNumber') }}<span class="text-primary">^</span>:
+                    </div>
+                  </template>
+                </v-text-field>
+
+                <!-- <v-autocomplete
               id="1@bkg_destination"
               auto-select-first
               autocomplete="off"
@@ -569,533 +580,495 @@
                 </div>
               </template>
             </v-autocomplete> -->
-              <v-autocomplete
-                auto-select-first
-                autocomplete="off"
-                clearable
-                color="primary"
-                density="compact"
-                hide-details
-                item-title="rl_code"
-                item-value="rl_code"
-                :items="queryPortList"
-                :menu-props="{
-                  'max-width': '100%',
-                }"
-                min-width="100%"
-                :model-value="inputData.wso_load_port"
-                no-data-text="$vuetify.custom.app.searchMore"
-                no-filter
-                return-object
-                variant="outlined"
-                @update:focused="
-                  $event => {
-                    if ($event) {
-                      queryPort(inputData.wso_load_port)
+                <v-autocomplete
+                  auto-select-first
+                  autocomplete="off"
+                  clearable
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  item-title="rl_code"
+                  item-value="rl_code"
+                  :items="queryPortList"
+                  :menu-props="{
+                    'max-width': '100%',
+                  }"
+                  min-width="100%"
+                  :model-value="inputData.wso_load_port"
+                  no-data-text="$vuetify.custom.app.searchMore"
+                  no-filter
+                  return-object
+                  variant="outlined"
+                  @update:focused="
+                    $event => {
+                      if ($event) {
+                        queryPort(inputData.wso_load_port)
+                      }
                     }
-                  }
-                "
-                @update:model-value="
-                  $event => {
-                    inputData.wso_load_port = $event?.rl_code ?? null
-                    inputData.wso_load_port_name = $event?.rl_port_name ?? null
-                  }
-                "
-                @update:search="queryPort"
-              >
-                <template #item="scope">
-                  <v-list-item
-                    v-bind="scope.props"
-                    :subtitle="scope.item.raw.rl_port_name"
-                    :title="scope.item.raw.rl_code"
-                  />
-                </template>
-
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('load') }}</div>
-                </template>
-              </v-autocomplete>
-
-              <v-autocomplete
-                auto-select-first
-                autocomplete="off"
-                clearable
-                color="primary"
-                density="compact"
-                hide-details
-                item-title="rl_code"
-                item-value="rl_code"
-                :items="queryPortList"
-                :menu-props="{
-                  'max-width': '100%',
-                }"
-                min-width="100%"
-                :model-value="inputData.wso_discharge_port"
-                no-data-text="$vuetify.custom.app.searchMore"
-                no-filter
-                return-object
-                variant="outlined"
-                @update:focused="
-                  $event => {
-                    if ($event) {
-                      queryPort(inputData.wso_discharge_port)
+                  "
+                  @update:model-value="
+                    $event => {
+                      inputData.wso_load_port = $event?.rl_code ?? null
+                      inputData.wso_load_port_name = $event?.rl_port_name ?? null
                     }
-                  }
-                "
-                @update:model-value="
-                  $event => {
-                    inputData.wso_discharge_port = $event?.rl_code ?? null
-                    inputData.wso_discharge_port_name = $event?.rl_port_name ?? null
-                  }
-                "
-                @update:search="queryPort"
-              >
-                <template #item="scope">
-                  <v-list-item
-                    v-bind="scope.props"
-                    :subtitle="scope.item.raw.rl_port_name"
-                    :title="scope.item.raw.rl_code"
-                  />
-                </template>
+                  "
+                  @update:search="queryPort"
+                >
+                  <template #item="scope">
+                    <v-list-item
+                      v-bind="scope.props"
+                      :subtitle="scope.item.raw.rl_port_name"
+                      :title="scope.item.raw.rl_code"
+                    />
+                  </template>
 
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('discharge') }}
-                  </div>
-                </template>
-              </v-autocomplete>
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('load') }}</div>
+                  </template>
+                </v-autocomplete>
 
-              <FDatePicker
-                id="1@wso_etd"
-                v-model:date-value="inputData.wso_etd"
-                max="2099-12-31"
-                min="2000-01-01"
-                :rules="bkgEtdRules"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('etd') }}<span class="text-primary">^</span>:
-                  </div>
-                </template>
-              </FDatePicker>
+                <v-autocomplete
+                  auto-select-first
+                  autocomplete="off"
+                  clearable
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  item-title="rl_code"
+                  item-value="rl_code"
+                  :items="queryPortList"
+                  :menu-props="{
+                    'max-width': '100%',
+                  }"
+                  min-width="100%"
+                  :model-value="inputData.wso_discharge_port"
+                  no-data-text="$vuetify.custom.app.searchMore"
+                  no-filter
+                  return-object
+                  variant="outlined"
+                  @update:focused="
+                    $event => {
+                      if ($event) {
+                        queryPort(inputData.wso_discharge_port)
+                      }
+                    }
+                  "
+                  @update:model-value="
+                    $event => {
+                      inputData.wso_discharge_port = $event?.rl_code ?? null
+                      inputData.wso_discharge_port_name = $event?.rl_port_name ?? null
+                    }
+                  "
+                  @update:search="queryPort"
+                >
+                  <template #item="scope">
+                    <v-list-item
+                      v-bind="scope.props"
+                      :subtitle="scope.item.raw.rl_port_name"
+                      :title="scope.item.raw.rl_code"
+                    />
+                  </template>
 
-              <FDatePicker
-                id="1@wso_eta"
-                v-model:date-value="inputData.wso_eta"
-                max="2099-12-31"
-                min="2000-01-01"
-                :rules="bkgEtaRules"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('eta') }}<span class="text-primary">^</span>:
-                  </div>
-                </template>
-              </FDatePicker>
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('discharge') }}
+                    </div>
+                  </template>
+                </v-autocomplete>
 
-              <FDatePicker
-                id="1@wso_cargo_ready"
-                v-model:date-value="inputData.wso_cargo_ready"
-                max="2099-12-31"
-                min="2000-01-01"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('cargoReadyDate') }}
-                  </div>
-                </template>
-              </FDatePicker>
+                <FDatePicker
+                  id="1@wso_etd"
+                  v-model:date-value="inputData.wso_etd"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  :rules="bkgEtdRules"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('etd') }}<span class="text-primary">^</span>:
+                    </div>
+                  </template>
+                </FDatePicker>
 
-              <FDatePicker
-                id="1@wso_est_pickup"
-                v-model:date-value="inputData.wso_est_pickup"
-                max="2099-12-31"
-                min="2000-01-01"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('estPickup') }}
-                  </div>
-                </template>
-              </FDatePicker>
+                <FDatePicker
+                  id="1@wso_eta"
+                  v-model:date-value="inputData.wso_eta"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  :rules="bkgEtaRules"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('eta') }}<span class="text-primary">^</span>:
+                    </div>
+                  </template>
+                </FDatePicker>
+              </div>
+            </v-col>
 
-              <FDatePicker
-                id="1@wso_est_delivery"
-                v-model:date-value="inputData.wso_est_delivery"
-                max="2099-12-31"
-                min="2000-01-01"
-                :rules="convertRequiredRules.estDelivery"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('estDelivery') }}<span class="text-primary">^</span>:
-                  </div>
-                </template>
-              </FDatePicker>
-            </div>
-          </v-col>
+            <v-col :cols="rescols('c12l3s6')">
+              <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <FDatePicker
+                  id="1@wso_cargo_ready"
+                  v-model:date-value="inputData.wso_cargo_ready"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('cargoReadyDate') }}
+                    </div>
+                  </template>
+                </FDatePicker>
 
-          <v-col :cols="rescols('c12l3s6')">
-            <div class="d-flex align-start flex-column flex-wrap ga-1">
-              <v-number-input
-                id="1@wso_actual_weight"
-                v-model="inputData.wso_actual_weight"
-                class="hide-step"
-                color="primary"
-                control-variant="hidden"
-                density="compact"
-                hide-details
-                :max="999999999.99999"
-                :min="0"
-                :min-fraction-digits="0"
-                min-width="100%"
-                :precision="5"
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('grossWeight') }}
-                  </div>
-                </template>
+                <FDatePicker
+                  id="1@wso_est_pickup"
+                  v-model:date-value="inputData.wso_est_pickup"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('estPickup') }}
+                    </div>
+                  </template>
+                </FDatePicker>
 
-                <template #append>
-                  <v-select
-                    v-model="inputData.wso_unit_of_weight"
-                    auto-select-first
-                    autocomplete="off"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    item-title="code"
-                    item-value="code"
-                    :items="appStore.appCombobox.getCombobox('weightUnit')"
-                    :list-props="{
-                      density: 'compact',
-                    }"
-                    no-filter
-                    variant="underlined"
-                    width="50px"
-                  />
-                </template>
-              </v-number-input>
+                <FDatePicker
+                  id="1@wso_est_delivery"
+                  v-model:date-value="inputData.wso_est_delivery"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  :rules="convertRequiredRules.estDelivery"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('estDelivery') }}<span class="text-primary">^</span>:
+                    </div>
+                  </template>
+                </FDatePicker>
 
-              <v-number-input
-                id="1@wso_actual_volume"
-                v-model="inputData.wso_actual_volume"
-                class="hide-step"
-                color="primary"
-                control-variant="hidden"
-                density="compact"
-                hide-details
-                :max="999999999.99999"
-                :min="0"
-                :min-fraction-digits="0"
-                min-width="100%"
-                :precision="5"
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('cbm') }}</div>
-                </template>
-
-                <template #append>
-                  <v-select
-                    v-model="inputData.wso_unit_of_volume"
-                    auto-select-first
-                    autocomplete="off"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    item-title="code"
-                    item-value="code"
-                    :items="appStore.appCombobox.getCombobox('cbmUnit')"
-                    :list-props="{
-                      density: 'compact',
-                    }"
-                    no-filter
-                    variant="underlined"
-                    width="50px"
-                  />
-                </template>
-              </v-number-input>
-
-              <v-text-field
-                id="1@wso_volume_weight"
-                class="input-numeric"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                :model-value="inputData.wso_volume_weight"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('volumeWeight') }}
-                  </div>
-                </template>
-
-                <template #append>
-                  <v-text-field
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    :model-value="inputData.wso_unit_of_weight"
-                    readonly
-                    type="input"
-                    variant="underlined"
-                    width="50px"
-                  />
-                </template>
-              </v-text-field>
-
-              <v-text-field
-                id="1@wso_actual_chargeable"
-                class="input-numeric"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                :model-value="inputData.wso_actual_chargeable"
-                readonly
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('chargeable') }}
-                  </div>
-                </template>
-
-                <template #append>
-                  <v-text-field
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    :model-value="inputData.wso_unit_of_volume"
-                    readonly
-                    type="input"
-                    variant="underlined"
-                    width="50px"
-                  />
-                </template>
-              </v-text-field>
-
-              <div class="d-flex align-center ga-0 w-100">
                 <v-number-input
-                  id="1@wso_total_package_count"
-                  v-model="inputData.wso_total_package_count"
-                  class="hide-step flex-1-1"
+                  id="1@wso_actual_weight"
+                  v-model="inputData.wso_actual_weight"
+                  class="hide-step"
                   color="primary"
                   control-variant="hidden"
                   density="compact"
                   hide-details
-                  :max="999999999"
+                  :max="999999999.99999"
                   :min="0"
                   :min-fraction-digits="0"
-                  :precision="0"
+                  min-width="100%"
+                  :precision="5"
                   type="input"
                   variant="outlined"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('noOfPackage') }}
+                      {{ detailField('grossWeight') }}
                     </div>
+                  </template>
+
+                  <template #append>
+                    <v-select
+                      v-model="inputData.wso_unit_of_weight"
+                      auto-select-first
+                      autocomplete="off"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      item-title="code"
+                      item-value="code"
+                      :items="appStore.appCombobox.getCombobox('weightUnit')"
+                      :list-props="{
+                        density: 'compact',
+                      }"
+                      no-filter
+                      variant="underlined"
+                      width="50px"
+                    />
                   </template>
                 </v-number-input>
 
-                <FRemoteTableMenu
-                  v-model="inputData.wso_pack_type"
-                  display-key="code"
-                  :fetch-method="fetchPackageTypes"
-                  :headers="packageTypeTableHeaders"
-                  item-value="code"
-                  query-key="query"
-                  :text-field-props="{
-                    color: 'primary',
-                    minWidth: '78',
-                    maxWidth: '78',
-                    variant: 'underlined',
-                    clearable: true,
-                  }"
-                  virtual
-                  @row-select="
-                    row =>
-                      assignPackageTypeFromRow(
-                        row,
-                        inputData,
-                        'wso_pack_type',
-                        'wso_pack_type_desc',
-                      )
-                  "
-                />
-              </div>
+                <v-number-input
+                  id="1@wso_actual_volume"
+                  v-model="inputData.wso_actual_volume"
+                  class="hide-step"
+                  color="primary"
+                  control-variant="hidden"
+                  density="compact"
+                  hide-details
+                  :max="999999999.99999"
+                  :min="0"
+                  :min-fraction-digits="0"
+                  min-width="100%"
+                  :precision="5"
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('cbm') }}</div>
+                  </template>
 
-              <v-select
-                id="1@wso_delivery_mode"
-                v-model="inputData.wso_delivery_mode"
-                auto-select-first
-                autocomplete="off"
-                density="compact"
-                hide-details
-                :items="['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']"
-                :menu-props="{
-                  'max-width': '100%',
-                }"
-                min-width="100%"
-                no-data-text="$vuetify.custom.app.searchMore"
-                no-filter
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('deliveryMode') }}
-                  </div>
-                </template>
-              </v-select>
+                  <template #append>
+                    <v-select
+                      v-model="inputData.wso_unit_of_volume"
+                      auto-select-first
+                      autocomplete="off"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      item-title="code"
+                      item-value="code"
+                      :items="appStore.appCombobox.getCombobox('cbmUnit')"
+                      :list-props="{
+                        density: 'compact',
+                      }"
+                      no-filter
+                      variant="underlined"
+                      width="50px"
+                    />
+                  </template>
+                </v-number-input>
 
-            </div>
-          </v-col>
+                <v-number-input
+                  id="1@wso_volume_weight"
+                  v-model="inputData.wso_volume_weight"
+                  class="hide-step"
+                  color="primary"
+                  control-variant="hidden"
+                  density="compact"
+                  hide-details
+                  :max="999999999.99999"
+                  :min="0"
+                  :min-fraction-digits="0"
+                  min-width="100%"
+                  :precision="5"
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('volumeWeight') }}
+                    </div>
+                  </template>
 
-          <v-col :cols="rescols('c12l3s6')">
-            <div class="d-flex align-start flex-column flex-wrap ga-1">
-              <FDatePicker
-                v-model:date-value="inputData.wso_so_confirm_date"
-                :date-props="{ clearable: true }"
-                max="2099-12-31"
-                min="2000-01-01"
-                min-width="100%"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('soConfirm') }}
-                  </div>
-                </template>
-              </FDatePicker>
+                  <template #append>
+                    <v-select
+                      v-model="inputData.wso_unit_of_weight"
+                      auto-select-first
+                      autocomplete="off"
+                      color="primary"
+                      density="compact"
+                      hide-details
+                      item-title="code"
+                      item-value="code"
+                      :items="appStore.appCombobox.getCombobox('weightUnit')"
+                      :list-props="{
+                        density: 'compact',
+                      }"
+                      no-filter
+                      variant="underlined"
+                      width="50px"
+                    />
+                  </template>
+                </v-number-input>
 
-              <FDatePicker
-                v-model:date-value="inputData.wso_vgm_cut_off_date"
-                :date-props="{ clearable: true }"
-                max="2099-12-31"
-                min="2000-01-01"
-                min-width="100%"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('vgmCutOff') }}
-                  </div>
-                </template>
-              </FDatePicker>
+                <div class="d-flex align-center ga-0 w-100">
+                  <v-number-input
+                    id="1@wso_total_package_count"
+                    v-model="inputData.wso_total_package_count"
+                    class="hide-step flex-1-1"
+                    color="primary"
+                    control-variant="hidden"
+                    density="compact"
+                    hide-details
+                    :max="999999999"
+                    :min="0"
+                    :min-fraction-digits="0"
+                    :precision="0"
+                    type="input"
+                    variant="outlined"
+                  >
+                    <template #prepend>
+                      <div class="text-caption text-end w-label-110">
+                        {{ detailField('noOfPackage') }}
+                      </div>
+                    </template>
+                  </v-number-input>
 
-              <FDatePicker
-                v-model:date-value="inputData.wso_doc_cut_off_date"
-                :date-props="{ clearable: true }"
-                max="2099-12-31"
-                min="2000-01-01"
-                min-width="100%"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('docCutOff') }}
-                  </div>
-                </template>
-              </FDatePicker>
-
-              <FDatePicker
-                v-model:date-value="inputData.wso_port_cargo_cut_off_date"
-                :date-props="{ clearable: true }"
-                max="2099-12-31"
-                min="2000-01-01"
-                min-width="100%"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('cyCutOff') }}</div>
-                </template>
-              </FDatePicker>
-
-              <v-text-field
-                v-model="inputData.wso_so_number"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                :rules="convertRequiredRules.soNumber"
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">
-                    {{ detailField('carrierSoNumber') }}<span class="text-primary">^</span>:
-                  </div>
-                </template>
-              </v-text-field>
-
-              <v-text-field
-                id="1@intended_vessel"
-                v-model="inputData.wso_intended_vessel"
-                color="primary"
-                density="compact"
-                hide-details
-                min-width="100%"
-                type="input"
-                variant="outlined"
-              >
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('intendedVessel') }}</div>
-                </template>
-              </v-text-field>
-
-              <v-autocomplete
-                id="1@place_of_delivery"
-                auto-select-first
-                autocomplete="off"
-                clearable
-                color="primary"
-                density="compact"
-                hide-details
-                item-title="rl_code"
-                item-value="rl_code"
-                :items="queryPortList"
-                :menu-props="{
-                  'max-width': '100%',
-                }"
-                min-width="100%"
-                :model-value="inputData.wso_place_of_delivery"
-                no-data-text="$vuetify.custom.app.searchMore"
-                no-filter
-                return-object
-                variant="outlined"
-                @update:focused="
-                  $event => {
-                    if ($event) {
-                      queryPort(inputData.wso_place_of_delivery)
-                    }
-                  }
-                "
-                @update:model-value="
-                  $event => {
-                    inputData.wso_place_of_delivery = $event?.rl_code ?? null
-                    inputData.wso_place_of_delivery_name = $event?.rl_port_name ?? null
-                  }
-                "
-                @update:search="queryPort"
-              >
-                <template #item="scope">
-                  <v-list-item
-                    v-bind="scope.props"
-                    :subtitle="scope.item.raw.rl_port_name"
-                    :title="scope.item.raw.rl_code"
+                  <FRemoteTableMenu
+                    v-model="inputData.wso_pack_type"
+                    display-key="code"
+                    :fetch-method="fetchPackageTypes"
+                    :headers="packageTypeTableHeaders"
+                    item-value="code"
+                    query-key="query"
+                    :text-field-props="{
+                      color: 'primary',
+                      minWidth: '78',
+                      maxWidth: '78',
+                      variant: 'underlined',
+                      clearable: true,
+                    }"
+                    virtual
+                    @row-select="
+                      row =>
+                        assignPackageTypeFromRow(
+                          row,
+                          inputData,
+                          'wso_pack_type',
+                          'wso_pack_type_desc',
+                        )
+                    "
                   />
-                </template>
+                </div>
 
-                <template #prepend>
-                  <div class="text-caption text-end w-label-110">{{ detailField('placeOfDelivery') }}</div>
-                </template>
-              </v-autocomplete>
+                <v-select
+                  id="1@wso_delivery_mode"
+                  v-model="inputData.wso_delivery_mode"
+                  auto-select-first
+                  autocomplete="off"
+                  density="compact"
+                  hide-details
+                  :items="['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']"
+                  :menu-props="{
+                    'max-width': '100%',
+                  }"
+                  min-width="100%"
+                  no-data-text="$vuetify.custom.app.searchMore"
+                  no-filter
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('deliveryMode') }}
+                    </div>
+                  </template>
+                </v-select>
+
+                <FDatePicker
+                  v-model:date-value="inputData.wso_so_confirm_date"
+                  :date-props="{ clearable: true }"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  min-width="100%"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('soConfirm') }}
+                    </div>
+                  </template>
+                </FDatePicker>
+
+              </div>
+            </v-col>
+
+            <v-col :cols="rescols('c12l3s6')">
+              <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <FDatePicker
+                  v-model:date-value="inputData.wso_vgm_cut_off_date"
+                  :date-props="{ clearable: true }"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  min-width="100%"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('vgmCutOff') }}
+                    </div>
+                  </template>
+                </FDatePicker>
+
+                <FDatePicker
+                  v-model:date-value="inputData.wso_doc_cut_off_date"
+                  :date-props="{ clearable: true }"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  min-width="100%"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('docCutOff') }}
+                    </div>
+                  </template>
+                </FDatePicker>
+
+                <FDatePicker
+                  v-model:date-value="inputData.wso_port_cargo_cut_off_date"
+                  :date-props="{ clearable: true }"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  min-width="100%"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('cyCutOff') }}</div>
+                  </template>
+                </FDatePicker>
+
+                <v-text-field
+                  id="1@intended_vessel"
+                  v-model="inputData.wso_intended_vessel"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  min-width="100%"
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('intendedVessel') }}</div>
+                  </template>
+                </v-text-field>
+
+                <v-autocomplete
+                  id="1@place_of_delivery"
+                  auto-select-first
+                  autocomplete="off"
+                  clearable
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  item-title="rl_code"
+                  item-value="rl_code"
+                  :items="queryPortList"
+                  :menu-props="{
+                    'max-width': '100%',
+                  }"
+                  min-width="100%"
+                  :model-value="inputData.wso_place_of_delivery"
+                  no-data-text="$vuetify.custom.app.searchMore"
+                  no-filter
+                  return-object
+                  variant="outlined"
+                  @update:focused="
+                    $event => {
+                      if ($event) {
+                        queryPort(inputData.wso_place_of_delivery)
+                      }
+                    }
+                  "
+                  @update:model-value="
+                    $event => {
+                      inputData.wso_place_of_delivery = $event?.rl_code ?? null
+                      inputData.wso_place_of_delivery_name = $event?.rl_port_name ?? null
+                    }
+                  "
+                  @update:search="queryPort"
+                >
+                  <template #item="scope">
+                    <v-list-item
+                      v-bind="scope.props"
+                      :subtitle="scope.item.raw.rl_port_name"
+                      :title="scope.item.raw.rl_code"
+                    />
+                  </template>
+
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('placeOfDelivery') }}</div>
+                  </template>
+                </v-autocomplete>
               <!-- <v-select
               v-model="inputData.job.job_direction"
               auto-select-first
@@ -1163,12 +1136,78 @@
                 <div class="text-caption text-end w-label-110">salesRep</div>
               </template>
             </v-autocomplete> -->
+              </div>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-form>
+
+      <v-card-text class="py-2">
+        <v-row dense>
+          <v-col class="min-width-0" :cols="rescols('c12l6')">
+            <v-btn class="mb-2" color="primary" size="small" variant="flat">
+              {{ detailField('container') }}
+            </v-btn>
+
+            <div class="ref-form-pre">
+              <v-data-table
+                class="table-filter"
+                disable-sort
+                :headers="containerTableHeaders"
+                hide-default-footer
+                item-value="rowKey"
+                :items="containerList"
+                :items-per-page="-1"
+                striped="even"
+              >
+                <template #header.actions>
+                  <v-btn
+                    color="primary"
+                    density="comfortable"
+                    icon="mdi-plus-circle"
+                    size="small"
+                    variant="text"
+                    @click.stop="addContainerRow"
+                  />
+                </template>
+
+                <template #item.actions="{ index }">
+                  <v-btn
+                    color="red"
+                    density="comfortable"
+                    icon="mdi-minus-circle"
+                    size="small"
+                    variant="text"
+                    @click.stop="removeContainerRow(index)"
+                  />
+                </template>
+
+                <template #item.container_no="{ item }">
+                  <v-text-field
+                    v-model="item.container_no"
+                    density="compact"
+                    hide-details
+                    variant="outlined"
+                  />
+                </template>
+
+                <template #item.container_count="{ item }">
+                  <v-number-input
+                    v-model="item.container_count"
+                    control-variant="hidden"
+                    density="compact"
+                    hide-details
+                    :min="0"
+                    :precision="0"
+                    variant="outlined"
+                  />
+                </template>
+              </v-data-table>
             </div>
           </v-col>
         </v-row>
       </v-card-text>
-    </v-form>
-
+    </fieldset>
   </div>
 </template>
 <script setup>
@@ -1178,7 +1217,9 @@
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { getWhsMarketOptions } from '@/api/whs-market'
   import FDatePicker from '@/components/FDatePicker.vue'
+  import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import FRemoteTableMenuWithCode from '@/components/FRemoteTableMenuWithCode.vue'
+  import { mapWarehouseAddrTableHeaders } from '@/composables/mapWarehouseOrderTableHeaders'
   import {
     defaultWhsMarketObject,
     normalizeWhsMarketObject,
@@ -1190,9 +1231,7 @@
     fetchPackageTypes,
     packageTypeTableHeaders,
   } from '@/composables/usePackageTypeRemoteMenu'
-  import { mapWarehouseAddrTableHeaders } from '@/composables/mapWarehouseOrderTableHeaders'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
-  import { WHS_ORDER_CONTAINER_OPTIONS } from '@/constants/warehouseOrderContainerOptions'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
@@ -1214,8 +1253,12 @@
       type: Array,
       default: () => [],
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   })
-  const { queryPortList } = toRefs(props)
+  const { queryPortList, readonly } = toRefs(props)
 
   const convertRequiredRules = computed(() => ({
     etd: [requiredRule(validationField('etd'))],
@@ -1284,6 +1327,60 @@
   const marketOptions = ref([])
   const plantIdOptionItems = ref([])
   const plantIdOptionsLoading = ref(false)
+  const tradeTypeOptions = ['TRADE', 'DI']
+
+  const containerList = computed(() => {
+    if (!inputData.value) {
+      return []
+    }
+    return Array.isArray(inputData.value.container_list) ? inputData.value.container_list : []
+  })
+
+  const ensureContainerList = () => {
+    if (!inputData.value) {
+      return []
+    }
+    if (!Array.isArray(inputData.value.container_list)) {
+      inputData.value.container_list = []
+    }
+    return inputData.value.container_list
+  }
+
+  const containerTableHeaders = computed(() => [
+    { key: 'actions', title: '', width: '50px', align: 'center' },
+    {
+      key: 'container_no',
+      title: String(detailField('container')).replace(/:$/, ''),
+      align: 'start',
+      minWidth: '180px',
+      width: '60%',
+    },
+    {
+      key: 'container_count',
+      title: detailField('containerCount'),
+      align: 'start',
+      minWidth: '120px',
+      width: '40%',
+    },
+  ])
+
+  const addContainerRow = () => {
+    const list = ensureContainerList()
+    list.push({
+      rowKey: `container-${Date.now()}-${list.length}`,
+      container_no: '',
+      container_count: 0,
+    })
+  }
+
+  const removeContainerRow = index => {
+    const list = ensureContainerList()
+    list.splice(index, 1)
+  }
+
+  if (inputData.value && !inputData.value.wso_trade_type) {
+    inputData.value.wso_trade_type = 'TRADE'
+  }
 
   const selectedMarketName = computed(() => {
     return String(inputData.value?.market?.market ?? inputData.value?.wso_market ?? '').trim()
@@ -1579,13 +1676,6 @@
     const cbm_d = new Decimal(inputData.value.wso_actual_volume ?? 0)
     const cbm = cbm_d.isNaN() ? new Decimal(0) : cbm_d
     const vol_weight = cbm.times(new Decimal(166)).times(new Decimal(1000)).div(new Decimal(1000))
-    const vw = vol_weight.toNumber()
-    const newVolumeWeight = vw === 0 ? null : vw
-
-    // 只在值真正改变时才更新，避免触发不必要的响应式更新
-    if (inputData.value.wso_volume_weight !== newVolumeWeight) {
-      inputData.value.wso_volume_weight = newVolumeWeight
-    }
 
     const gw_d = new Decimal(inputData.value.wso_actual_weight ?? 0)
     const gw = gw_d.isNaN() ? new Decimal(0) : gw_d
@@ -1598,12 +1688,39 @@
     }
   }
 
+  let isSyncingFromLines = false
+  const syncHeaderMeasuresFromOrderLines = () => {
+    if (!inputData.value || isSyncingFromLines) {
+      return
+    }
+    const rows = Array.isArray(inputData.value.item_list) ? inputData.value.item_list : []
+    if (rows.length === 0) {
+      return
+    }
+    const sumField = key =>
+      rows.reduce((acc, row) => {
+        const n = Number(row?.[key] ?? 0)
+        return acc + (Number.isFinite(n) ? n : 0)
+      }, 0)
+
+    isSyncingFromLines = true
+    try {
+      inputData.value.wso_actual_weight = sumField('woi_gross_wt')
+      inputData.value.wso_actual_volume = sumField('woi_volume')
+      inputData.value.wso_volume_weight = sumField('woi_net_wt')
+      inputData.value.wso_total_package_count = sumField('woi_outer_pack')
+      js_w()
+    } finally {
+      isSyncingFromLines = false
+    }
+  }
+
   // 使用标志位防止循环更新
   let isCalculating = false
   watch(
     () => inputData.value.wso_actual_volume,
     () => {
-      if (isCalculating) return
+      if (isCalculating || isSyncingFromLines) return
       isCalculating = true
       js_w()
       setTimeout(() => {
@@ -1616,7 +1733,7 @@
   watch(
     () => inputData.value.wso_actual_weight,
     () => {
-      if (isCalculating) return
+      if (isCalculating || isSyncingFromLines) return
       isCalculating = true
       js_w()
       setTimeout(() => {
@@ -1624,6 +1741,14 @@
       }, 0)
     },
     { immediate: false },
+  )
+
+  watch(
+    () => inputData.value?.item_list,
+    () => {
+      syncHeaderMeasuresFromOrderLines()
+    },
+    { deep: true },
   )
   watch(
     () => inputData.value?.wso_unit_of_weight,
@@ -1638,13 +1763,31 @@
 </script>
 
 <style lang="scss" scoped>
+  .whs-order-detail--readonly {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .whs-order-detail--readonly :deep(.v-field),
+  .whs-order-detail--readonly :deep(.v-selection-control),
+  .whs-order-detail--readonly :deep(.v-btn) {
+    opacity: 0.72;
+  }
+
+  .whs-order-detail-fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
   .market-plant-row {
     width: 100%;
   }
 
   .market-plant-row__field {
-    flex: 0 0 25%;
-    max-width: 25%;
+    flex: 1 1 0;
+    max-width: 50%;
     min-width: 0;
   }
 

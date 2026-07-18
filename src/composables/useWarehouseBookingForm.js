@@ -13,12 +13,14 @@ function createDefaultWhsOrderFormData() {
     pk: '',
     wso_transport_mode: 'SEA',
     wso_packing_mode: 'FCL',
+    wso_trade_type: 'TRADE',
     shipper: {},
     consignee: {},
     notify_party: {
       add_address_name: 'SAME AS CONSIGNEE',
     },
     item_list: [],
+    container_list: [],
     inbound_list: [],
     outbound_list: [],
     e_docs_list: [],
@@ -36,6 +38,46 @@ function createDefaultWhsOrderFormData() {
   }
 }
 
+function pickMappedField(mapped, wsoKey, bkgKey, fallback) {
+  return mapped?.[wsoKey] ?? mapped?.[bkgKey] ?? fallback
+}
+
+function buildRecognizePrefillForm(mapped) {
+  const defaults = createDefaultWhsOrderFormData()
+  const notifyParty = mapped?.notify_party ?? { add_address_name: 'SAME AS CONSIGNEE' }
+  return {
+    ...defaults,
+    ...mapped,
+    id: 0,
+    pk: '',
+    shipper: mapped?.shipper || {},
+    consignee: mapped?.consignee || {},
+    notify_party: notifyParty,
+    item_list: mapped?.item_list ?? mapped?.pac_list ?? [],
+    container_list: mapped?.container_list || [],
+    inbound_list: mapped?.inbound_list || [],
+    outbound_list: mapped?.outbound_list || [],
+    e_docs_list: mapped?.e_docs_list ?? mapped?.eDocs_list ?? [],
+    wso_unit_of_weight: pickMappedField(mapped, 'wso_unit_of_weight', 'bkg_unit_of_weight', 'KG'),
+    wso_unit_of_volume: pickMappedField(mapped, 'wso_unit_of_volume', 'bkg_unit_of_volume', 'M3'),
+    wso_actual_chargeable_unit: pickMappedField(
+      mapped,
+      'wso_actual_chargeable_unit',
+      'bkg_actual_chargeable_unit',
+      'KG',
+    ),
+    wso_volume_weight_unit: pickMappedField(
+      mapped,
+      'wso_volume_weight_unit',
+      'bkg_volume_weight_unit',
+      'KG',
+    ),
+    wso_pack_type: pickMappedField(mapped, 'wso_pack_type', 'bkg_pack_type', 'CTN'),
+    wso_pack_type_desc: pickMappedField(mapped, 'wso_pack_type_desc', 'bkg_pack_type_desc', 'Carton'),
+    notify_party_same_as_consignee: notifyParty.add_address_name === 'SAME AS CONSIGNEE' ? 'Y' : 'N',
+  }
+}
+
 export function applyRecognizePrefillToInputData(inputDataRef, route) {
   if (route?.query?.source !== 'recognize') {
     return false
@@ -50,31 +92,7 @@ export function applyRecognizePrefillToInputData(inputDataRef, route) {
     const parsed = JSON.parse(rawRecognize)
     const order = Array.isArray(parsed?.orders) ? parsed.orders[0] : parsed
     const mapped = mapWhsOrderDetailToForm(order) ?? order
-    const itemList = mapped?.item_list ?? mapped?.pac_list ?? []
-    const notifyParty = mapped?.notify_party ?? { add_address_name: 'SAME AS CONSIGNEE' }
-
-    inputDataRef.value = {
-      ...createDefaultWhsOrderFormData(),
-      ...mapped,
-      id: 0,
-      pk: '',
-      shipper: mapped?.shipper || {},
-      consignee: mapped?.consignee || {},
-      notify_party: notifyParty,
-      item_list: itemList,
-      inbound_list: mapped?.inbound_list || [],
-      outbound_list: mapped?.outbound_list || [],
-      e_docs_list: mapped?.e_docs_list ?? mapped?.eDocs_list ?? [],
-      wso_unit_of_weight: mapped?.wso_unit_of_weight ?? mapped?.bkg_unit_of_weight ?? 'KG',
-      wso_unit_of_volume: mapped?.wso_unit_of_volume ?? mapped?.bkg_unit_of_volume ?? 'M3',
-      wso_actual_chargeable_unit:
-        mapped?.wso_actual_chargeable_unit ?? mapped?.bkg_actual_chargeable_unit ?? 'KG',
-      wso_volume_weight_unit: mapped?.wso_volume_weight_unit ?? mapped?.bkg_volume_weight_unit ?? 'KG',
-      wso_pack_type: mapped?.wso_pack_type ?? mapped?.bkg_pack_type ?? 'CTN',
-      wso_pack_type_desc: mapped?.wso_pack_type_desc ?? mapped?.bkg_pack_type_desc ?? 'Carton',
-      notify_party_same_as_consignee:
-        notifyParty.add_address_name === 'SAME AS CONSIGNEE' ? 'Y' : 'N',
-    }
+    inputDataRef.value = buildRecognizePrefillForm(mapped)
     return true
   } catch (error) {
     console.error('Failed to parse recognize warehouse order data:', error)

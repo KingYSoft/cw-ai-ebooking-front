@@ -15,343 +15,417 @@
       />
     </v-card-text>
 
-    <v-data-table
-      class="table-filter"
-      disable-sort
-      :headers="tblContainerHeaders"
-      hide-default-footer
-      item-value="rowKey"
-      :items="itemList"
-      :items-per-page="-1"
-      :show-select="false"
-      striped="even"
-    >
-      <template #header.actions>
-        <v-btn
-          color="primary"
-          density="comfortable"
-          icon="mdi-plus-circle"
-          size="small"
-          variant="text"
-          @click.stop="addNewContainer"
-        />
-      </template>
-
-      <template #item.actions="{ index }">
-        <v-btn
-          color="red"
-          density="comfortable"
-          icon="mdi-minus-circle"
-          size="small"
-          variant="text"
-          @click.stop="removeNewContainer(index)"
-        />
-      </template>
-
-      <template #item.woi_invoice_no="{ item }">
-        <v-text-field
-          v-model="item.woi_invoice_no"
-          density="compact"
-          hide-details
-          variant="outlined"
-        />
-      </template>
-
-      <template #item.woi_packlist_no="{ item }">
-        <v-text-field
-          v-model="item.woi_packlist_no"
-          density="compact"
-          hide-details
-          variant="outlined"
-        />
-      </template>
-
-      <template #item.woi_desc="{ item }">
-        <v-text-field v-model="item.woi_desc" density="compact" hide-details variant="outlined" />
-      </template>
-
-      <template #item.woi_item="{ item }">
-        <v-text-field v-model="item.woi_item" density="compact" hide-details variant="outlined" />
-      </template>
-
-      <template #item.woi_gross_wt="{ item }">
-        <div class="d-flex align-center ga-0 w-100">
-          <v-number-input
-            v-model="item.woi_gross_wt"
-            class="flex-1-1"
+    <v-form class="ref-form-pre" color="background">
+      <v-data-table
+        class="table-filter"
+        disable-sort
+        :headers="tblContainerHeaders"
+        hide-default-footer
+        item-value="rowKey"
+        :items="itemList"
+        :items-per-page="-1"
+        :show-select="false"
+        striped="even"
+      >
+        <template #header.actions>
+          <v-btn
             color="primary"
+            density="comfortable"
+            icon="mdi-plus-circle"
+            size="small"
+            variant="text"
+            @click.stop="addNewContainer"
+          />
+        </template>
+
+        <template #item.actions="{ index }">
+          <v-btn
+            color="red"
+            density="comfortable"
+            icon="mdi-minus-circle"
+            size="small"
+            variant="text"
+            @click.stop="removeNewContainer(index)"
+          />
+        </template>
+
+        <!-- Market -->
+        <template #item.woi_market="{ item }">
+          <v-autocomplete
+            v-model="item.woi_market"
+            density="compact"
+            hide-details="auto"
+            :items="uniqueMarketNames"
+            :menu-props="{ maxWidth: '240px' }"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.woi_invoice_no="{ item }">
+          <v-text-field
+            v-model="item.woi_invoice_no"
+            density="compact"
+            hide-details
+            :rules="lineTextRules.woi_invoice_no"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.woi_packlist_no="{ item }">
+          <v-text-field
+            v-model="item.woi_packlist_no"
+            density="compact"
+            hide-details
+            :rules="lineTextRules.woi_packlist_no"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.woi_desc="{ item }">
+          <v-text-field
+            v-model="item.woi_desc"
+            density="compact"
+            hide-details
+            :rules="lineTextRules.woi_desc"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.woi_item="{ item }">
+          <v-text-field
+            v-model="item.woi_item"
+            density="compact"
+            hide-details
+            :rules="lineTextRules.woi_item"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.woi_gross_wt="{ item }">
+          <div class="d-flex align-center ga-0 w-100">
+            <v-number-input
+              v-model="item.woi_gross_wt"
+              class="flex-1-1"
+              color="primary"
+              control-variant="hidden"
+              density="compact"
+              hide-details
+              :precision="WAREHOUSE_MEASURE_DECIMALS"
+              :rules="lineMeasureRules.woi_gross_wt"
+              variant="outlined"
+            />
+
+            <div>
+              <v-select
+                v-model="item.woi_gw_unit"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="appStore.appCombobox.getCombobox('weightUnit')"
+                variant="underlined"
+                width="50px"
+                @update:model-value="item.woi_nw_unit = item.woi_gw_unit"
+              />
+            </div>
+          </div>
+        </template>
+
+        <template #item.woi_net_wt="{ item }">
+          <div class="d-flex align-center ga-0 w-100">
+            <v-number-input
+              v-model="item.woi_net_wt"
+              class="flex-1-1"
+              color="primary"
+              control-variant="hidden"
+              density="compact"
+              hide-details
+              :precision="WAREHOUSE_MEASURE_DECIMALS"
+              :rules="lineMeasureRules.woi_net_wt"
+              variant="outlined"
+            />
+
+            <div>
+              <v-select
+                v-model="item.woi_gw_unit"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="appStore.appCombobox.getCombobox('weightUnit')"
+                variant="underlined"
+                width="50px"
+              />
+            </div>
+          </div>
+        </template>
+
+        <template #item.woi_volume="{ item }">
+          <div class="d-flex align-center ga-0 w-100">
+            <v-number-input
+              v-model="item.woi_volume"
+              class="flex-1-1"
+              color="primary"
+              control-variant="hidden"
+              density="compact"
+              hide-details
+              :precision="WAREHOUSE_MEASURE_DECIMALS"
+              :rules="lineMeasureRules.woi_volume"
+              variant="outlined"
+            />
+
+            <div>
+              <v-select
+                v-model="item.woi_vol_unit"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="appStore.appCombobox.getCombobox('cbmUnit')"
+                variant="underlined"
+                width="70px"
+              />
+            </div>
+          </div>
+        </template>
+
+        <template #item.woi_outer_pack="{ item }">
+          <div class="d-flex align-center ga-0 w-100">
+            <v-number-input
+              v-model="item.woi_outer_pack"
+              class="flex-1-1"
+              color="primary"
+              control-variant="hidden"
+              density="compact"
+              hide-details
+              :min-fraction-digits="0"
+              :precision="0"
+              :rules="lineMeasureRules.woi_outer_pack"
+              variant="outlined"
+            />
+
+            <div>
+              <FRemoteTableMenu
+                v-model="item.woi_outpack_unit"
+                display-key="code"
+                :fetch-method="fetchPackageTypes"
+                :headers="packageTypeTableHeaders"
+                item-value="code"
+                :text-field-props="{
+                  variant: 'underlined',
+                  width: '78',
+                }"
+                virtual
+                @row-select="row => assignPackageTypeFromRow(row, item, 'woi_outpack_unit')"
+              />
+            </div>
+          </div>
+        </template>
+
+        <template #item.woi_pieces="{ item }">
+          <v-number-input
+            v-model="item.woi_pieces"
             control-variant="hidden"
             density="compact"
             hide-details
             :precision="WAREHOUSE_MEASURE_DECIMALS"
+            :rules="lineMeasureRules.woi_pieces"
             variant="outlined"
           />
+        </template>
 
-          <div>
-            <v-select
-              v-model="item.woi_gw_unit"
-              density="compact"
-              hide-details
-              item-title="code"
-              item-value="code"
-              :items="appStore.appCombobox.getCombobox('weightUnit')"
-              variant="underlined"
-              width="50px"
-              @update:model-value="item.woi_nw_unit = item.woi_gw_unit"
-            />
-          </div>
-        </div>
-      </template>
-
-      <template #item.woi_net_wt="{ item }">
-        <div class="d-flex align-center ga-0 w-100">
-          <v-number-input
-            v-model="item.woi_net_wt"
-            class="flex-1-1"
+        <template #item.woi_is_palletization="{ item }">
+          <v-checkbox-btn
+            v-model="item.woi_is_palletization"
             color="primary"
-            control-variant="hidden"
             density="compact"
+            :false-value="0"
             hide-details
-            :precision="WAREHOUSE_MEASURE_DECIMALS"
-            variant="outlined"
+            :true-value="1"
           />
+        </template>
 
-          <div>
-            <v-select
-              v-model="item.woi_gw_unit"
+        <template #item.woi_is_battery_included="{ item }">
+          <div class="d-flex flex-column align-center ga-1 py-1">
+            <v-checkbox-btn
+              v-model="item.woi_is_battery_included"
+              color="primary"
               density="compact"
+              :false-value="0"
               hide-details
-              item-title="code"
-              item-value="code"
-              :items="appStore.appCombobox.getCombobox('weightUnit')"
-              variant="underlined"
-              width="50px"
+              :true-value="1"
             />
-          </div>
-        </div>
-      </template>
 
-      <template #item.woi_volume="{ item }">
-        <div class="d-flex align-center ga-0 w-100">
-          <v-number-input
-            v-model="item.woi_volume"
-            class="flex-1-1"
-            color="primary"
-            control-variant="hidden"
-            density="compact"
-            hide-details
-            :precision="WAREHOUSE_MEASURE_DECIMALS"
-            variant="outlined"
-          />
-
-          <div>
-            <v-select
-              v-model="item.woi_vol_unit"
-              density="compact"
-              hide-details
-              item-title="code"
-              item-value="code"
-              :items="appStore.appCombobox.getCombobox('cbmUnit')"
-              variant="underlined"
-              width="70px"
-            />
-          </div>
-        </div>
-      </template>
-
-      <template #item.woi_outer_pack="{ item }">
-        <div class="d-flex align-center ga-0 w-100">
-          <v-number-input
-            v-model="item.woi_outer_pack"
-            class="flex-1-1"
-            color="primary"
-            control-variant="hidden"
-            density="compact"
-            hide-details
-            :min-fraction-digits="0"
-            :precision="0"
-            variant="outlined"
-          />
-
-          <div>
-            <FRemoteTableMenu
-              v-model="item.woi_outpack_unit"
-              display-key="code"
-              :fetch-method="fetchPackageTypes"
-              :headers="packageTypeTableHeaders"
-              item-value="code"
-              :text-field-props="{
-                variant: 'underlined',
-                width: '78',
-              }"
-              virtual
-              @row-select="row => assignPackageTypeFromRow(row, item, 'woi_outpack_unit')"
-            />
-          </div>
-        </div>
-      </template>
-
-      <template #item.woi_pieces="{ item }">
-        <v-number-input
-          v-model="item.woi_pieces"
-          control-variant="hidden"
-          density="compact"
-          hide-details
-          :precision="WAREHOUSE_MEASURE_DECIMALS"
-          variant="outlined"
-        />
-      </template>
-
-      <template #item.woi_is_palletization="{ item }">
-        <v-checkbox-btn
-          v-model="item.woi_is_palletization"
-          color="primary"
-          density="compact"
-          :false-value="0"
-          hide-details
-          :true-value="1"
-        />
-      </template>
-
-      <template #item.woi_is_battery_included="{ item }">
-        <v-checkbox-btn
-          v-model="item.woi_is_battery_included"
-          color="primary"
-          density="compact"
-          :false-value="0"
-          hide-details
-          :true-value="1"
-        />
-      </template>
-
-      <template #body.append="{ columns }">
-        <tr v-if="itemList.length > 0" class="v-data-table__tr">
-          <td
-            v-for="column in columns"
-            :key="column.key"
-            class="v-data-table__td v-data-table-column--align-start"
-          >
-            <template v-if="column.key === 'woi_invoice_no'">
-              <span class="font-weight-bold">{{ itemDetailLabel('total') }} :</span>
-            </template>
-
-            <template v-else-if="column.key === 'woi_gross_wt'">
-              <div class="d-flex align-center ga-0 w-100">
-                <v-text-field
-                  class="flex-1-1 input-numeric"
+            <template v-if="Number(item.woi_is_battery_included) === 1">
+              <div
+                v-if="Array.isArray(item.battery_files) && item.battery_files.length > 0"
+                class="d-flex flex-wrap justify-center ga-1"
+              >
+                <v-chip
+                  v-for="(fileItem, fileIndex) in item.battery_files"
+                  :key="`${fileItem.name}-${fileIndex}`"
+                  closable
                   density="compact"
-                  hide-details
-                  :model-value="itemTotals.gross_weight"
-                  readonly
-                  variant="outlined"
-                />
+                  size="small"
+                  @click:close="removeBatteryFile(item, fileIndex)"
+                >
+                  {{ fileItem.name }}
+                </v-chip>
+              </div>
 
-                <div>
+              <v-btn
+                color="primary"
+                density="comfortable"
+                prepend-icon="mdi-upload"
+                size="x-small"
+                variant="tonal"
+                @click.stop="triggerBatteryUpload(item)"
+              >
+                {{ itemDetailLabel('upload') }}
+              </v-btn>
+            </template>
+          </div>
+        </template>
+
+        <template #body.append="{ columns }">
+          <tr v-if="itemList.length > 0" class="v-data-table__tr">
+            <td
+              v-for="column in columns"
+              :key="column.key"
+              class="v-data-table__td v-data-table-column--align-start"
+            >
+              <template v-if="column.key === 'woi_invoice_no'">
+                <span class="font-weight-bold">{{ itemDetailLabel('total') }} :</span>
+              </template>
+
+              <template v-else-if="column.key === 'woi_gross_wt'">
+                <div class="d-flex align-center ga-0 w-100">
                   <v-text-field
                     class="flex-1-1 input-numeric"
                     density="compact"
                     hide-details
-                    :model-value="totalWeightUnit"
+                    :model-value="itemTotals.gross_weight"
                     readonly
-                    variant="underlined"
-                    width="50"
+                    variant="outlined"
                   />
-                </div>
-              </div>
-            </template>
 
-            <template v-else-if="column.key === 'woi_net_wt'">
-              <div class="d-flex align-center ga-0 w-100">
+                  <div>
+                    <v-text-field
+                      class="flex-1-1 input-numeric"
+                      density="compact"
+                      hide-details
+                      :model-value="totalWeightUnit"
+                      readonly
+                      variant="underlined"
+                      width="50"
+                    />
+                  </div>
+                </div>
+              </template>
+
+              <template v-else-if="column.key === 'woi_net_wt'">
+                <div class="d-flex align-center ga-0 w-100">
+                  <v-text-field
+                    class="flex-1-1 input-numeric"
+                    density="compact"
+                    hide-details
+                    :model-value="itemTotals.net_weight"
+                    readonly
+                    variant="outlined"
+                  />
+
+                  <div>
+                    <v-text-field
+                      density="compact"
+                      hide-details
+                      :model-value="totalWeightUnit"
+                      readonly
+                      variant="underlined"
+                      width="50px"
+                    />
+                  </div>
+                </div>
+              </template>
+
+              <template v-else-if="column.key === 'woi_volume'">
+                <div class="d-flex align-center ga-0 w-100">
+                  <v-text-field
+                    class="flex-1-1 input-numeric"
+                    density="compact"
+                    hide-details
+                    :model-value="itemTotals.volume"
+                    readonly
+                    variant="outlined"
+                  />
+
+                  <div>
+                    <v-text-field
+                      density="compact"
+                      hide-details
+                      :model-value="totalVolumeUnit"
+                      readonly
+                      variant="underlined"
+                      width="70px"
+                    />
+                  </div>
+                </div>
+              </template>
+
+              <template v-else-if="column.key === 'woi_outer_pack'">
+                <div class="d-flex align-center ga-0 w-100">
+                  <v-text-field
+                    class="flex-1-1 input-numeric"
+                    density="compact"
+                    hide-details
+                    :model-value="itemTotals.package_count"
+                    readonly
+                    variant="outlined"
+                  />
+
+                  <div>
+                    <v-text-field
+                      density="compact"
+                      hide-details
+                      :model-value="totalPackageType"
+                      readonly
+                      variant="underlined"
+                      width="78px"
+                    />
+                  </div>
+                </div>
+              </template>
+
+              <template v-else-if="column.key === 'woi_pieces'">
                 <v-text-field
-                  class="flex-1-1 input-numeric"
+                  class="input-numeric"
                   density="compact"
                   hide-details
-                  :model-value="itemTotals.net_weight"
+                  :model-value="itemTotals.pieces"
                   readonly
                   variant="outlined"
                 />
+              </template>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+    </v-form>
 
-                <div>
-                  <v-text-field
-                    density="compact"
-                    hide-details
-                    :model-value="totalWeightUnit"
-                    readonly
-                    variant="underlined"
-                    width="50px"
-                  />
-                </div>
-              </div>
-            </template>
-
-            <template v-else-if="column.key === 'woi_volume'">
-              <div class="d-flex align-center ga-0 w-100">
-                <v-text-field
-                  class="flex-1-1 input-numeric"
-                  density="compact"
-                  hide-details
-                  :model-value="itemTotals.volume"
-                  readonly
-                  variant="outlined"
-                />
-
-                <div>
-                  <v-text-field
-                    density="compact"
-                    hide-details
-                    :model-value="totalVolumeUnit"
-                    readonly
-                    variant="underlined"
-                    width="70px"
-                  />
-                </div>
-              </div>
-            </template>
-
-            <template v-else-if="column.key === 'woi_outer_pack'">
-              <div class="d-flex align-center ga-0 w-100">
-                <v-text-field
-                  class="flex-1-1 input-numeric"
-                  density="compact"
-                  hide-details
-                  :model-value="itemTotals.package_count"
-                  readonly
-                  variant="outlined"
-                />
-
-                <div>
-                  <v-text-field
-                    density="compact"
-                    hide-details
-                    :model-value="totalPackageType"
-                    readonly
-                    variant="underlined"
-                    width="78px"
-                  />
-                </div>
-              </div>
-            </template>
-
-            <template v-else-if="column.key === 'woi_pieces'">
-              <v-text-field
-                class="input-numeric"
-                density="compact"
-                hide-details
-                :model-value="itemTotals.pieces"
-                readonly
-                variant="outlined"
-              />
-            </template>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+    <input
+      ref="batteryFileInput"
+      accept="*/*"
+      class="d-none"
+      multiple
+      type="file"
+      @change="onBatteryFilesSelected"
+    >
   </div>
 </template>
 
 <script setup>
   import Decimal from 'decimal.js'
-  import { computed, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
+  import { getWhsMarketOptions } from '@/api/whs-market'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import {
     assignPackageTypeFromRow,
@@ -370,7 +444,83 @@
   })
 
   const appStore = useAppStore()
-  const { itemHeader, itemDetailLabel, validation } = useWarehouseOrderPageI18n()
+  const { itemHeader, itemDetailLabel, validation, requiredRule } = useWarehouseOrderPageI18n()
+
+  const measureRequiredRule = fieldLabel => value =>
+    (value != null && value !== '') || validation('required', fieldLabel)
+
+  const lineTextRules = computed(() => ({
+    woi_invoice_no: [requiredRule(itemHeader('invoiceNo'))],
+    woi_packlist_no: [requiredRule(itemHeader('packingListNo'))],
+    woi_desc: [requiredRule(itemHeader('description'))],
+    woi_item: [requiredRule(itemHeader('itemCode'))],
+  }))
+
+  const lineMeasureRules = computed(() => ({
+    woi_gross_wt: [measureRequiredRule(itemHeader('grossWeight'))],
+    woi_net_wt: [measureRequiredRule(itemHeader('netWeight'))],
+    woi_volume: [measureRequiredRule(itemHeader('volume'))],
+    woi_outer_pack: [measureRequiredRule(itemHeader('noOfPackage'))],
+    woi_pieces: [measureRequiredRule(itemHeader('pieces'))],
+  }))
+
+  const marketOptions = ref([])
+  const uniqueMarketNames = computed(() => {
+    const seen = new Set()
+    const names = []
+    for (const opt of marketOptions.value) {
+      const name = String(opt?.market ?? opt?.Market ?? '').trim()
+      if (!name || seen.has(name)) {
+        continue
+      }
+      seen.add(name)
+      names.push(name)
+    }
+    return names
+  })
+
+  const loadMarketOptions = async () => {
+    try {
+      const { data } = await getWhsMarketOptions()
+      marketOptions.value = Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error('loadMarketOptions failed:', error)
+      marketOptions.value = []
+    }
+  }
+  loadMarketOptions()
+
+  const batteryFileInput = ref(null)
+  const batteryUploadTarget = ref(null)
+
+  const triggerBatteryUpload = item => {
+    batteryUploadTarget.value = item
+    batteryFileInput.value?.click()
+  }
+
+  const onBatteryFilesSelected = event => {
+    const files = Array.from(event?.target?.files ?? [])
+    const row = batteryUploadTarget.value
+    if (row && files.length > 0) {
+      if (!Array.isArray(row.battery_files)) {
+        row.battery_files = []
+      }
+      for (const file of files) {
+        row.battery_files.push({ name: file.name, file })
+      }
+    }
+    if (event?.target) {
+      event.target.value = ''
+    }
+    batteryUploadTarget.value = null
+  }
+
+  const removeBatteryFile = (item, index) => {
+    if (!Array.isArray(item?.battery_files)) {
+      return
+    }
+    item.battery_files.splice(index, 1)
+  }
 
   const inputData = defineModel('input-data', {
     type: Object,
@@ -443,6 +593,7 @@
       id: 0,
       pk: '',
       rowKey: `new-${Date.now()}`,
+      woi_market: '',
       woi_invoice_no: '',
       woi_packlist_no: '',
       woi_desc: '',
@@ -458,6 +609,7 @@
       woi_pieces: null,
       woi_is_palletization: 0,
       woi_is_battery_included: 0,
+      battery_files: [],
     }
   }
 
@@ -474,6 +626,7 @@
 
   const tblContainerHeaders = computed(() => [
     { title: '', key: 'actions', width: '50px', align: 'center' },
+    { title: itemHeader('market'), key: 'woi_market', minWidth: '140px' },
     { title: itemHeader('invoiceNo'), key: 'woi_invoice_no', minWidth: '150px' },
     { title: itemHeader('packingListNo'), key: 'woi_packlist_no', minWidth: '150px' },
     { title: itemHeader('description'), key: 'woi_desc', minWidth: '200px' },
@@ -492,7 +645,7 @@
     {
       title: itemHeader('batteryIncluded'),
       key: 'woi_is_battery_included',
-      minWidth: '150px',
+      minWidth: '160px',
       align: 'center',
     },
   ])

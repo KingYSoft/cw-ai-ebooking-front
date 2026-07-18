@@ -5,10 +5,10 @@
         <template v-if="activedTab === 1 || activedTab === 2" #actions>
           <v-btn
             color="primary"
-            :disabled="cardLoading"
+            :disabled="cardLoading || isOrderReceived"
             size="small"
             variant="flat"
-            @click.stop="onSaveHandle"
+            @click.stop="onSaveWhsOrder"
           >
             {{ editButton('save') }}
           </v-btn>
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-  import { onActivated, onMounted, ref } from 'vue'
+  import { computed, onActivated, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
@@ -74,6 +74,12 @@
   const router = useRouter()
   const { edit, editButton, editTab, editMessage } = useWarehouseOrderPageI18n()
 
+  const isOrderReceived = computed(
+    () =>
+      String(inputData.value?.wso_shipment_status ?? inputData.value?.wso_status ?? '').trim() ===
+      'Received',
+  )
+
   // // 注册 inputData 未保存检查；查询完成或保存成功后刷新已保存快照。
   // const { markInputDataSaved } = useUnsavedInputDataGuard(inputData)
 
@@ -102,6 +108,26 @@
     }
   }
   const refDataForm = ref(null)
+
+  const onSaveWhsOrder = async () => {
+    if (isOrderReceived.value) {
+      return
+    }
+    const rows = Array.isArray(inputData.value?.item_list) ? inputData.value.item_list : []
+    const missingBatteryFile = rows.some(
+      row =>
+        Number(row?.woi_is_battery_included) === 1 &&
+        !(Array.isArray(row.battery_files) && row.battery_files.length > 0),
+    )
+    if (missingBatteryFile) {
+      appStore.openMessage({
+        color: 'warning',
+        content: edit('validation.batteryFileRequired'),
+      })
+      return
+    }
+    await onSaveHandle()
+  }
 
   const onSaveHandle = async () => {
     const { valid, errors } = await refDataForm.value.validate()

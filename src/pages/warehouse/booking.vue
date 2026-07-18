@@ -39,6 +39,14 @@
         </v-btn>
       </template>
 
+      <template #item.so_release="{ item }">
+        <v-icon
+          v-if="String(item.so_release ?? '').toUpperCase() === 'Y'"
+          icon="mdi-file-pdf-box"
+          @click.prevent
+        />
+      </template>
+
       <template #bottom>
         <v-divider />
 
@@ -69,8 +77,8 @@
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesWarehouseBookingFilter from '@/components/warehouse/PagesWarehouseBookingFilter.vue'
   import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
-  import { WHS_ORDER_RECOGNIZE_STORAGE_KEY } from '@/composables/useWarehouseBookingForm'
   import { mapWhsOrderListRow } from '@/composables/mapWhsOrderDetail'
+  import { WHS_ORDER_RECOGNIZE_STORAGE_KEY } from '@/composables/useWarehouseBookingForm'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
 
@@ -190,6 +198,7 @@
   const tblHeaders = computed(() => [
     { title: header('status'), key: 'wso_status', align: 'start', minWidth: '90px' },
     { title: header('orderNo'), key: 'wso_consign_no', align: 'start', minWidth: '140px' },
+    { title: header('soRelease'), key: 'so_release', align: 'start', minWidth: '100px' },
     { title: header('transMode'), key: 'wso_transport_mode', align: 'start', minWidth: '110px' },
     { title: header('container'), key: 'wso_shipment_type', align: 'start', minWidth: '110px' },
     { title: header('houseBill'), key: 'wso_house_bill', align: 'start', minWidth: '120px' },
