@@ -122,6 +122,7 @@ function mapPacListItem(row, index = 0) {
     pac_weight_unit: resolveItemField(row, 'woi_gw_unit', 'pac_weight_unit') ?? 'KG',
     pac_actual_volume_uom: resolveItemField(row, 'woi_vol_unit', 'pac_actual_volume_uom') ?? 'CBM',
     pac_pack_type: resolveItemField(row, 'woi_outpack_unit', 'pac_pack_type') ?? '',
+    battery_files: Array.isArray(row.battery_files) ? row.battery_files : [],
   }
 
   for (const [woiKey, uiKey] of WOI_UI_FIELD_PAIRS) {
@@ -162,6 +163,7 @@ export function mapWhsOrderDetailToForm(el) {
   mapped.inbound_list = Array.isArray(el.inbound_list) ? el.inbound_list : []
   mapped.outbound_list = Array.isArray(el.outbound_list) ? el.outbound_list : []
   mapped.eDocs_list = el.eDocs_list ?? []
+  mapped.container_list = mapContainerListFromApi(el.container_list)
   mapped.shipper = { ...el.shipper }
   mapped.consignee = { ...el.consignee }
   mapped.notify_party = {
@@ -175,6 +177,10 @@ export function mapWhsOrderDetailToForm(el) {
     mapped.notify_party,
   )
   mapped.whsOrderRelationOutput = normalizeWhsOrderRelationOutput(el.whsOrderRelationOutput)
+
+  if (!hasFieldValue(mapped.wso_trade_type)) {
+    mapped.wso_trade_type = 'TRADE'
+  }
 
   // Volume Weight 单位 = Gross Weight；Chargeable Weight 单位 = CBM
   mapped.bkg_volume_weight_unit = mapped.bkg_unit_of_weight ?? mapped.bkg_volume_weight_unit ?? 'KG'
@@ -328,21 +334,50 @@ function resolveMarketForSave(form) {
   )
 }
 
+function mapContainerListFromApi(rawList) {
+  if (!Array.isArray(rawList)) {
+    return []
+  }
+  return rawList.map((row, index) => {
+    const source = row && typeof row === 'object' ? row : {}
+    return {
+      ...source,
+      container_no: source.container_no ?? '',
+      container_count: source.container_count ?? 0,
+      rowKey:
+        source.rowKey ??
+        `container-${index}-${String(source.container_no ?? '').trim() || 'new'}`,
+    }
+  })
+}
+
+function mapContainerListForSave(rawList) {
+  if (!Array.isArray(rawList)) {
+    return []
+  }
+  return rawList.map(row => {
+    const source = row && typeof row === 'object' ? row : {}
+    return {
+      container_no: source.container_no ?? '',
+      container_count: toNum(source.container_count),
+    }
+  })
+}
+
+const ADDRESS_PARTY_KEYS = ['shipper', 'consignee', 'notify_party']
+
 function syncPacListMarketFields(form, marketObj) {
   const normalized = normalizeWhsMarketObject(marketObj) ?? defaultWhsMarketObject()
   const rows = form?.pac_list ?? form?.item_list
   if (!Array.isArray(rows)) {
     return
   }
+  // Order Line Market is per-row; do not overwrite from header Market Group.
   rows.forEach(row => {
-    row.market = normalized.market
     row.plant_id = normalized.plant_id
-    row.woi_market = normalized.market
     row.woi_plant_id = normalized.plant_id
   })
 }
-
-const ADDRESS_PARTY_KEYS = ['shipper', 'consignee', 'notify_party']
 
 function cloneAddressParty(addr) {
   if (!addr || typeof addr !== 'object') {
@@ -363,6 +398,7 @@ const WSO_PASSTHROUGH_KEYS = [
   'wso_shipment_status',
   'wso_cargo_receipt',
   'wso_is_split',
+  'wso_trade_type',
   'wso_org_header_pk',
   'wso_status',
   'create_user',
@@ -509,6 +545,9 @@ export function mapWhsOrderFormToSave(form, options = {}) {
     }
   }
 
+  payload.wso_trade_type = hasFieldValue(form.wso_trade_type) ? form.wso_trade_type : 'TRADE'
+  payload.container_list = mapContainerListForSave(form.container_list)
+
   // Volume Weight 单位跟 Gross Weight；Chargeable Weight 单位跟 CBM
   if (hasFieldValue(form.bkg_unit_of_weight)) {
     payload.wso_volume_weight_unit = form.bkg_unit_of_weight
@@ -524,7 +563,11 @@ export function mapWhsOrderFormToSave(form, options = {}) {
     payload.wso_insurance_currency = form.bkg_insurance_value_currency
   }
 
-  const pacList = Array.isArray(form.pac_list) ? form.pac_list : []
+  const pacList = Array.isArray(form.pac_list)
+    ? form.pac_list
+    : (Array.isArray(form.item_list)
+        ? form.item_list
+        : [])
   payload.item_list = pacList.map(row => mapFormItemToWoi(row, payload.pk)).filter(Boolean)
 
   // save 接口仅接受 shipper / consignee / notify_party

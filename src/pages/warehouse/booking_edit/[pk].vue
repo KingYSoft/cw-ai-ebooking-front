@@ -32,7 +32,7 @@
         <template v-if="activedTab === 1 || activedTab === 2" #actions>
           <v-btn
             color="primary"
-            :disabled="cardLoading || isEditLockedByOther"
+            :disabled="cardLoading || isEditLockedByOther || isOrderReceived || (isOrderSubmitted && activedTab === 1)"
             size="small"
             variant="flat"
             @click.stop="onSaveHandle"
@@ -42,7 +42,7 @@
 
           <v-btn
             color="primary"
-            :disabled="cardLoading || isEditLockedByOther"
+            :disabled="cardLoading || isEditLockedByOther || isOrderReceived || isOrderSubmitted"
             size="small"
             variant="tonal"
             @click.stop="onSubmitClick"
@@ -63,7 +63,11 @@
 
       <v-sheet class="overflow-y-auto" style="flex: 1">
         <v-form ref="refDataForm" class="ref-form-pre" color="background">
-          <PagesWarehouseOrderEdit v-model:input-data="inputData" :actived-tab="activedTab" />
+          <PagesWarehouseOrderEdit
+            v-model:input-data="inputData"
+            :actived-tab="activedTab"
+            :readonly="isOrderSubmitted || isOrderReceived"
+          />
         </v-form>
       </v-sheet>
     </FPageLayout>
@@ -192,9 +196,11 @@
       pickup: el.pickup || {}, // address
       delivery: el.delivery || {}, // address
       item_list: el.item_list || [],
+      container_list: el.container_list || [],
       inbound_list: el.inbound_list || [],
       outbound_list: el.outbound_list || [],
       e_docs_list: el.e_docs_list || [],
+      wso_trade_type: el.wso_trade_type || 'TRADE',
       wso_unit_of_weight: el.wso_unit_of_weight || 'KG',
       wso_unit_of_volume: el.wso_unit_of_volume || 'M3',
       wso_actual_chargeable_unit: el.wso_actual_chargeable_unit || 'KG',
@@ -218,6 +224,16 @@
   })
   const isEditLockedByOther = computed(() => editLockGuard.isSaveBlocked.value)
   const editLockWarningText = computed(() => editLockGuard.lockWarningText.value)
+  const resolveOrderStatus = () =>
+    String(inputData.value?.wso_status ?? inputData.value?.wso_shipment_status ?? '')
+      .trim()
+      .toLowerCase()
+  const isOrderSubmitted = computed(() => {
+    const status = resolveOrderStatus()
+    // API may return "Submitted" or misspelled "Submited"
+    return status === 'submitted' || status === 'submited'
+  })
+  const isOrderReceived = computed(() => resolveOrderStatus() === 'received')
 
   const queryData = async pk => {
     try {
@@ -239,10 +255,29 @@
 
   const refDataForm = ref(null)
   const onSaveHandle = async () => {
+    if (isOrderReceived.value) {
+      return
+    }
+    if (isOrderSubmitted.value && activedTab.value === 1) {
+      return
+    }
     if (!editLockGuard.ensureCanSave()) {
       return
     }
     if (checkBookingLocked()) {
+      return
+    }
+    const rows = Array.isArray(inputData.value?.item_list) ? inputData.value.item_list : []
+    const missingBatteryFile = rows.some(
+      row =>
+        Number(row?.woi_is_battery_included) === 1 &&
+        !(Array.isArray(row.battery_files) && row.battery_files.length > 0),
+    )
+    if (missingBatteryFile) {
+      appStore.openMessage({
+        color: 'warning',
+        content: edit('validation.batteryFileRequired'),
+      })
       return
     }
     const { valid, errors } = await refDataForm.value.validate()
@@ -299,6 +334,9 @@
   }
 
   const onSubmitClick = () => {
+    if (isOrderSubmitted.value || isOrderReceived.value) {
+      return
+    }
     if (!editLockGuard.ensureCanSave()) {
       return
     }
@@ -310,6 +348,9 @@
 
   const onSubmitConfirm = async () => {
     submitConfirmVis.value = false
+    if (isOrderSubmitted.value || isOrderReceived.value) {
+      return
+    }
 
     const { valid, errors } = await refDataForm.value.validate()
     if (!valid) {
@@ -330,6 +371,13 @@
           content: editMessage('submitted'),
           color: 'success',
         })
+        if (inputData.value) {
+          inputData.value.wso_status = 'Submited'
+          if (Object.prototype.hasOwnProperty.call(inputData.value, 'wso_shipment_status')) {
+            inputData.value.wso_shipment_status = 'Submited'
+          }
+        }
+        await queryData(pk)
         markInputDataSaved()
       }
     } catch (error) {

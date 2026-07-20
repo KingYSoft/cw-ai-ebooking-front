@@ -6,6 +6,7 @@
           v-model:input-data="inputData"
           :input-data-rules="inputDataRules"
           :query-port-list="queryPortList"
+          :readonly="readonly"
           @on-clear-addr="OnClearAddr"
           @on-select-addr="onSelectAddr"
           @query-port="queryPort"
@@ -56,10 +57,14 @@
       type: Number,
       default: 1,
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   })
   // const emit = defineEmits([])
 
-  const { activedTab } = toRefs(props)
+  const { activedTab, readonly } = toRefs(props)
 
   const inputData = defineModel('input-data', {
     type: Object,
