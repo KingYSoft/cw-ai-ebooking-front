@@ -285,6 +285,40 @@ export default {
       },
     },
     bookingPage,
+    upload: {
+      dropZone: {
+        title: 'Kéo tập tin vào đây',
+        subtitle: 'Hoặc bấm vào nút bên dưới để chọn file',
+      },
+      buttons: {
+        browse: 'Duyệt tập tin',
+        clear: 'Xóa danh sách',
+        upload: 'Tải tập tin lên',
+        ocr: 'Nhận dạng OCR',
+      },
+      fields: {
+        docType: 'Loại tài liệu',
+        ebookingVisible: 'EBooking Visible',
+      },
+      fileCount: 'Tệp đã chọn',
+      ocr: {
+        title: 'Đặt chỗ OCR',
+        processing: 'Đang nhận dạng OCR...',
+        success: 'Nhận dạng OCR thành công.',
+        failed: 'Nhận dạng OCR thất bại. Vui lòng thử lại.',
+      },
+      messages: {
+        noFileSelected: 'Vui lòng chọn một tập tin để tải lên',
+        noJobNumber: 'Vui lòng nhập mã số công việc',
+        noDocType: 'Vui lòng chọn loại tài liệu',
+      },
+      success: {
+        uploadSuccess: '{0} Tài liệu đã được tải lên',
+      },
+      error: {
+        uploadError: 'Lỗi tải lên: {0}',
+      },
+    },
     systemPage,
     warehouseOrder,
   },

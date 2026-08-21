@@ -491,6 +491,40 @@ export default {
         },
       },
     },
+    upload: {
+      dropZone: {
+        title: 'Drag files here',
+        subtitle: 'Or click the button below to select files',
+      },
+      buttons: {
+        browse: 'Browse Files',
+        clear: 'Clear List',
+        upload: 'Upload Files',
+        ocr: 'OCR Recognition',
+      },
+      fields: {
+        docType: 'Doc Type',
+        ebookingVisible: 'EBooking Visible',
+      },
+      fileCount: 'Selected files',
+      ocr: {
+        title: 'OCR Booking',
+        processing: 'OCR recognition in progress...',
+        success: 'OCR recognition succeeded.',
+        failed: 'OCR recognition failed. Please try again.',
+      },
+      messages: {
+        noFileSelected: 'Please select a file to upload',
+        noJobNumber: 'Please enter job number',
+        noDocType: 'Please select document type',
+      },
+      success: {
+        uploadSuccess: '{0} Doc is uploaded',
+      },
+      error: {
+        uploadError: 'Upload error: {0}',
+      },
+    },
     systemPage,
     warehouseOrder,
   },
