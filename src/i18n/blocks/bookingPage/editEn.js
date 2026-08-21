@@ -92,6 +92,8 @@ export default {
       uploadButtonText: 'Upload Files',
       fileName: 'File Name',
       filePath: 'File Path',
+      fileType: 'File Type',
+      remarks: 'Remarks',
       refNo: 'Ref No.',
       receivedTime: 'Received Time',
       download: 'download',

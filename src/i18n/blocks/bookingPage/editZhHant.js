@@ -92,6 +92,8 @@ export default {
       uploadButtonText: '上傳檔案',
       fileName: '檔案名稱',
       filePath: '檔案路徑',
+      fileType: '檔案類型',
+      remarks: '備註',
       refNo: '參考號',
       receivedTime: '接收時間',
       download: '下載',

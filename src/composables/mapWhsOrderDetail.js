@@ -62,6 +62,8 @@ const WSO_TO_BKG_FIELDS = [
   ['wso_so_number', 'bkg_so_number'],
   ['wso_po_number', 'bkg_po_number'],
   ['wso_intended_vessel', 'bkg_intended_vessel'],
+  ['wso_si_cut_off', 'si_cut_off'],
+  ['wso_cfs_cut_off', 'wso_cfs_cut_off'],
 ]
 
 /** Item Detail 表格 UI 字段 ↔ 接口 woi_* */
@@ -135,6 +137,25 @@ function mapPacListItem(row, index = 0) {
   return mapped
 }
 
+function applyWarehouseHeaderFields(mapped, el) {
+  if (!hasFieldValue(mapped.wso_trade_type)) {
+    mapped.wso_trade_type = 'TRADE'
+  }
+  mapped.warehouse_code = String(el.warehouse_code ?? '').trim()
+  mapped.wso_warehouse_pk = String(el.wso_warehouse_pk ?? '').trim()
+
+  if (!hasFieldValue(mapped.si_cut_off)) {
+    const siCutOff = el.si_cut_off ?? el.wso_si_cut_off
+    if (hasFieldValue(siCutOff)) {
+      mapped.si_cut_off = siCutOff
+      mapped.wso_si_cut_off = siCutOff
+    }
+  }
+  if (hasFieldValue(mapped.si_cut_off)) {
+    mapped.wso_si_cut_off = mapped.si_cut_off
+  }
+}
+
 /** API 详情 wso_* → 表单沿用的 bkg_* 字段 */
 export function mapWhsOrderDetailToForm(el) {
   if (!el || typeof el !== 'object') {
@@ -178,9 +199,7 @@ export function mapWhsOrderDetailToForm(el) {
   )
   mapped.whsOrderRelationOutput = normalizeWhsOrderRelationOutput(el.whsOrderRelationOutput)
 
-  if (!hasFieldValue(mapped.wso_trade_type)) {
-    mapped.wso_trade_type = 'TRADE'
-  }
+  applyWarehouseHeaderFields(mapped, el)
 
   // Volume Weight 单位 = Gross Weight；Chargeable Weight 单位 = CBM
   mapped.bkg_volume_weight_unit = mapped.bkg_unit_of_weight ?? mapped.bkg_volume_weight_unit ?? 'KG'
@@ -399,6 +418,9 @@ const WSO_PASSTHROUGH_KEYS = [
   'wso_cargo_receipt',
   'wso_is_split',
   'wso_trade_type',
+  'wso_warehouse_pk',
+  'wso_cfs_cut_off',
+  'wso_si_cut_off',
   'wso_org_header_pk',
   'wso_status',
   'create_user',
@@ -546,6 +568,20 @@ export function mapWhsOrderFormToSave(form, options = {}) {
   }
 
   payload.wso_trade_type = hasFieldValue(form.wso_trade_type) ? form.wso_trade_type : 'TRADE'
+  if (hasFieldValue(form.warehouse_code)) {
+    payload.warehouse_code = String(form.warehouse_code).trim()
+  }
+  if (hasFieldValue(form.wso_warehouse_pk)) {
+    payload.wso_warehouse_pk = String(form.wso_warehouse_pk).trim()
+  }
+  const siCutOff = form.si_cut_off ?? form.wso_si_cut_off
+  if (hasFieldValue(siCutOff)) {
+    payload.si_cut_off = siCutOff
+    payload.wso_si_cut_off = siCutOff
+  }
+  if (hasFieldValue(form.wso_cfs_cut_off)) {
+    payload.wso_cfs_cut_off = form.wso_cfs_cut_off
+  }
   payload.container_list = mapContainerListForSave(form.container_list)
 
   // Volume Weight 单位跟 Gross Weight；Chargeable Weight 单位跟 CBM

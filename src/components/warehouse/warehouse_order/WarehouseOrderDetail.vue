@@ -6,35 +6,32 @@
           <v-row dense>
             <v-col :cols="rescols('c12l3s6')">
               <div class="d-flex align-start flex-column flex-wrap ga-1">
-                <v-select
-                  id="1@wso_trade_type"
-                  v-model="inputData.wso_trade_type"
-                  density="compact"
-                  hide-details
-                  :items="tradeTypeOptions"
-                  min-width="100%"
-                  variant="outlined"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('tradeType') }}</div>
-                  </template>
-                </v-select>
+                <WhsWarehouseSelectField
+                  id="1@warehouse_code"
+                  v-model="inputData.warehouse_code"
+                  v-model:pk="inputData.wso_warehouse_pk"
+                  :disabled="readonly"
+                  :label="detailField('warehouse')"
+                  label-class="w-label-110"
+                  :readonly="readonly"
+                  required
+                  :rules="warehouseRules"
+                />
               </div>
             </v-col>
 
-            <v-col cols="12" md="9">
-              <div class="market-plant-row d-flex align-start ga-2">
+            <v-col :cols="rescols('c12l3s6')">
+              <div class="d-flex align-start flex-column flex-wrap ga-1">
                 <v-autocomplete
                   id="1@market"
                   autocomplete="off"
-                  class="market-plant-row__field"
                   clearable
                   color="primary"
                   density="compact"
                   hide-details="auto"
                   :items="uniqueMarketNames"
                   :menu-props="{ maxWidth: '320px' }"
-                  min-width="0"
+                  min-width="100%"
                   :model-value="selectedMarketName"
                   :rules="marketRules"
                   variant="outlined"
@@ -46,10 +43,13 @@
                     </div>
                   </template>
                 </v-autocomplete>
+              </div>
+            </v-col>
 
+            <v-col :cols="rescols('c12l3s6')">
+              <div class="d-flex align-start flex-column flex-wrap ga-1">
                 <v-select
                   id="1@plant_id"
-                  class="market-plant-row__field"
                   clearable
                   color="primary"
                   density="compact"
@@ -60,14 +60,34 @@
                   :items="plantIdOptionItems"
                   :loading="plantIdOptionsLoading"
                   :menu-props="{ maxWidth: '320px' }"
-                  min-width="0"
+                  min-width="100%"
                   :model-value="selectedPlantId"
                   :rules="plantIdRules"
                   variant="outlined"
                   @update:model-value="onOrderPlantIdChange"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('plantId') }}</div>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('plantId') }}<span class="text-error"> *</span>
+                    </div>
+                  </template>
+                </v-select>
+              </div>
+            </v-col>
+
+            <v-col :cols="rescols('c12l3s6')">
+              <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <v-select
+                  id="1@wso_trade_type"
+                  v-model="inputData.wso_trade_type"
+                  density="compact"
+                  hide-details
+                  :items="tradeTypeOptions"
+                  min-width="100%"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('tradeType') }}</div>
                   </template>
                 </v-select>
               </div>
@@ -739,11 +759,11 @@
                   v-model:date-value="inputData.wso_est_delivery"
                   max="2099-12-31"
                   min="2000-01-01"
-                  :rules="convertRequiredRules.estDelivery"
+                  :rules="estDeliveryRules"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('estDelivery') }}<span class="text-primary">^</span>:
+                      {{ detailField('estDelivery') }}<span class="text-error"> *</span>
                     </div>
                   </template>
                 </FDatePicker>
@@ -925,13 +945,33 @@
                   />
                 </div>
 
+                <v-number-input
+                  id="1@order_line_qty_total"
+                  class="hide-step"
+                  color="primary"
+                  control-variant="hidden"
+                  density="compact"
+                  hide-details
+                  :min-fraction-digits="0"
+                  min-width="100%"
+                  :model-value="orderLineQtyTotal"
+                  :precision="3"
+                  readonly
+                  type="input"
+                  variant="outlined"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('qty') }}</div>
+                  </template>
+                </v-number-input>
+
                 <v-select
                   id="1@wso_delivery_mode"
                   v-model="inputData.wso_delivery_mode"
                   auto-select-first
                   autocomplete="off"
                   density="compact"
-                  hide-details
+                  hide-details="auto"
                   :items="['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']"
                   :menu-props="{
                     'max-width': '100%',
@@ -939,11 +979,12 @@
                   min-width="100%"
                   no-data-text="$vuetify.custom.app.searchMore"
                   no-filter
+                  :rules="deliveryModeRules"
                   variant="outlined"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('deliveryMode') }}
+                      {{ detailField('deliveryMode') }}<span class="text-error"> *</span>
                     </div>
                   </template>
                 </v-select>
@@ -967,6 +1008,18 @@
 
             <v-col :cols="rescols('c12l3s6')">
               <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <FDateTimePicker
+                  v-model:date-time-value="inputData.si_cut_off"
+                  :date-props="{ clearable: true }"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  min-width="100%"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">{{ detailField('siCutOff') }}</div>
+                  </template>
+                </FDateTimePicker>
+
                 <FDatePicker
                   v-model:date-value="inputData.wso_vgm_cut_off_date"
                   :date-props="{ clearable: true }"
@@ -1006,6 +1059,21 @@
                     <div class="text-caption text-end w-label-110">{{ detailField('cyCutOff') }}</div>
                   </template>
                 </FDatePicker>
+
+                <FDateTimePicker
+                  v-model:date-time-value="inputData.wso_cfs_cut_off"
+                  :date-props="{ clearable: true }"
+                  max="2099-12-31"
+                  min="2000-01-01"
+                  min-width="100%"
+                  :rules="cfsCutOffRules"
+                >
+                  <template #prepend>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('cfsCutOff') }}<span class="text-error"> *</span>
+                    </div>
+                  </template>
+                </FDateTimePicker>
 
                 <v-text-field
                   id="1@intended_vessel"
@@ -1217,8 +1285,10 @@
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { getWhsMarketOptions } from '@/api/whs-market'
   import FDatePicker from '@/components/FDatePicker.vue'
+  import FDateTimePicker from '@/components/FDateTimePicker.vue'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import FRemoteTableMenuWithCode from '@/components/FRemoteTableMenuWithCode.vue'
+  import WhsWarehouseSelectField from '@/components/warehouse/WhsWarehouseSelectField.vue'
   import { mapWarehouseAddrTableHeaders } from '@/composables/mapWarehouseOrderTableHeaders'
   import {
     defaultWhsMarketObject,
@@ -1263,9 +1333,12 @@
   const convertRequiredRules = computed(() => ({
     etd: [requiredRule(validationField('etd'))],
     eta: [requiredRule(validationField('eta'))],
-    estDelivery: [requiredRule(validationField('estDelivery'))],
     soNumber: [requiredRule(validationField('carrierSoNumber'))],
   }))
+
+  const estDeliveryRules = computed(() => [requiredRule(validationField('estDelivery'))])
+  const deliveryModeRules = [requiredRule(validationField('deliveryMode'))]
+  const cfsCutOffRules = [requiredRule(validationField('cfsCutOff'))]
 
   /** ETD 须严格晚于 Cargo Ready（yyyy-MM-dd：es > cs，不可同日） */
   function validateBookingEtdNotBeforeCargoReady() {
@@ -1457,7 +1530,36 @@
     return matched || validation('marketSelectFromList')
   }
   const marketRules = [marketRequiredRule]
-  const plantIdRules = []
+  const plantIdRequiredRule = value => {
+    const plantId = String(value ?? selectedPlantId.value ?? '').trim()
+    if (!plantId) {
+      return validation('plantIdRequired')
+    }
+    if (plantIdOptionItems.value.length > 0) {
+      const matched = plantIdOptionItems.value.some(item => item.value === plantId)
+      return matched || validation('plantIdSelectFromList')
+    }
+    return true
+  }
+  const plantIdRules = [plantIdRequiredRule]
+  const warehouseRequiredRule = value => {
+    const code = String(value ?? inputData.value?.warehouse_code ?? '').trim()
+    if (!code) {
+      return validation('warehouseRequired')
+    }
+    return true
+  }
+  const warehouseRules = [warehouseRequiredRule]
+
+  const orderLineQtyTotal = computed(() => {
+    let rows = []
+    if (Array.isArray(inputData.value?.item_list)) {
+      rows = inputData.value.item_list
+    } else if (Array.isArray(inputData.value?.pac_list)) {
+      rows = inputData.value.pac_list
+    }
+    return rows.reduce((sum, row) => sum + (Number(row?.woi_pieces ?? row?.pieces) || 0), 0)
+  })
 
   const findMarketOption = (marketName, plantId) => {
     const name = String(marketName ?? '').trim()
@@ -1779,26 +1881,6 @@
     margin: 0;
     padding: 0;
     min-width: 0;
-  }
-
-  .market-plant-row {
-    width: 100%;
-  }
-
-  .market-plant-row__field {
-    flex: 1 1 0;
-    max-width: 50%;
-    min-width: 0;
-  }
-
-  .market-plant-row :deep(.v-input.v-input--horizontal) {
-    width: 100%;
-    max-width: 100%;
-
-    .v-input__control {
-      flex: 1 1 0;
-      min-width: 0;
-    }
   }
 
   .address-fields-col,

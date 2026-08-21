@@ -14,6 +14,10 @@ function createDefaultWhsOrderFormData() {
     wso_transport_mode: 'SEA',
     wso_packing_mode: 'FCL',
     wso_trade_type: 'TRADE',
+    warehouse_code: '',
+    wso_warehouse_pk: '',
+    si_cut_off: '',
+    wso_cfs_cut_off: '',
     shipper: {},
     consignee: {},
     notify_party: {
