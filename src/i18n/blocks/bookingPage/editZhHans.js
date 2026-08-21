@@ -92,6 +92,8 @@ export default {
       uploadButtonText: '上传文件',
       fileName: '文件名',
       filePath: '文件路径',
+      fileType: '文件类型',
+      remarks: '备注',
       refNo: '参考号',
       receivedTime: '接收时间',
       download: '下载',

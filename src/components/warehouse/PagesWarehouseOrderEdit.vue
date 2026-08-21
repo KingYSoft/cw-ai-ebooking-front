@@ -22,7 +22,7 @@
 
     <v-scroll-x-transition hide-on-leave mode="out-in">
       <div v-show="activedTab === 3">
-        <BookingEDocs v-model:input-data="inputData" :actived-tab="activedTab" />
+        <WarehouseOrderEDocs v-model:input-data="inputData" :actived-tab="activedTab" />
       </div>
     </v-scroll-x-transition>
 
@@ -43,11 +43,11 @@
   import { useLocale } from 'vuetify'
   import { portCodeQueryOptions } from '@/api/port_code'
   import { debounceFn } from '@/api/utils'
-  import BookingEDocs from '@/components/business/booking/BookingEDocs.vue'
   import BookingLogs from '@/components/business/booking/BookingLogs.vue'
   import { useAppStore } from '@/stores/app'
   import WarehouseItemDetail from './warehouse_order/WarehouseItemDetail.vue'
   import WarehouseOrderDetail from './warehouse_order/WarehouseOrderDetail.vue'
+  import WarehouseOrderEDocs from './warehouse_order/WarehouseOrderEDocs.vue'
 
   const appStore = useAppStore()
   const { t } = useLocale()

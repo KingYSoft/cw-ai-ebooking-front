@@ -92,6 +92,8 @@ export default {
       uploadButtonText: 'Tải lên tệp',
       fileName: 'Tên tệp',
       filePath: 'Đường dẫn tệp',
+      fileType: 'Loại tệp',
+      remarks: 'Ghi chú',
       refNo: 'Số tham chiếu',
       receivedTime: 'Thời gian nhận',
       download: 'tải xuống',

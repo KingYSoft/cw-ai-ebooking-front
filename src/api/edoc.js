@@ -1,9 +1,47 @@
-// import service from './index'
+import service from './index'
 
-const ok = (data = null) => Promise.resolve({ success: true, data })
+/** 获取 edoc 列表 */
+export const edocSearch = params =>
+  service({
+    url: '/edoc/search',
+    method: 'get',
+    params,
+  })
 
-export const edocSearch = () => ok({ items: [] })
+export const edocSave = params =>
+  service({
+    url: '/edoc/save',
+    method: 'post',
+    data: params,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 
-export const edocSave = () => ok(null)
+/** Warehouse Order eDoc 列表 */
+export const whsEdocSearch = params =>
+  service({
+    url: '/edoc/whs-search',
+    method: 'post',
+    data: params,
+  })
 
-export const edocDownloadFiles = () => ok(null)
+/** Warehouse Order eDoc 上传 */
+export const whsEdocSave = params =>
+  service({
+    url: '/edoc/whs-save',
+    method: 'post',
+    data: params,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+
+export const edocDownloadFiles = (params, signal) =>
+  service({
+    url: '/edoc/download-files',
+    method: 'post',
+    data: params,
+    responseType: 'blob',
+    signal,
+  })
