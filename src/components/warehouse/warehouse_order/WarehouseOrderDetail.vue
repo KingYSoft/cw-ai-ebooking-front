@@ -1,7 +1,7 @@
 <template>
   <div class="whs-order-detail" :class="{ 'whs-order-detail--readonly': readonly }">
     <fieldset class="whs-order-detail-fieldset" :disabled="readonly">
-      <v-form class="ref-form-pre" color="background" :disabled="readonly">
+      <v-form :ref="setRef" class="ref-form-pre" color="background" :disabled="readonly">
         <v-card-text class="py-2">
           <v-row dense>
             <v-col :cols="rescols('c12l3s6')">
@@ -1383,7 +1383,11 @@
     default: () => ({}),
   })
 
-  const emit = defineEmits(['query-port', 'on-select-addr', 'on-clear-addr'])
+  const emit = defineEmits(['query-port', 'on-select-addr', 'on-clear-addr', 'register-form-refs'])
+
+  const setRef = el => {
+    emit('register-form-refs', el)
+  }
 
   const queryPort = value => {
     emit('query-port', value)

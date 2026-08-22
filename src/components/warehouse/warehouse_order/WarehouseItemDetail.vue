@@ -4,18 +4,20 @@
       <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat">
         {{ itemDetailLabel('upload') }}
       </v-btn>
-
-      <v-text-field
-        id="2@container_rows_required"
-        class="d-none"
-        density="compact"
-        hide-details
-        :model-value="itemList.length"
-        :rules="[v => Number(v || 0) > 0 || validation('atLeastOneLine')]"
-      />
     </v-card-text>
 
-    <v-form class="ref-form-pre" color="background">
+    <v-form :ref="setRef" class="ref-form-pre" color="background">
+      <v-card-text class="py-2">
+        <v-text-field
+          id="2@container_rows_required"
+          class="d-none"
+          density="compact"
+          hide-details
+          :model-value="itemList.length"
+          :rules="[v => Number(v || 0) > 0 || validation('atLeastOneLine')]"
+        />
+      </v-card-text>
+
       <v-data-table
         class="table-filter"
         disable-sort
@@ -526,6 +528,12 @@
     type: Object,
     default: () => ({}),
   })
+
+  const emit = defineEmits(['register-form-refs'])
+
+  const setRef = el => {
+    emit('register-form-refs', el)
+  }
 
   const itemList = computed(() => inputData.value?.item_list ?? [])
 

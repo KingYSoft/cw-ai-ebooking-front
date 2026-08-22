@@ -10,13 +10,18 @@
           @on-clear-addr="OnClearAddr"
           @on-select-addr="onSelectAddr"
           @query-port="queryPort"
+          @register-form-refs="registerFormRefs"
         />
       </div>
     </v-scroll-x-transition>
 
     <v-scroll-x-transition hide-on-leave mode="out-in">
       <div v-show="activedTab === 2">
-        <WarehouseItemDetail v-model:input-data="inputData" :input-data-rules="inputDataRules" />
+        <WarehouseItemDetail
+          v-model:input-data="inputData"
+          :input-data-rules="inputDataRules"
+          @register-form-refs="registerFormRefs"
+        />
       </div>
     </v-scroll-x-transition>
 
@@ -62,9 +67,13 @@
       default: false,
     },
   })
-  // const emit = defineEmits([])
+  const emit = defineEmits(['register-form-refs'])
 
   const { activedTab, readonly } = toRefs(props)
+
+  const registerFormRefs = el => {
+    emit('register-form-refs', el)
+  }
 
   const inputData = defineModel('input-data', {
     type: Object,
