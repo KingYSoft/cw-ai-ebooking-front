@@ -285,6 +285,40 @@ export default {
       },
     },
     bookingPage,
+    upload: {
+      dropZone: {
+        title: '拖曳文件到此處',
+        subtitle: '或點擊下方按鈕選取文件',
+      },
+      buttons: {
+        browse: '瀏覽文件',
+        clear: '清空清單',
+        upload: '上傳文件',
+        ocr: 'OCR識別',
+      },
+      fields: {
+        docType: '單證類型',
+        ebookingVisible: 'EBooking Visible',
+      },
+      fileCount: '已選文件',
+      ocr: {
+        title: 'OCR 委託',
+        processing: '正在進行 OCR 識別...',
+        success: 'OCR 識別成功',
+        failed: 'OCR 識別失敗，請重試',
+      },
+      messages: {
+        noFileSelected: '請選擇要上傳的文件',
+        noJobNumber: '請輸入編號',
+        noDocType: '請選擇文件類型',
+      },
+      success: {
+        uploadSuccess: '{0} Doc is uploaded',
+      },
+      error: {
+        uploadError: 'Upload error: {0}',
+      },
+    },
     systemPage,
     warehouseOrder,
   },

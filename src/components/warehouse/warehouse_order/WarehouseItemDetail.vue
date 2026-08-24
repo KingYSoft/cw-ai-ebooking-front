@@ -4,18 +4,20 @@
       <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat">
         {{ itemDetailLabel('upload') }}
       </v-btn>
-
-      <v-text-field
-        id="2@container_rows_required"
-        class="d-none"
-        density="compact"
-        hide-details
-        :model-value="itemList.length"
-        :rules="[v => Number(v || 0) > 0 || validation('atLeastOneLine')]"
-      />
     </v-card-text>
 
-    <v-form class="ref-form-pre" color="background">
+    <v-form :ref="setRef" class="ref-form-pre" color="background">
+      <v-card-text class="py-2">
+        <v-text-field
+          id="2@container_rows_required"
+          class="d-none"
+          density="compact"
+          hide-details
+          :model-value="itemList.length"
+          :rules="[v => Number(v || 0) > 0 || validation('atLeastOneLine')]"
+        />
+      </v-card-text>
+
       <v-data-table
         class="table-filter"
         disable-sort
@@ -49,14 +51,15 @@
           />
         </template>
 
-        <!-- Market -->
+        <!-- Market：选项来自 Order Header 所选 Market Group -->
         <template #item.woi_market="{ item }">
           <v-autocomplete
             v-model="item.woi_market"
             density="compact"
             hide-details="auto"
-            :items="uniqueMarketNames"
+            :items="orderLineMarketItems"
             :menu-props="{ maxWidth: '240px' }"
+            :rules="lineTextRules.woi_market"
             variant="outlined"
           />
         </template>
@@ -425,7 +428,7 @@
 <script setup>
   import Decimal from 'decimal.js'
   import { computed, ref, watch } from 'vue'
-  import { getWhsMarketOptions } from '@/api/whs-market'
+  import { getWhsMarketPlantOptions } from '@/api/whs-market'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import {
     assignPackageTypeFromRow,
@@ -450,6 +453,7 @@
     (value != null && value !== '') || validation('required', fieldLabel)
 
   const lineTextRules = computed(() => ({
+    woi_market: [requiredRule(itemHeader('market'))],
     woi_invoice_no: [requiredRule(itemHeader('invoiceNo'))],
     woi_packlist_no: [requiredRule(itemHeader('packingListNo'))],
     woi_desc: [requiredRule(itemHeader('description'))],
@@ -463,32 +467,6 @@
     woi_outer_pack: [measureRequiredRule(itemHeader('noOfPackage'))],
     woi_pieces: [measureRequiredRule(itemHeader('pieces'))],
   }))
-
-  const marketOptions = ref([])
-  const uniqueMarketNames = computed(() => {
-    const seen = new Set()
-    const names = []
-    for (const opt of marketOptions.value) {
-      const name = String(opt?.market ?? opt?.Market ?? '').trim()
-      if (!name || seen.has(name)) {
-        continue
-      }
-      seen.add(name)
-      names.push(name)
-    }
-    return names
-  })
-
-  const loadMarketOptions = async () => {
-    try {
-      const { data } = await getWhsMarketOptions()
-      marketOptions.value = Array.isArray(data) ? data : []
-    } catch (error) {
-      console.error('loadMarketOptions failed:', error)
-      marketOptions.value = []
-    }
-  }
-  loadMarketOptions()
 
   const batteryFileInput = ref(null)
   const batteryUploadTarget = ref(null)
@@ -527,7 +505,75 @@
     default: () => ({}),
   })
 
+  const emit = defineEmits(['register-form-refs'])
+
+  const setRef = el => {
+    emit('register-form-refs', el)
+  }
+
   const itemList = computed(() => inputData.value?.item_list ?? [])
+
+  /** Order Header 所选 Market Group */
+  const selectedMarketGroup = computed(() =>
+    String(inputData.value?.market?.market ?? inputData.value?.wso_market ?? '').trim(),
+  )
+
+  const orderLineMarketItems = ref([])
+
+  const syncOrderLineMarketsWithGroup = allowedMarkets => {
+    const rows = itemList.value
+    if (rows.length === 0) {
+      return
+    }
+    const allowed = new Set((allowedMarkets ?? []).map(m => String(m ?? '').trim()).filter(Boolean))
+    for (const row of rows) {
+      const current = String(row?.woi_market ?? '').trim()
+      if (!current || allowed.has(current)) {
+        continue
+      }
+      row.woi_market = ''
+    }
+  }
+
+  const loadOrderLineMarketItems = async marketGroup => {
+    const name = String(marketGroup ?? '').trim()
+    if (!name) {
+      orderLineMarketItems.value = []
+      syncOrderLineMarketsWithGroup([])
+      return
+    }
+    try {
+      const { data } = await getWhsMarketPlantOptions({ query: name })
+      const list = Array.isArray(data) ? data : []
+      const group =
+        list.find(item => String(item?.market_group ?? '').trim() === name) ??
+        (list.length === 1 ? list[0] : null)
+      const markets = Array.isArray(group?.market_list) ? group.market_list : []
+      const seen = new Set()
+      const items = []
+      for (const market of markets) {
+        const value = String(market ?? '').trim()
+        if (!value || seen.has(value)) {
+          continue
+        }
+        seen.add(value)
+        items.push(value)
+      }
+      orderLineMarketItems.value = items
+      syncOrderLineMarketsWithGroup(items)
+    } catch (error) {
+      console.error('loadOrderLineMarketItems failed:', error)
+      orderLineMarketItems.value = []
+    }
+  }
+
+  watch(
+    selectedMarketGroup,
+    marketGroup => {
+      loadOrderLineMarketItems(marketGroup)
+    },
+    { immediate: true },
+  )
 
   const toDecimal = value => {
     const text = String(value ?? '')
@@ -594,6 +640,8 @@
       pk: '',
       rowKey: `new-${Date.now()}`,
       woi_market: '',
+      woi_plant_id:
+        inputData.value?.market?.plant_id ?? inputData.value?.wso_plant_id ?? '',
       woi_invoice_no: '',
       woi_packlist_no: '',
       woi_desc: '',

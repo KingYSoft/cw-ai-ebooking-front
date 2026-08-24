@@ -491,6 +491,40 @@ export default {
         },
       },
     },
+    upload: {
+      dropZone: {
+        title: '拖拽文件到此处',
+        subtitle: '或点击下方按钮选取文件',
+      },
+      buttons: {
+        browse: '浏览文件',
+        clear: '清空列表',
+        upload: '上传文件',
+        ocr: 'OCR识别',
+      },
+      fields: {
+        docType: '单证类型',
+        ebookingVisible: 'EBooking Visible',
+      },
+      fileCount: '已选文件',
+      ocr: {
+        title: 'OCR 委托',
+        processing: '正在进行 OCR 识别...',
+        success: 'OCR 识别成功',
+        failed: 'OCR 识别失败，请重试',
+      },
+      messages: {
+        noFileSelected: '请选择要上传的文件',
+        noJobNumber: '请输入编号',
+        noDocType: '请选择文件类型',
+      },
+      success: {
+        uploadSuccess: '{0} Doc is uploaded',
+      },
+      error: {
+        uploadError: 'Upload error: {0}',
+      },
+    },
     systemPage,
     warehouseOrder,
   },

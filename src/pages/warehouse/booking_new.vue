@@ -25,9 +25,11 @@
       <v-divider />
 
       <v-sheet class="overflow-y-auto" style="flex: 1">
-        <v-form ref="refDataForm" class="ref-form-pre" color="background">
-          <PagesWarehouseOrderEdit v-model:input-data="inputData" :actived-tab="activedTab" />
-        </v-form>
+        <PagesWarehouseOrderEdit
+          v-model:input-data="inputData"
+          :actived-tab="activedTab"
+          @register-form-refs="registerFormRefs"
+        />
       </v-sheet>
     </FPageLayout>
   </div>
@@ -67,6 +69,8 @@
     handleValidationErrors,
     markInputDataSaved,
     applyRecognizePrefill,
+    registerFormRefs,
+    validateAll,
   } = useWarehouseBookingForm()
 
   const appStore = useAppStore()
@@ -107,7 +111,6 @@
       cardLoading.value = false
     }
   }
-  const refDataForm = ref(null)
 
   const onSaveWhsOrder = async () => {
     if (isOrderReceived.value) {
@@ -130,9 +133,7 @@
   }
 
   const onSaveHandle = async () => {
-    const { valid, errors } = await refDataForm.value.validate()
-    if (!valid) {
-      handleValidationErrors(errors)
+    if (!(await validateAll())) {
       return
     }
     try {

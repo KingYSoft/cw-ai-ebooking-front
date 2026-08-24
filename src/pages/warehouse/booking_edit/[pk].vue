@@ -62,13 +62,12 @@
       <v-divider />
 
       <v-sheet class="overflow-y-auto" style="flex: 1">
-        <v-form ref="refDataForm" class="ref-form-pre" color="background">
-          <PagesWarehouseOrderEdit
-            v-model:input-data="inputData"
-            :actived-tab="activedTab"
-            :readonly="isOrderSubmitted || isOrderReceived"
-          />
-        </v-form>
+        <PagesWarehouseOrderEdit
+          v-model:input-data="inputData"
+          :actived-tab="activedTab"
+          :readonly="isOrderSubmitted || isOrderReceived"
+          @register-form-refs="registerFormRefs"
+        />
       </v-sheet>
     </FPageLayout>
 
@@ -170,6 +169,8 @@
     whsOrderSaveHandle,
     handleValidationErrors,
     markInputDataSaved,
+    registerFormRefs,
+    validateAll,
   } = useWarehouseBookingForm()
 
   const router = useRouter()
@@ -253,7 +254,6 @@
     }
   }
 
-  const refDataForm = ref(null)
   const onSaveHandle = async () => {
     if (isOrderReceived.value) {
       return
@@ -280,9 +280,7 @@
       })
       return
     }
-    const { valid, errors } = await refDataForm.value.validate()
-    if (!valid) {
-      handleValidationErrors(errors)
+    if (!(await validateAll())) {
       return
     }
     try {
@@ -352,9 +350,7 @@
       return
     }
 
-    const { valid, errors } = await refDataForm.value.validate()
-    if (!valid) {
-      handleValidationErrors(errors)
+    if (!(await validateAll())) {
       return
     }
 

@@ -163,6 +163,27 @@ export function useWarehouseBookingForm() {
     }
   }
 
+  const formRefs = ref([])
+  const registerFormRefs = el => {
+    if (!el) {
+      return
+    }
+    if (!formRefs.value.includes(el)) {
+      formRefs.value.push(el)
+    }
+  }
+
+  const validateAll = async () => {
+    for (const refDataForm of formRefs.value) {
+      const { valid, errors } = await refDataForm.validate()
+      if (!valid) {
+        handleValidationErrors(errors)
+        return false
+      }
+    }
+    return true
+  }
+
   /**
    * save order inputData
    * @param param0
@@ -198,5 +219,7 @@ export function useWarehouseBookingForm() {
     handleValidationErrors,
     markInputDataSaved,
     applyRecognizePrefill,
+    registerFormRefs,
+    validateAll,
   }
 }
