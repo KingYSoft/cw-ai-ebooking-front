@@ -141,8 +141,12 @@ function applyWarehouseHeaderFields(mapped, el) {
   if (!hasFieldValue(mapped.wso_trade_type)) {
     mapped.wso_trade_type = 'TRADE'
   }
-  mapped.warehouse_code = String(el.warehouse_code ?? '').trim()
+  mapped.wso_warehouse_code = String(
+    el.wso_warehouse_code ?? el.warehouse_code ?? '',
+  ).trim()
   mapped.wso_warehouse_pk = String(el.wso_warehouse_pk ?? '').trim()
+  // 兼容旧字段名
+  mapped.warehouse_code = mapped.wso_warehouse_code
 
   if (!hasFieldValue(mapped.si_cut_off)) {
     const siCutOff = el.si_cut_off ?? el.wso_si_cut_off
@@ -418,6 +422,7 @@ const WSO_PASSTHROUGH_KEYS = [
   'wso_cargo_receipt',
   'wso_is_split',
   'wso_trade_type',
+  'wso_warehouse_code',
   'wso_warehouse_pk',
   'wso_cfs_cut_off',
   'wso_si_cut_off',
@@ -568,8 +573,9 @@ export function mapWhsOrderFormToSave(form, options = {}) {
   }
 
   payload.wso_trade_type = hasFieldValue(form.wso_trade_type) ? form.wso_trade_type : 'TRADE'
-  if (hasFieldValue(form.warehouse_code)) {
-    payload.warehouse_code = String(form.warehouse_code).trim()
+  const warehouseCode = form.wso_warehouse_code ?? form.warehouse_code
+  if (hasFieldValue(warehouseCode)) {
+    payload.wso_warehouse_code = String(warehouseCode).trim()
   }
   if (hasFieldValue(form.wso_warehouse_pk)) {
     payload.wso_warehouse_pk = String(form.wso_warehouse_pk).trim()

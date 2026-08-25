@@ -202,6 +202,8 @@
       outbound_list: el.outbound_list || [],
       e_docs_list: el.e_docs_list || [],
       wso_trade_type: el.wso_trade_type || 'TRADE',
+      wso_warehouse_code: el.wso_warehouse_code || el.warehouse_code || '',
+      wso_warehouse_pk: el.wso_warehouse_pk || '',
       wso_unit_of_weight: el.wso_unit_of_weight || 'KG',
       wso_unit_of_volume: el.wso_unit_of_volume || 'M3',
       wso_actual_chargeable_unit: el.wso_actual_chargeable_unit || 'KG',

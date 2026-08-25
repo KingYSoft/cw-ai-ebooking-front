@@ -7,8 +7,8 @@
             <v-col :cols="rescols('c12l3s6')">
               <div class="d-flex align-start flex-column flex-wrap ga-1">
                 <WhsWarehouseSelectField
-                  id="1@warehouse_code"
-                  v-model="inputData.warehouse_code"
+                  id="1@wso_warehouse_code"
+                  v-model="inputData.wso_warehouse_code"
                   v-model:pk="inputData.wso_warehouse_pk"
                   :disabled="readonly"
                   :label="detailField('warehouse')"
@@ -1437,7 +1437,7 @@
   }
   const plantIdRules = [plantIdRequiredRule]
   const warehouseRequiredRule = value => {
-    const code = String(value ?? inputData.value?.warehouse_code ?? '').trim()
+    const code = String(value ?? inputData.value?.wso_warehouse_code ?? '').trim()
     if (!code) {
       return validation('warehouseRequired')
     }
