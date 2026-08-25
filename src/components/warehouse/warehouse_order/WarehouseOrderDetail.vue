@@ -541,13 +541,13 @@
                   density="compact"
                   hide-details
                   min-width="100%"
-                  :rules="convertRequiredRules.soNumber"
+                  readonly
                   type="input"
                   variant="outlined"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('carrierSoNumber') }}<span class="text-primary">^</span>:
+                      {{ detailField('carrierSoNumber') }}:
                     </div>
                   </template>
                 </v-text-field>
@@ -603,7 +603,6 @@
                 <v-autocomplete
                   auto-select-first
                   autocomplete="off"
-                  clearable
                   color="primary"
                   density="compact"
                   hide-details
@@ -617,22 +616,9 @@
                   :model-value="inputData.wso_load_port"
                   no-data-text="$vuetify.custom.app.searchMore"
                   no-filter
+                  readonly
                   return-object
                   variant="outlined"
-                  @update:focused="
-                    $event => {
-                      if ($event) {
-                        queryPort(inputData.wso_load_port)
-                      }
-                    }
-                  "
-                  @update:model-value="
-                    $event => {
-                      inputData.wso_load_port = $event?.rl_code ?? null
-                      inputData.wso_load_port_name = $event?.rl_port_name ?? null
-                    }
-                  "
-                  @update:search="queryPort"
                 >
                   <template #item="scope">
                     <v-list-item
@@ -650,7 +636,6 @@
                 <v-autocomplete
                   auto-select-first
                   autocomplete="off"
-                  clearable
                   color="primary"
                   density="compact"
                   hide-details
@@ -664,22 +649,9 @@
                   :model-value="inputData.wso_discharge_port"
                   no-data-text="$vuetify.custom.app.searchMore"
                   no-filter
+                  readonly
                   return-object
                   variant="outlined"
-                  @update:focused="
-                    $event => {
-                      if ($event) {
-                        queryPort(inputData.wso_discharge_port)
-                      }
-                    }
-                  "
-                  @update:model-value="
-                    $event => {
-                      inputData.wso_discharge_port = $event?.rl_code ?? null
-                      inputData.wso_discharge_port_name = $event?.rl_port_name ?? null
-                    }
-                  "
-                  @update:search="queryPort"
                 >
                   <template #item="scope">
                     <v-list-item
@@ -699,13 +671,13 @@
                 <FDatePicker
                   id="1@wso_etd"
                   v-model:date-value="inputData.wso_etd"
+                  :date-props="{ clearable: false, readonly: true }"
                   max="2099-12-31"
                   min="2000-01-01"
-                  :rules="bkgEtdRules"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('etd') }}<span class="text-primary">^</span>:
+                      {{ detailField('etd') }}:
                     </div>
                   </template>
                 </FDatePicker>
@@ -713,13 +685,13 @@
                 <FDatePicker
                   id="1@wso_eta"
                   v-model:date-value="inputData.wso_eta"
+                  :date-props="{ clearable: false, readonly: true }"
                   max="2099-12-31"
                   min="2000-01-01"
-                  :rules="bkgEtaRules"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('eta') }}<span class="text-primary">^</span>:
+                      {{ detailField('eta') }}:
                     </div>
                   </template>
                 </FDatePicker>
@@ -1010,7 +982,7 @@
               <div class="d-flex align-start flex-column flex-wrap ga-1">
                 <FDateTimePicker
                   v-model:date-time-value="inputData.si_cut_off"
-                  :date-props="{ clearable: true }"
+                  :date-props="{ clearable: false, readonly: true }"
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
@@ -1022,7 +994,7 @@
 
                 <FDatePicker
                   v-model:date-value="inputData.wso_vgm_cut_off_date"
-                  :date-props="{ clearable: true }"
+                  :date-props="{ clearable: false, readonly: true }"
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
@@ -1036,7 +1008,7 @@
 
                 <FDatePicker
                   v-model:date-value="inputData.wso_doc_cut_off_date"
-                  :date-props="{ clearable: true }"
+                  :date-props="{ clearable: false, readonly: true }"
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
@@ -1050,7 +1022,7 @@
 
                 <FDatePicker
                   v-model:date-value="inputData.wso_port_cargo_cut_off_date"
-                  :date-props="{ clearable: true }"
+                  :date-props="{ clearable: false, readonly: true }"
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
@@ -1229,25 +1201,11 @@
                 striped="even"
               >
                 <template #header.actions>
-                  <v-btn
-                    color="primary"
-                    density="comfortable"
-                    icon="mdi-plus-circle"
-                    size="small"
-                    variant="text"
-                    @click.stop="addContainerRow"
-                  />
+                  <span />
                 </template>
 
-                <template #item.actions="{ index }">
-                  <v-btn
-                    color="red"
-                    density="comfortable"
-                    icon="mdi-minus-circle"
-                    size="small"
-                    variant="text"
-                    @click.stop="removeContainerRow(index)"
-                  />
+                <template #item.actions>
+                  <span />
                 </template>
 
                 <template #item.container_no="{ item }">
@@ -1255,6 +1213,7 @@
                     v-model="item.container_no"
                     density="compact"
                     hide-details
+                    readonly
                     variant="outlined"
                   />
                 </template>
@@ -1267,6 +1226,7 @@
                     hide-details
                     :min="0"
                     :precision="0"
+                    readonly
                     variant="outlined"
                   />
                 </template>
@@ -1281,7 +1241,6 @@
 <script setup>
   import Decimal from 'decimal.js'
   import { computed, ref, toRefs, watch } from 'vue'
-  import { useLocale } from 'vuetify'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { getWhsMarketOptions } from '@/api/whs-market'
   import FDatePicker from '@/components/FDatePicker.vue'
@@ -1309,7 +1268,6 @@
   })
 
   const appStore = useAppStore()
-  const { t } = useLocale()
   const { rescols } = useLayoutCols()
   const { detailSection, detailField, addrTable, validation, validationField, requiredRule } =
     useWarehouseOrderPageI18n()
@@ -1330,53 +1288,9 @@
   })
   const { queryPortList, readonly } = toRefs(props)
 
-  const convertRequiredRules = computed(() => ({
-    etd: [requiredRule(validationField('etd'))],
-    eta: [requiredRule(validationField('eta'))],
-    soNumber: [requiredRule(validationField('carrierSoNumber'))],
-  }))
-
   const estDeliveryRules = computed(() => [requiredRule(validationField('estDelivery'))])
   const deliveryModeRules = [requiredRule(validationField('deliveryMode'))]
   const cfsCutOffRules = [requiredRule(validationField('cfsCutOff'))]
-
-  /** ETD 须严格晚于 Cargo Ready（yyyy-MM-dd：es > cs，不可同日） */
-  function validateBookingEtdNotBeforeCargoReady() {
-    return () => {
-      const es = String(inputData.value.wso_etd ?? '').trim()
-      const cs = String(inputData.value.wso_cargo_ready ?? '').trim()
-      if (!es || !cs) return true
-      if (es > cs) return true
-      return t('$vuetify.custom.bookingPage.form.etd_must_be_before_cargo_ready.err')
-    }
-  }
-
-  /** SEA: ETA > ETD；AIR: ETA >= ETD */
-  function validateBookingEtaVsEtd() {
-    return () => {
-      const mode = String(inputData.value.wso_transport_mode ?? '').toUpperCase()
-      const etd = String(inputData.value.wso_etd ?? '').trim()
-      const eta = String(inputData.value.wso_eta ?? '').trim()
-      if (!etd || !eta) return true
-      if (mode === 'SEA') {
-        if (eta > etd) return true
-        return t('$vuetify.custom.bookingPage.form.eta_vs_etd_sea.err')
-      }
-      if (mode === 'AIR') {
-        if (eta >= etd) return true
-        return t('$vuetify.custom.bookingPage.form.eta_vs_etd_air.err')
-      }
-      return true
-    }
-  }
-
-  const bkgEtdRules = computed(() => [
-    ...convertRequiredRules.value.etd,
-    validateBookingEtdNotBeforeCargoReady(),
-    validateBookingEtaVsEtd(),
-  ])
-
-  const bkgEtaRules = computed(() => [...convertRequiredRules.value.eta, validateBookingEtaVsEtd()])
 
   const inputData = defineModel('input-data', {
     type: Object,
@@ -1413,16 +1327,6 @@
     return Array.isArray(inputData.value.container_list) ? inputData.value.container_list : []
   })
 
-  const ensureContainerList = () => {
-    if (!inputData.value) {
-      return []
-    }
-    if (!Array.isArray(inputData.value.container_list)) {
-      inputData.value.container_list = []
-    }
-    return inputData.value.container_list
-  }
-
   const containerTableHeaders = computed(() => [
     { key: 'actions', title: '', width: '50px', align: 'center' },
     {
@@ -1440,20 +1344,6 @@
       width: '40%',
     },
   ])
-
-  const addContainerRow = () => {
-    const list = ensureContainerList()
-    list.push({
-      rowKey: `container-${Date.now()}-${list.length}`,
-      container_no: '',
-      container_count: 0,
-    })
-  }
-
-  const removeContainerRow = index => {
-    const list = ensureContainerList()
-    list.splice(index, 1)
-  }
 
   if (inputData.value && !inputData.value.wso_trade_type) {
     inputData.value.wso_trade_type = 'TRADE'
