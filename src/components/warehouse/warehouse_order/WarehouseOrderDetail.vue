@@ -8,7 +8,7 @@
               <div class="d-flex align-start flex-column flex-wrap ga-1">
                 <WhsWarehouseSelectField
                   id="1@warehouse_code"
-                  v-model="inputData.warehouse_code"
+                  v-model="inputData.wso_warehouse_code"
                   v-model:pk="inputData.wso_warehouse_pk"
                   :disabled="readonly"
                   :label="detailField('warehouse')"
@@ -541,9 +541,9 @@
                   density="compact"
                   hide-details
                   min-width="100%"
-                  :rules="convertRequiredRules.soNumber"
                   type="input"
                   variant="outlined"
+                  readonly
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
@@ -633,6 +633,7 @@
                     }
                   "
                   @update:search="queryPort"
+                  readonly
                 >
                   <template #item="scope">
                     <v-list-item
@@ -680,6 +681,7 @@
                     }
                   "
                   @update:search="queryPort"
+                  readonly
                 >
                   <template #item="scope">
                     <v-list-item
@@ -701,7 +703,7 @@
                   v-model:date-value="inputData.wso_etd"
                   max="2099-12-31"
                   min="2000-01-01"
-                  :rules="bkgEtdRules"
+                  disabled
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
@@ -715,7 +717,7 @@
                   v-model:date-value="inputData.wso_eta"
                   max="2099-12-31"
                   min="2000-01-01"
-                  :rules="bkgEtaRules"
+                  disabled
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
@@ -981,6 +983,7 @@
                   no-filter
                   :rules="deliveryModeRules"
                   variant="outlined"
+                  readonly
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
@@ -1009,7 +1012,7 @@
             <v-col :cols="rescols('c12l3s6')">
               <div class="d-flex align-start flex-column flex-wrap ga-1">
                 <FDateTimePicker
-                  v-model:date-time-value="inputData.si_cut_off"
+                  v-model:date-time-value="inputData.wso_si_cut_off"
                   :date-props="{ clearable: true }"
                   max="2099-12-31"
                   min="2000-01-01"
@@ -1054,6 +1057,7 @@
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
+                  disabled
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">{{ detailField('cyCutOff') }}</div>
@@ -1084,6 +1088,7 @@
                   min-width="100%"
                   type="input"
                   variant="outlined"
+                  readonly
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">{{ detailField('intendedVessel') }}</div>
@@ -1124,6 +1129,7 @@
                     }
                   "
                   @update:search="queryPort"
+                  readonly
                 >
                   <template #item="scope">
                     <v-list-item
