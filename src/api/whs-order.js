@@ -24,6 +24,23 @@ export const whsOrderSave = data =>
     data,
   })
 
+/**
+ * 保存仓库订单（含明细行文件）
+ * FormData:
+ * - data: JSON 字符串（与原 save 入参一致；item_list 行含 upload_key）
+ * - itemFiles__{upload_key}: 对应该行新上传的文件（可多个）
+ * @param {FormData} formData
+ */
+export const whsOrderSaveWithItemFiles = formData =>
+  service({
+    url: '/whs-order/save-with-item-files',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+
 /** POST /whs-order/submit — 提交 */
 export const whsOrderSubmit = pk =>
   service({

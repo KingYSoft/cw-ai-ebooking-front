@@ -1,4 +1,4 @@
-import { whsOrderSave } from '@/api/whs-order'
+import { whsOrderSaveWithItemFiles } from '@/api/whs-order'
 
 const WSO_TO_BKG_FIELDS = [
   ['wso_transport_mode', 'bkg_transport_mode'],
@@ -103,6 +103,15 @@ function mapPacListItem(row, index = 0) {
     return row
   }
   const lineId = normalizeSaveId(row.id, row.pk)
+  const fileList = Array.isArray(row.file_list) ? row.file_list : []
+  const existingBatteryFiles = Array.isArray(row.battery_files) ? row.battery_files : []
+  const mappedFileList = fileList.map(file => ({
+    pk: String(file?.pk ?? '').trim(),
+    name: String(file?.file_name ?? '').trim(),
+    file_name: String(file?.file_name ?? '').trim(),
+    file_type: String(file?.file_type ?? '').trim(),
+    received_time: file?.received_time ?? '',
+  }))
   const mapped = {
     ...row,
     id: lineId,
@@ -124,7 +133,12 @@ function mapPacListItem(row, index = 0) {
     pac_weight_unit: resolveItemField(row, 'woi_gw_unit', 'pac_weight_unit') ?? 'KG',
     pac_actual_volume_uom: resolveItemField(row, 'woi_vol_unit', 'pac_actual_volume_uom') ?? 'CBM',
     pac_pack_type: resolveItemField(row, 'woi_outpack_unit', 'pac_pack_type') ?? '',
-    battery_files: Array.isArray(row.battery_files) ? row.battery_files : [],
+    file_list: fileList,
+    // 回显 file_list + 本地待上传 battery_files（仅含 File 的本地项）
+    battery_files: [
+      ...mappedFileList,
+      ...existingBatteryFiles.filter(item => item?.file instanceof File),
+    ],
   }
 
   for (const [woiKey, uiKey] of WOI_UI_FIELD_PAIRS) {
@@ -185,6 +199,7 @@ export function mapWhsOrderDetailToForm(el) {
   mapped.pac_list = Array.isArray(rawItems)
     ? rawItems.map((row, index) => mapPacListItem(row, index))
     : []
+  mapped.item_list = mapped.pac_list
   mapped.inbound_list = Array.isArray(el.inbound_list) ? el.inbound_list : []
   mapped.outbound_list = Array.isArray(el.outbound_list) ? el.outbound_list : []
   mapped.eDocs_list = el.eDocs_list ?? []
@@ -474,7 +489,7 @@ function normalizeSaveId(id, pk = '') {
   return Math.floor(n)
 }
 
-function mapFormItemToWoi(row, parentPk = '') {
+function mapFormItemToWoi(row, parentPk = '', index = 0) {
   if (!row || typeof row !== 'object') {
     return null
   }
@@ -483,6 +498,7 @@ function mapFormItemToWoi(row, parentPk = '') {
   return {
     id: lineId,
     pk: linePk,
+    upload_key: formatWhsOrderItemUploadKey(index),
     woi_parent_id: row.woi_parent_id || parentPk || '',
     woi_parent_table: row.woi_parent_table || 'whs_order',
     woi_buyer: row.woi_buyer ?? '',
@@ -610,7 +626,9 @@ export function mapWhsOrderFormToSave(form, options = {}) {
     : (Array.isArray(form.item_list)
         ? form.item_list
         : [])
-  payload.item_list = pacList.map(row => mapFormItemToWoi(row, payload.pk)).filter(Boolean)
+  payload.item_list = pacList
+    .map((row, index) => mapFormItemToWoi(row, payload.pk, index))
+    .filter(Boolean)
 
   // save 接口仅接受 shipper / consignee / notify_party
   for (const key of ADDRESS_PARTY_KEYS) {
@@ -618,6 +636,48 @@ export function mapWhsOrderFormToSave(form, options = {}) {
   }
 
   return payload
+}
+
+/** 明细行上传关联 key：line001 / line002 … */
+export function formatWhsOrderItemUploadKey(index) {
+  const n = Number(index)
+  const safeIndex = Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0
+  return `line${String(safeIndex + 1).padStart(3, '0')}`
+}
+
+/** FormData 文件字段名：itemFiles__line001 */
+export function formatWhsOrderItemFilesFieldName(uploadKey) {
+  return `itemFiles__${String(uploadKey ?? '').trim()}`
+}
+
+/**
+ * 组装 save-with-item-files 的 FormData
+ * - data: 原 save JSON 字符串（item_list 含 upload_key，不含 file_list）
+ * - itemFiles__{upload_key}: 该行新上传的 File
+ */
+export function buildWhsOrderSaveWithItemFilesFormData(form, options = {}) {
+  const payload = mapWhsOrderFormToSave(form, options)
+  const itemList = Array.isArray(form?.item_list)
+    ? form.item_list
+    : (Array.isArray(form?.pac_list)
+        ? form.pac_list
+        : [])
+  const formData = new FormData()
+
+  formData.append('data', JSON.stringify(payload))
+
+  itemList.forEach((row, index) => {
+    const uploadKey = formatWhsOrderItemUploadKey(index)
+    const fieldName = formatWhsOrderItemFilesFieldName(uploadKey)
+    const files = Array.isArray(row?.battery_files) ? row.battery_files : []
+    files.forEach(fileItem => {
+      if (fileItem?.file instanceof File) {
+        formData.append(fieldName, fileItem.file, fileItem.file.name)
+      }
+    })
+  })
+
+  return formData
 }
 
 export function mapWhsOrderListRow(item, index) {
@@ -630,6 +690,6 @@ export function mapWhsOrderListRow(item, index) {
 }
 
 export async function saveWhsOrderFromForm(form, options = {}) {
-  const payload = mapWhsOrderFormToSave(form, options)
-  return whsOrderSave(payload)
+  const formData = buildWhsOrderSaveWithItemFilesFormData(form, options)
+  return whsOrderSaveWithItemFiles(formData)
 }
