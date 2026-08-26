@@ -81,14 +81,15 @@
                   id="1@wso_trade_type"
                   v-model="inputData.wso_trade_type"
                   density="compact"
-                  hide-details
+                  hide-details="auto"
                   :items="tradeTypeOptions"
                   min-width="100%"
+                  :rules="tradeTypeRules"
                   variant="outlined"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('tradeType') }}
+                      {{ detailField('tradeType') }}<span class="text-error"> *</span>
                     </div>
                   </template>
                 </v-select>
@@ -999,7 +1000,6 @@
                   min-width="100%"
                   no-data-text="$vuetify.custom.app.searchMore"
                   no-filter
-                  readonly
                   :rules="deliveryModeRules"
                   variant="outlined"
                 >
@@ -1350,6 +1350,7 @@
   const estDeliveryRules = computed(() => [requiredRule(validationField('estDelivery'))])
   const deliveryModeRules = [requiredRule(validationField('deliveryMode'))]
   const cfsCutOffRules = [requiredRule(validationField('cfsCutOff'))]
+  const tradeTypeRules = [requiredRule(validationField('tradeType'))]
 
   const inputData = defineModel('input-data', {
     type: Object,

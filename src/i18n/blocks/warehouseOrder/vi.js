@@ -122,9 +122,14 @@ export default {
       carrierSoNumber: 'Số SO hãng tàu',
       deliveryMode: 'Phương thức giao hàng',
       cfsCutOff: 'Hạn CFS',
+      tradeType: 'Trade Type',
     },
     itemDetail: {
       upload: 'Tải lên',
+      uploadSuccess: 'Đã cập nhật dòng đơn từ tệp.',
+      uploadEmptyLines: 'Kết quả nhận dạng không có dữ liệu dòng đơn.',
+      uploadMarketMismatch:
+        'Market nhận dạng không khớp với Market trên Order Header. Dòng đơn chưa được cập nhật.',
       total: 'Tổng',
     },
     detail: {

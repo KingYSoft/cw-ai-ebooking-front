@@ -122,9 +122,14 @@ export default {
       carrierSoNumber: 'Carrier SO number',
       deliveryMode: 'Delivery Mode',
       cfsCutOff: 'CFS Cut-Off',
+      tradeType: 'Trade Type',
     },
     itemDetail: {
       upload: 'Upload',
+      uploadSuccess: 'Order lines updated from file.',
+      uploadEmptyLines: 'Recognition response has no order line data.',
+      uploadMarketMismatch:
+        'Recognized Market does not match Order Header Market. Order lines were not updated.',
       total: 'Total',
     },
     detail: {

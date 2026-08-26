@@ -98,7 +98,7 @@ function resolveItemField(row, woiKey, uiKey) {
   return undefined
 }
 
-function mapPacListItem(row, index = 0) {
+export function mapPacListItem(row, index = 0) {
   if (!row || typeof row !== 'object') {
     return row
   }
@@ -149,6 +149,26 @@ function mapPacListItem(row, index = 0) {
   }
 
   return mapped
+}
+
+/** 识别结果只取 item_list → 表单明细行（不改 header / 地址等） */
+export function mapWhsOrderItemListFromRecognize(order) {
+  const rawItems = order?.item_list ?? order?.pac_list ?? []
+  if (!Array.isArray(rawItems)) {
+    return []
+  }
+  return rawItems.map((row, index) => mapPacListItem(row, index)).filter(Boolean)
+}
+
+/** 含电池行是否已有文件：本地 battery_files 或详情回显 file_list */
+export function hasWhsOrderItemBatteryFile(row) {
+  if (Array.isArray(row?.battery_files) && row.battery_files.length > 0) {
+    return true
+  }
+  if (Array.isArray(row?.file_list) && row.file_list.length > 0) {
+    return true
+  }
+  return false
 }
 
 function applyWarehouseHeaderFields(mapped, el) {

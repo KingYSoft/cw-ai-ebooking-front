@@ -1,7 +1,15 @@
 <template>
   <div>
     <v-card-text class="py-2">
-      <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat">
+      <v-btn
+        color="primary"
+        :disabled="importLoading"
+        :loading="importLoading"
+        prepend-icon="mdi-upload"
+        size="small"
+        variant="flat"
+        @click="importDialogOpen = true"
+      >
         {{ itemDetailLabel('upload') }}
       </v-btn>
     </v-card-text>
@@ -261,13 +269,13 @@
 
             <template v-if="Number(item.woi_is_battery_included) === 1">
               <div
-                v-if="Array.isArray(item.battery_files) && item.battery_files.length > 0"
+                v-if="hasBatteryFile(item)"
                 class="d-flex flex-wrap justify-center ga-1"
               >
                 <v-chip
-                  v-for="(fileItem, fileIndex) in item.battery_files"
-                  :key="`${fileItem.pk || fileItem.name}-${fileIndex}`"
-                  closable
+                  v-for="(fileItem, fileIndex) in batteryFileItems(item)"
+                  :key="`${fileItem.pk || fileItem.name || fileItem.file_name}-${fileIndex}`"
+                  :closable="isLocalBatteryFile(fileItem)"
                   density="compact"
                   size="small"
                   @click:close="removeBatteryFile(item, fileIndex)"
@@ -277,6 +285,7 @@
               </div>
 
               <v-btn
+                v-if="!hasBatteryFile(item)"
                 color="primary"
                 density="comfortable"
                 prepend-icon="mdi-upload"
@@ -418,10 +427,15 @@
       ref="batteryFileInput"
       accept="*/*"
       class="d-none"
-      multiple
       type="file"
       @change="onBatteryFilesSelected"
     >
+
+    <WarehouseOrderImportDialog
+      v-model="importDialogOpen"
+      :loading="importLoading"
+      @upload="onOrderLineImportUpload"
+    />
   </div>
 </template>
 
@@ -429,7 +443,10 @@
   import Decimal from 'decimal.js'
   import { computed, ref, watch } from 'vue'
   import { getWhsMarketPlantOptions } from '@/api/whs-market'
+  import { recognizeWhsBookingFile } from '@/api/whs-order'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
+  import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
+  import { hasWhsOrderItemBatteryFile, mapWhsOrderItemListFromRecognize } from '@/composables/mapWhsOrderDetail'
   import {
     assignPackageTypeFromRow,
     fetchPackageTypes,
@@ -447,7 +464,72 @@
   })
 
   const appStore = useAppStore()
-  const { itemHeader, itemDetailLabel, validation, requiredRule } = useWarehouseOrderPageI18n()
+  const { itemHeader, itemDetailLabel, validation, requiredRule, import: importI18n } =
+    useWarehouseOrderPageI18n()
+
+  const importDialogOpen = ref(false)
+  const importLoading = ref(false)
+
+  const onOrderLineImportUpload = async ({ files }) => {
+    if (!files?.length) {
+      appStore.openMessage({
+        content: importI18n('noFile'),
+        color: 'warning',
+      })
+      return
+    }
+
+    importLoading.value = true
+    try {
+      appStore.openGlobalLoadingWithIcon(importI18n('uploading'), '$upload', 'info')
+      const formData = new FormData()
+      formData.append('file', files[0])
+      const { success, data } = await recognizeWhsBookingFile(formData)
+      const order = Array.isArray(data?.orders) ? data.orders[0] : null
+      if (!success || !order || typeof order !== 'object') {
+        throw new Error(importI18n('missingData'))
+      }
+
+      const headerMarket = String(
+        inputData.value?.market?.market ?? inputData.value?.wso_market ?? '',
+      )
+        .trim()
+        .toUpperCase()
+      const recognizedMarket = String(order?.market?.market ?? order?.wso_market ?? '')
+        .trim()
+        .toUpperCase()
+      if (headerMarket && recognizedMarket && headerMarket !== recognizedMarket) {
+        appStore.openMessage({
+          content: itemDetailLabel('uploadMarketMismatch'),
+          color: 'warning',
+        })
+        return
+      }
+
+      const mappedItems = mapWhsOrderItemListFromRecognize(order)
+      if (!Array.isArray(mappedItems) || mappedItems.length === 0) {
+        throw new Error(itemDetailLabel('uploadEmptyLines'))
+      }
+
+      // 只覆盖 Order Line，不改 header / 地址等
+      inputData.value.item_list = mappedItems
+      inputData.value.pac_list = mappedItems
+      importDialogOpen.value = false
+      appStore.openMessage({
+        content: itemDetailLabel('uploadSuccess'),
+        color: 'success',
+      })
+    } catch (error) {
+      console.error(error)
+      appStore.openMessage({
+        content: error.message || importI18n('failed'),
+        color: 'error',
+      })
+    } finally {
+      importLoading.value = false
+      appStore.closeGlobalLoading()
+    }
+  }
 
   const measureRequiredRule = fieldLabel => value =>
     (value != null && value !== '') || validation('required', fieldLabel)
@@ -471,7 +553,29 @@
   const batteryFileInput = ref(null)
   const batteryUploadTarget = ref(null)
 
+  const batteryFileItems = item => {
+    if (Array.isArray(item?.battery_files) && item.battery_files.length > 0) {
+      return item.battery_files
+    }
+    if (Array.isArray(item?.file_list) && item.file_list.length > 0) {
+      return item.file_list.map(file => ({
+        pk: file?.pk,
+        name: file?.file_name ?? file?.name ?? '',
+        file_name: file?.file_name ?? file?.name ?? '',
+      }))
+    }
+    return []
+  }
+
+  const hasBatteryFile = item => hasWhsOrderItemBatteryFile(item)
+
+  /** 仅本地新上传的 File 可删；详情 item_list/file_list 回显不可删 */
+  const isLocalBatteryFile = fileItem => fileItem?.file instanceof File
+
   const triggerBatteryUpload = item => {
+    if (hasBatteryFile(item)) {
+      return
+    }
     batteryUploadTarget.value = item
     batteryFileInput.value?.click()
   }
@@ -479,13 +583,11 @@
   const onBatteryFilesSelected = event => {
     const files = Array.from(event?.target?.files ?? [])
     const row = batteryUploadTarget.value
-    if (row && files.length > 0) {
-      if (!Array.isArray(row.battery_files)) {
-        row.battery_files = []
-      }
-      for (const file of files) {
-        row.battery_files.push({ name: file.name, file })
-      }
+    const file = files[0]
+    if (row && file) {
+      // 仅支持 1 个文件
+      row.battery_files = [{ name: file.name, file }]
+      row.file_list = []
     }
     if (event?.target) {
       event.target.value = ''
@@ -494,10 +596,17 @@
   }
 
   const removeBatteryFile = (item, index) => {
-    if (!Array.isArray(item?.battery_files)) {
+    const files = batteryFileItems(item)
+    const target = files[index]
+    if (!isLocalBatteryFile(target)) {
       return
     }
-    item.battery_files.splice(index, 1)
+    if (Array.isArray(item?.battery_files) && item.battery_files.length > 0) {
+      item.battery_files.splice(index, 1)
+    }
+    if (!hasBatteryFile(item)) {
+      item.battery_files = []
+    }
   }
 
   const inputData = defineModel('input-data', {

@@ -146,7 +146,10 @@ export function applyRecognizePrefillToInputData(inputDataRef, route) {
     const parsed = JSON.parse(rawRecognize)
     const order = Array.isArray(parsed?.orders) ? parsed.orders[0] : parsed
     const mapped = mapWhsOrderDetailToForm(order) ?? order
+    // Shipper 仍用登录组织带出的信息，不采用识别结果覆盖
+    const loginShipper = { ...inputDataRef.value?.shipper }
     inputDataRef.value = buildRecognizePrefillForm(mapped)
+    inputDataRef.value.shipper = loginShipper
     return true
   } catch (error) {
     console.error('Failed to parse recognize warehouse order data:', error)
