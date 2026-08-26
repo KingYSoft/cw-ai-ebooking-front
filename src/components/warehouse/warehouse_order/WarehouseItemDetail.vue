@@ -266,13 +266,13 @@
               >
                 <v-chip
                   v-for="(fileItem, fileIndex) in item.battery_files"
-                  :key="`${fileItem.name}-${fileIndex}`"
+                  :key="`${fileItem.pk || fileItem.name}-${fileIndex}`"
                   closable
                   density="compact"
                   size="small"
                   @click:close="removeBatteryFile(item, fileIndex)"
                 >
-                  {{ fileItem.name }}
+                  {{ fileItem.name || fileItem.file_name }}
                 </v-chip>
               </div>
 

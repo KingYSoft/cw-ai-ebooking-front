@@ -23,8 +23,8 @@
     v-bind="getProps"
     :width="width"
     @click:clear="onClear"
-    @click:control="open = true"
-    @keydown.enter="open = true"
+    @click:control="openPicker"
+    @keydown.enter="openPicker"
     @update:focused="onFocused"
   >
     <v-menu
@@ -279,7 +279,21 @@
     }
   }
 
+  const isReadonly = computed(
+    () => Boolean(dateProps.value?.readonly) || Boolean(dateProps.value?.disabled),
+  )
+
+  const openPicker = () => {
+    if (isReadonly.value) {
+      return
+    }
+    open.value = true
+  }
+
   const onClear = () => {
+    if (isReadonly.value) {
+      return
+    }
     dateTimeValue.value = ''
   }
 

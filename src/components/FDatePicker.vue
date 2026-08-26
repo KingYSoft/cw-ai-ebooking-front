@@ -20,8 +20,8 @@
     variant="outlined"
     v-bind="getProps"
     :width="width"
-    @click:control="open = true"
-    @keydown.enter="open = true"
+    @click:control="openPicker"
+    @keydown.enter="openPicker"
     @update:focused="inputBlurredHandle"
   >
     <v-menu
@@ -62,7 +62,7 @@
   </v-text-field>
 </template>
 <script setup>
-  import { toRefs, watch } from 'vue'
+  import { computed, toRefs, watch } from 'vue'
   import { useAppStore } from '@/stores/app'
 
   const appStore = useAppStore()
@@ -139,6 +139,9 @@
 
   const open = ref(false)
   const newDate = ref(new Date())
+  const isReadonly = computed(
+    () => Boolean(dateProps.value?.readonly) || Boolean(dateProps.value?.disabled),
+  )
   const inputBlurredHandle = focused => {
     if (focused) {
       // open.value = true
@@ -147,6 +150,12 @@
     //   open.value = false
     // }
     updateVal()
+  }
+  const openPicker = () => {
+    if (isReadonly.value) {
+      return
+    }
+    open.value = true
   }
   const updateVal = () => {
     const newVal = dateValue.value

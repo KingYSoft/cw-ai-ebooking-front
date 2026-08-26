@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { useLocale } from 'vuetify'
-import { whsOrderSave } from '@/api/whs-order'
-import { mapWhsOrderDetailToForm } from '@/composables/mapWhsOrderDetail'
+import { whsOrderDetail } from '@/api/whs-order'
+import { mapWhsOrderDetailToForm, saveWhsOrderFromForm } from '@/composables/mapWhsOrderDetail'
 import { useUnsavedInputDataGuard } from '@/composables/useUnsavedInputDataGuard'
 import { useAppStore } from '@/stores/app'
 
@@ -14,7 +14,7 @@ function createDefaultWhsOrderFormData() {
     wso_transport_mode: 'SEA',
     wso_packing_mode: 'FCL',
     wso_trade_type: 'TRADE',
-    warehouse_code: '',
+    wso_warehouse_code: '',
     wso_warehouse_pk: '',
     si_cut_off: '',
     wso_cfs_cut_off: '',
@@ -46,22 +46,8 @@ function pickMappedField(mapped, wsoKey, bkgKey, fallback) {
   return mapped?.[wsoKey] ?? mapped?.[bkgKey] ?? fallback
 }
 
-function buildRecognizePrefillForm(mapped) {
-  const defaults = createDefaultWhsOrderFormData()
-  const notifyParty = mapped?.notify_party ?? { add_address_name: 'SAME AS CONSIGNEE' }
+function buildWhsOrderMeasureFields(mapped) {
   return {
-    ...defaults,
-    ...mapped,
-    id: 0,
-    pk: '',
-    shipper: mapped?.shipper || {},
-    consignee: mapped?.consignee || {},
-    notify_party: notifyParty,
-    item_list: mapped?.item_list ?? mapped?.pac_list ?? [],
-    container_list: mapped?.container_list || [],
-    inbound_list: mapped?.inbound_list || [],
-    outbound_list: mapped?.outbound_list || [],
-    e_docs_list: mapped?.e_docs_list ?? mapped?.eDocs_list ?? [],
     wso_unit_of_weight: pickMappedField(mapped, 'wso_unit_of_weight', 'bkg_unit_of_weight', 'KG'),
     wso_unit_of_volume: pickMappedField(mapped, 'wso_unit_of_volume', 'bkg_unit_of_volume', 'M3'),
     wso_actual_chargeable_unit: pickMappedField(
@@ -78,8 +64,72 @@ function buildRecognizePrefillForm(mapped) {
     ),
     wso_pack_type: pickMappedField(mapped, 'wso_pack_type', 'bkg_pack_type', 'CTN'),
     wso_pack_type_desc: pickMappedField(mapped, 'wso_pack_type_desc', 'bkg_pack_type_desc', 'Carton'),
-    notify_party_same_as_consignee: notifyParty.add_address_name === 'SAME AS CONSIGNEE' ? 'Y' : 'N',
   }
+}
+
+function buildWhsOrderListFields(mapped) {
+  return {
+    item_list: mapped?.item_list ?? mapped?.pac_list ?? [],
+    pac_list: mapped?.pac_list ?? mapped?.item_list ?? [],
+    container_list: mapped?.container_list || [],
+    inbound_list: mapped?.inbound_list || [],
+    outbound_list: mapped?.outbound_list || [],
+    e_docs_list: mapped?.e_docs_list ?? mapped?.eDocs_list ?? [],
+  }
+}
+
+function applyWhsOrderIdentityFields(form, mapped, clearIdentity) {
+  if (clearIdentity) {
+    form.id = 0
+    form.pk = ''
+    return
+  }
+  form.wso_trade_type = mapped?.wso_trade_type || 'TRADE'
+  form.wso_warehouse_code = mapped?.wso_warehouse_code ?? mapped?.warehouse_code ?? ''
+  form.wso_warehouse_pk = mapped?.wso_warehouse_pk ?? ''
+}
+
+function buildWhsOrderFormFromMapped(mapped, { clearIdentity = false } = {}) {
+  const defaults = createDefaultWhsOrderFormData()
+  const notifyParty = mapped?.notify_party ?? { add_address_name: 'SAME AS CONSIGNEE' }
+  const form = {
+    ...defaults,
+    ...mapped,
+    ...buildWhsOrderMeasureFields(mapped),
+    ...buildWhsOrderListFields(mapped),
+    shipper: mapped?.shipper || {},
+    consignee: mapped?.consignee || {},
+    notify_party: notifyParty,
+    notify_party_same_as_consignee:
+      notifyParty.add_address_name === 'SAME AS CONSIGNEE' ? 'Y' : 'N',
+  }
+  applyWhsOrderIdentityFields(form, mapped, clearIdentity)
+  return form
+}
+
+export function applyWhsOrderDetailToInputData(inputDataRef, el) {
+  if (!el || typeof el !== 'object') {
+    return
+  }
+  const mapped = mapWhsOrderDetailToForm(el) ?? el
+  inputDataRef.value = buildWhsOrderFormFromMapped(mapped)
+}
+
+async function queryWhsOrderDetail(inputDataRef, pk) {
+  const pkStr = String(pk ?? '').trim()
+  if (!pkStr) {
+    return false
+  }
+  const { success, data } = await whsOrderDetail(pkStr)
+  if (success && data) {
+    applyWhsOrderDetailToInputData(inputDataRef, data)
+    return true
+  }
+  return false
+}
+
+function buildRecognizePrefillForm(mapped) {
+  return buildWhsOrderFormFromMapped(mapped, { clearIdentity: true })
 }
 
 export function applyRecognizePrefillToInputData(inputDataRef, route) {
@@ -189,7 +239,7 @@ export function useWarehouseBookingForm() {
    * @param param0
    */
   const whsOrderSaveHandle = async ({ showMessage = true } = {}) => {
-    const { success, data } = await whsOrderSave(inputData.value)
+    const { success, data } = await saveWhsOrderFromForm(inputData.value)
 
     if (success && data) {
       if (showMessage) {
@@ -199,13 +249,25 @@ export function useWarehouseBookingForm() {
         })
       }
 
-      inputData.value.id = data.id ?? 0
-      inputData.value.pk = data.pk
-      inputData.value.wso_consign_no = data.wso_consign_no
+      const pk = String(data.pk ?? inputData.value.pk ?? '').trim()
+      const refreshed = pk ? await queryWhsOrderDetail(inputData, pk) : false
+      if (!refreshed) {
+        inputData.value.id = data.id ?? 0
+        inputData.value.pk = data.pk
+        inputData.value.wso_consign_no = data.wso_consign_no
+      }
       markInputDataSaved()
       return true
     }
     return false
+  }
+
+  const queryWhsOrderDetailHandle = async pk => {
+    const refreshed = await queryWhsOrderDetail(inputData, pk)
+    if (refreshed) {
+      markInputDataSaved()
+    }
+    return refreshed
   }
 
   const applyRecognizePrefill = route => applyRecognizePrefillToInputData(inputData, route)
@@ -216,6 +278,7 @@ export function useWarehouseBookingForm() {
     cardLoading,
     activedTab,
     whsOrderSaveHandle,
+    queryWhsOrderDetailHandle,
     handleValidationErrors,
     markInputDataSaved,
     applyRecognizePrefill,

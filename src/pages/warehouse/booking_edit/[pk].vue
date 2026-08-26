@@ -133,7 +133,7 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { whsOrderDetail, whsOrderSubmit } from '@/api/whs-order'
+  import { whsOrderSubmit } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
@@ -167,6 +167,7 @@
     cardLoading,
     activedTab,
     whsOrderSaveHandle,
+    queryWhsOrderDetailHandle,
     handleValidationErrors,
     markInputDataSaved,
     registerFormRefs,
@@ -184,40 +185,20 @@
   const bookingEmptyVis = ref(false)
   const submitConfirmVis = ref(false)
 
-  const applyBookingInput = el => {
-    if (!el || typeof el !== 'object') {
-      return
-    }
-
-    inputData.value = Object.assign({}, el, {
-      pk: el.pk ?? '',
-      shipper: el.shipper || {},
-      consignee: el.consignee || {},
-      notify_party: el.notify_party || {},
-      pickup: el.pickup || {}, // address
-      delivery: el.delivery || {}, // address
-      item_list: el.item_list || [],
-      container_list: el.container_list || [],
-      inbound_list: el.inbound_list || [],
-      outbound_list: el.outbound_list || [],
-      e_docs_list: el.e_docs_list || [],
-      wso_trade_type: el.wso_trade_type || 'TRADE',
-      wso_unit_of_weight: el.wso_unit_of_weight || 'KG',
-      wso_unit_of_volume: el.wso_unit_of_volume || 'M3',
-      wso_actual_chargeable_unit: el.wso_actual_chargeable_unit || 'KG',
-      wso_volume_weight_unit: el.wso_volume_weight_unit || 'KG',
-      wso_pack_type: el.wso_pack_type || 'CTN',
-      wso_pack_type_desc: el.wso_pack_type_desc || 'Carton',
-    })
-    if (inputData.value.notify_party.add_address_name === 'SAME AS CONSIGNEE') {
-      inputData.value.notify_party_same_as_consignee = 'Y'
-    } else {
-      inputData.value.notify_party_same_as_consignee = 'N'
+  const queryData = async pk => {
+    try {
+      cardLoading.value = true
+      const refreshed = await queryWhsOrderDetailHandle(pk)
+      skeletonLoading.value = false
+      if (!refreshed) {
+        bookingEmptyVis.value = true
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
     }
   }
-
-  // // 注册 inputData 未保存检查；查询完成或保存成功后刷新已保存快照。
-  // const { markInputDataSaved } = useUnsavedInputDataGuard(inputData)
 
   const editLockGuard = useEditLockGuard({
     businessType: 'warehouse_order',
@@ -235,24 +216,6 @@
     return status === 'submitted' || status === 'submited'
   })
   const isOrderReceived = computed(() => resolveOrderStatus() === 'received')
-
-  const queryData = async pk => {
-    try {
-      cardLoading.value = true
-      const { success, data } = await whsOrderDetail(pk)
-      skeletonLoading.value = false
-      if (success && data) {
-        applyBookingInput(data)
-      } else {
-        bookingEmptyVis.value = true
-      }
-      markInputDataSaved()
-    } catch (error) {
-      console.log(error)
-    } finally {
-      cardLoading.value = false
-    }
-  }
 
   const onSaveHandle = async () => {
     if (isOrderReceived.value) {
