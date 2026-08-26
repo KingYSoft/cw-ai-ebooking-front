@@ -122,9 +122,13 @@ export default {
       carrierSoNumber: '承運人 SO 號',
       deliveryMode: '交付方式',
       cfsCutOff: 'CFS 截止',
+      tradeType: '貿易類型',
     },
     itemDetail: {
       upload: '上傳',
+      uploadSuccess: '已根據檔案更新訂單明細。',
+      uploadEmptyLines: '識別結果中沒有訂單明細資料。',
+      uploadMarketMismatch: '識別到的 Market 與 Order Header 所選 Market 不一致，未更新訂單明細。',
       total: '合計',
     },
     detail: {

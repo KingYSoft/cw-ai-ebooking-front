@@ -1,7 +1,15 @@
 <template>
   <div>
     <v-card-text class="py-2">
-      <v-btn color="primary" prepend-icon="mdi-upload" size="small" variant="flat">
+      <v-btn
+        color="primary"
+        :disabled="importLoading"
+        :loading="importLoading"
+        prepend-icon="mdi-upload"
+        size="small"
+        variant="flat"
+        @click="importDialogOpen = true"
+      >
         {{ itemDetailLabel('upload') }}
       </v-btn>
     </v-card-text>
@@ -422,6 +430,12 @@
       type="file"
       @change="onBatteryFilesSelected"
     >
+
+    <WarehouseOrderImportDialog
+      v-model="importDialogOpen"
+      :loading="importLoading"
+      @upload="onOrderLineImportUpload"
+    />
   </div>
 </template>
 
@@ -429,7 +443,10 @@
   import Decimal from 'decimal.js'
   import { computed, ref, watch } from 'vue'
   import { getWhsMarketPlantOptions } from '@/api/whs-market'
+  import { recognizeWhsBookingFile } from '@/api/whs-order'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
+  import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
+  import { mapWhsOrderItemListFromRecognize } from '@/composables/mapWhsOrderDetail'
   import {
     assignPackageTypeFromRow,
     fetchPackageTypes,
@@ -447,7 +464,72 @@
   })
 
   const appStore = useAppStore()
-  const { itemHeader, itemDetailLabel, validation, requiredRule } = useWarehouseOrderPageI18n()
+  const { itemHeader, itemDetailLabel, validation, requiredRule, import: importI18n } =
+    useWarehouseOrderPageI18n()
+
+  const importDialogOpen = ref(false)
+  const importLoading = ref(false)
+
+  const onOrderLineImportUpload = async ({ files }) => {
+    if (!files?.length) {
+      appStore.openMessage({
+        content: importI18n('noFile'),
+        color: 'warning',
+      })
+      return
+    }
+
+    importLoading.value = true
+    try {
+      appStore.openGlobalLoadingWithIcon(importI18n('uploading'), '$upload', 'info')
+      const formData = new FormData()
+      formData.append('file', files[0])
+      const { success, data } = await recognizeWhsBookingFile(formData)
+      const order = Array.isArray(data?.orders) ? data.orders[0] : null
+      if (!success || !order || typeof order !== 'object') {
+        throw new Error(importI18n('missingData'))
+      }
+
+      const headerMarket = String(
+        inputData.value?.market?.market ?? inputData.value?.wso_market ?? '',
+      )
+        .trim()
+        .toUpperCase()
+      const recognizedMarket = String(order?.market?.market ?? order?.wso_market ?? '')
+        .trim()
+        .toUpperCase()
+      if (headerMarket && recognizedMarket && headerMarket !== recognizedMarket) {
+        appStore.openMessage({
+          content: itemDetailLabel('uploadMarketMismatch'),
+          color: 'warning',
+        })
+        return
+      }
+
+      const mappedItems = mapWhsOrderItemListFromRecognize(order)
+      if (!Array.isArray(mappedItems) || mappedItems.length === 0) {
+        throw new Error(itemDetailLabel('uploadEmptyLines'))
+      }
+
+      // 只覆盖 Order Line，不改 header / 地址等
+      inputData.value.item_list = mappedItems
+      inputData.value.pac_list = mappedItems
+      importDialogOpen.value = false
+      appStore.openMessage({
+        content: itemDetailLabel('uploadSuccess'),
+        color: 'success',
+      })
+    } catch (error) {
+      console.error(error)
+      appStore.openMessage({
+        content: error.message || importI18n('failed'),
+        color: 'error',
+      })
+    } finally {
+      importLoading.value = false
+      appStore.closeGlobalLoading()
+    }
+  }
 
   const measureRequiredRule = fieldLabel => value =>
     (value != null && value !== '') || validation('required', fieldLabel)

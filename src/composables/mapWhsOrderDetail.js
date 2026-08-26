@@ -98,7 +98,7 @@ function resolveItemField(row, woiKey, uiKey) {
   return undefined
 }
 
-function mapPacListItem(row, index = 0) {
+export function mapPacListItem(row, index = 0) {
   if (!row || typeof row !== 'object') {
     return row
   }
@@ -149,6 +149,15 @@ function mapPacListItem(row, index = 0) {
   }
 
   return mapped
+}
+
+/** 识别结果只取 item_list → 表单明细行（不改 header / 地址等） */
+export function mapWhsOrderItemListFromRecognize(order) {
+  const rawItems = order?.item_list ?? order?.pac_list ?? []
+  if (!Array.isArray(rawItems)) {
+    return []
+  }
+  return rawItems.map((row, index) => mapPacListItem(row, index)).filter(Boolean)
 }
 
 function applyWarehouseHeaderFields(mapped, el) {
