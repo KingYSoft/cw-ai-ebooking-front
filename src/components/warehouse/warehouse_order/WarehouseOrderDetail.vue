@@ -87,7 +87,9 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('tradeType') }}</div>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('tradeType') }}
+                    </div>
                   </template>
                 </v-select>
               </div>
@@ -135,7 +137,9 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
+                    <div class="text-caption text-end w-label-120">
+                      {{ detailField('address1') }}
+                    </div>
                   </template>
                 </v-text-field>
 
@@ -150,7 +154,9 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
+                    <div class="text-caption text-end w-label-120">
+                      {{ detailField('address2') }}
+                    </div>
                   </template>
                 </v-text-field>
               </div>
@@ -169,7 +175,9 @@
                       variant="outlined"
                     >
                       <template #prepend>
-                        <div class="text-caption text-end w-label-120">{{ detailField('uscl') }}</div>
+                        <div class="text-caption text-end w-label-120">
+                          {{ detailField('uscl') }}
+                        </div>
                       </template>
                     </v-text-field>
                   </div>
@@ -188,7 +196,9 @@
                       variant="outlined"
                     >
                       <template #prepend>
-                        <div class="text-caption text-end w-label">{{ detailField('contact') }}</div>
+                        <div class="text-caption text-end w-label">
+                          {{ detailField('contact') }}
+                        </div>
                       </template>
                     </v-text-field>
                   </div>
@@ -209,7 +219,9 @@
                       variant="outlined"
                     >
                       <template #prepend>
-                        <div class="text-caption text-end w-label-120">{{ detailField('tel') }}</div>
+                        <div class="text-caption text-end w-label-120">
+                          {{ detailField('tel') }}
+                        </div>
                       </template>
                     </v-text-field>
                   </div>
@@ -249,7 +261,9 @@
                       variant="outlined"
                     >
                       <template #prepend>
-                        <div class="text-caption text-end w-label-120">{{ detailField('fax') }}</div>
+                        <div class="text-caption text-end w-label-120">
+                          {{ detailField('fax') }}
+                        </div>
                       </template>
                     </v-text-field>
                   </div>
@@ -297,7 +311,9 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
+                    <div class="text-caption text-end w-label-120">
+                      {{ detailField('address1') }}
+                    </div>
                   </template>
                 </v-text-field>
 
@@ -312,7 +328,9 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
+                    <div class="text-caption text-end w-label-120">
+                      {{ detailField('address2') }}
+                    </div>
                   </template>
                 </v-text-field>
               </div>
@@ -465,7 +483,9 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('address1') }}</div>
+                    <div class="text-caption text-end w-label-120">
+                      {{ detailField('address1') }}
+                    </div>
                   </template>
                 </v-text-field>
 
@@ -480,7 +500,9 @@
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('address2') }}</div>
+                    <div class="text-caption text-end w-label-120">
+                      {{ detailField('address2') }}
+                    </div>
                   </template>
                 </v-text-field>
               </div>
@@ -619,6 +641,20 @@
                   readonly
                   return-object
                   variant="outlined"
+                  @update:focused="
+                    $event => {
+                      if ($event) {
+                        queryPort(inputData.wso_load_port)
+                      }
+                    }
+                  "
+                  @update:model-value="
+                    $event => {
+                      inputData.wso_load_port = $event?.rl_code ?? null
+                      inputData.wso_load_port_name = $event?.rl_port_name ?? null
+                    }
+                  "
+                  @update:search="queryPort"
                 >
                   <template #item="scope">
                     <v-list-item
@@ -652,6 +688,20 @@
                   readonly
                   return-object
                   variant="outlined"
+                  @update:focused="
+                    $event => {
+                      if ($event) {
+                        queryPort(inputData.wso_discharge_port)
+                      }
+                    }
+                  "
+                  @update:model-value="
+                    $event => {
+                      inputData.wso_discharge_port = $event?.rl_code ?? null
+                      inputData.wso_discharge_port_name = $event?.rl_port_name ?? null
+                    }
+                  "
+                  @update:search="queryPort"
                 >
                   <template #item="scope">
                     <v-list-item
@@ -672,13 +722,12 @@
                   id="1@wso_etd"
                   v-model:date-value="inputData.wso_etd"
                   :date-props="{ clearable: false, readonly: true }"
+                  disabled
                   max="2099-12-31"
                   min="2000-01-01"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">
-                      {{ detailField('etd') }}:
-                    </div>
+                    <div class="text-caption text-end w-label-110">{{ detailField('etd') }}:</div>
                   </template>
                 </FDatePicker>
 
@@ -686,13 +735,12 @@
                   id="1@wso_eta"
                   v-model:date-value="inputData.wso_eta"
                   :date-props="{ clearable: false, readonly: true }"
+                  disabled
                   max="2099-12-31"
                   min="2000-01-01"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">
-                      {{ detailField('eta') }}:
-                    </div>
+                    <div class="text-caption text-end w-label-110">{{ detailField('eta') }}:</div>
                   </template>
                 </FDatePicker>
               </div>
@@ -951,6 +999,7 @@
                   min-width="100%"
                   no-data-text="$vuetify.custom.app.searchMore"
                   no-filter
+                  readonly
                   :rules="deliveryModeRules"
                   variant="outlined"
                 >
@@ -974,21 +1023,22 @@
                     </div>
                   </template>
                 </FDatePicker>
-
               </div>
             </v-col>
 
             <v-col :cols="rescols('c12l3s6')">
               <div class="d-flex align-start flex-column flex-wrap ga-1">
                 <FDateTimePicker
-                  v-model:date-time-value="inputData.si_cut_off"
-                  :date-props="{ clearable: false, readonly: true }"
+                  v-model:date-time-value="inputData.wso_si_cut_off"
+                  :date-props="{ clearable: true }"
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('siCutOff') }}</div>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('siCutOff') }}
+                    </div>
                   </template>
                 </FDateTimePicker>
 
@@ -1023,12 +1073,15 @@
                 <FDatePicker
                   v-model:date-value="inputData.wso_port_cargo_cut_off_date"
                   :date-props="{ clearable: false, readonly: true }"
+                  disabled
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('cyCutOff') }}</div>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('cyCutOff') }}
+                    </div>
                   </template>
                 </FDatePicker>
 
@@ -1054,11 +1107,14 @@
                   density="compact"
                   hide-details
                   min-width="100%"
+                  readonly
                   type="input"
                   variant="outlined"
                 >
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('intendedVessel') }}</div>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('intendedVessel') }}
+                    </div>
                   </template>
                 </v-text-field>
 
@@ -1080,6 +1136,7 @@
                   :model-value="inputData.wso_place_of_delivery"
                   no-data-text="$vuetify.custom.app.searchMore"
                   no-filter
+                  readonly
                   return-object
                   variant="outlined"
                   @update:focused="
@@ -1106,10 +1163,12 @@
                   </template>
 
                   <template #prepend>
-                    <div class="text-caption text-end w-label-110">{{ detailField('placeOfDelivery') }}</div>
+                    <div class="text-caption text-end w-label-110">
+                      {{ detailField('placeOfDelivery') }}
+                    </div>
                   </template>
                 </v-autocomplete>
-              <!-- <v-select
+                <!-- <v-select
               v-model="inputData.job.job_direction"
               auto-select-first
               autocomplete="off"
@@ -1418,9 +1477,7 @@
     if (!marketName) {
       return validation('marketRequired')
     }
-    const matched = marketOptions.value.some(
-      opt => resolveMarketOptionMarket(opt) === marketName,
-    )
+    const matched = marketOptions.value.some(opt => resolveMarketOptionMarket(opt) === marketName)
     return matched || validation('marketSelectFromList')
   }
   const marketRules = [marketRequiredRule]
