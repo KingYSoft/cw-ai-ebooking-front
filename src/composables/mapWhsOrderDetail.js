@@ -160,6 +160,17 @@ export function mapWhsOrderItemListFromRecognize(order) {
   return rawItems.map((row, index) => mapPacListItem(row, index)).filter(Boolean)
 }
 
+/** 含电池行是否已有文件：本地 battery_files 或详情回显 file_list */
+export function hasWhsOrderItemBatteryFile(row) {
+  if (Array.isArray(row?.battery_files) && row.battery_files.length > 0) {
+    return true
+  }
+  if (Array.isArray(row?.file_list) && row.file_list.length > 0) {
+    return true
+  }
+  return false
+}
+
 function applyWarehouseHeaderFields(mapped, el) {
   if (!hasFieldValue(mapped.wso_trade_type)) {
     mapped.wso_trade_type = 'TRADE'

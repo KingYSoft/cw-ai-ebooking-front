@@ -269,13 +269,13 @@
 
             <template v-if="Number(item.woi_is_battery_included) === 1">
               <div
-                v-if="Array.isArray(item.battery_files) && item.battery_files.length > 0"
+                v-if="hasBatteryFile(item)"
                 class="d-flex flex-wrap justify-center ga-1"
               >
                 <v-chip
-                  v-for="(fileItem, fileIndex) in item.battery_files"
-                  :key="`${fileItem.pk || fileItem.name}-${fileIndex}`"
-                  closable
+                  v-for="(fileItem, fileIndex) in batteryFileItems(item)"
+                  :key="`${fileItem.pk || fileItem.name || fileItem.file_name}-${fileIndex}`"
+                  :closable="isLocalBatteryFile(fileItem)"
                   density="compact"
                   size="small"
                   @click:close="removeBatteryFile(item, fileIndex)"
@@ -285,6 +285,7 @@
               </div>
 
               <v-btn
+                v-if="!hasBatteryFile(item)"
                 color="primary"
                 density="comfortable"
                 prepend-icon="mdi-upload"
@@ -426,7 +427,6 @@
       ref="batteryFileInput"
       accept="*/*"
       class="d-none"
-      multiple
       type="file"
       @change="onBatteryFilesSelected"
     >
@@ -446,7 +446,7 @@
   import { recognizeWhsBookingFile } from '@/api/whs-order'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
-  import { mapWhsOrderItemListFromRecognize } from '@/composables/mapWhsOrderDetail'
+  import { hasWhsOrderItemBatteryFile, mapWhsOrderItemListFromRecognize } from '@/composables/mapWhsOrderDetail'
   import {
     assignPackageTypeFromRow,
     fetchPackageTypes,
@@ -553,7 +553,29 @@
   const batteryFileInput = ref(null)
   const batteryUploadTarget = ref(null)
 
+  const batteryFileItems = item => {
+    if (Array.isArray(item?.battery_files) && item.battery_files.length > 0) {
+      return item.battery_files
+    }
+    if (Array.isArray(item?.file_list) && item.file_list.length > 0) {
+      return item.file_list.map(file => ({
+        pk: file?.pk,
+        name: file?.file_name ?? file?.name ?? '',
+        file_name: file?.file_name ?? file?.name ?? '',
+      }))
+    }
+    return []
+  }
+
+  const hasBatteryFile = item => hasWhsOrderItemBatteryFile(item)
+
+  /** 仅本地新上传的 File 可删；详情 item_list/file_list 回显不可删 */
+  const isLocalBatteryFile = fileItem => fileItem?.file instanceof File
+
   const triggerBatteryUpload = item => {
+    if (hasBatteryFile(item)) {
+      return
+    }
     batteryUploadTarget.value = item
     batteryFileInput.value?.click()
   }
@@ -561,13 +583,11 @@
   const onBatteryFilesSelected = event => {
     const files = Array.from(event?.target?.files ?? [])
     const row = batteryUploadTarget.value
-    if (row && files.length > 0) {
-      if (!Array.isArray(row.battery_files)) {
-        row.battery_files = []
-      }
-      for (const file of files) {
-        row.battery_files.push({ name: file.name, file })
-      }
+    const file = files[0]
+    if (row && file) {
+      // 仅支持 1 个文件
+      row.battery_files = [{ name: file.name, file }]
+      row.file_list = []
     }
     if (event?.target) {
       event.target.value = ''
@@ -576,10 +596,17 @@
   }
 
   const removeBatteryFile = (item, index) => {
-    if (!Array.isArray(item?.battery_files)) {
+    const files = batteryFileItems(item)
+    const target = files[index]
+    if (!isLocalBatteryFile(target)) {
       return
     }
-    item.battery_files.splice(index, 1)
+    if (Array.isArray(item?.battery_files) && item.battery_files.length > 0) {
+      item.battery_files.splice(index, 1)
+    }
+    if (!hasBatteryFile(item)) {
+      item.battery_files = []
+    }
   }
 
   const inputData = defineModel('input-data', {

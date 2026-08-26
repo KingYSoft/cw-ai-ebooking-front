@@ -42,6 +42,7 @@
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
+  import { hasWhsOrderItemBatteryFile } from '@/composables/mapWhsOrderDetail'
   import { useWarehouseBookingForm } from '@/composables/useWarehouseBookingForm'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
@@ -118,9 +119,7 @@
     }
     const rows = Array.isArray(inputData.value?.item_list) ? inputData.value.item_list : []
     const missingBatteryFile = rows.some(
-      row =>
-        Number(row?.woi_is_battery_included) === 1 &&
-        !(Array.isArray(row.battery_files) && row.battery_files.length > 0),
+      row => Number(row?.woi_is_battery_included) === 1 && !hasWhsOrderItemBatteryFile(row),
     )
     if (missingBatteryFile) {
       appStore.openMessage({
