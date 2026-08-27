@@ -355,6 +355,11 @@ export function syncMarketDerivedFields(form, marketObj) {
     return defaultWhsMarketObject()
   }
   const normalized = normalizeWhsMarketObject(marketObj) ?? defaultWhsMarketObject()
+  const existingMarket = String(form.market?.market ?? form.wso_market ?? form.bkg_market ?? '').trim()
+  // plant_options 常只有 plant_id / pk，不带 market_group，需保留已选 Market Group
+  if (!normalized.market && existingMarket) {
+    normalized.market = existingMarket
+  }
   form.market = normalized
   form.wso_market = normalized.market
   form.wso_market_pk = normalized.pk
@@ -435,6 +440,72 @@ function syncPacListMarketFields(form, marketObj) {
     row.plant_id = normalized.plant_id
     row.woi_plant_id = normalized.plant_id
   })
+}
+
+function addressPartyString(src, ...keys) {
+  for (const key of keys) {
+    const val = src?.[key]
+    if (val != null && String(val).trim() !== '') {
+      return String(val)
+    }
+  }
+  return ''
+}
+
+function normalizeAddressPartyFromApi(src) {
+  if (!src || typeof src !== 'object') {
+    return {}
+  }
+  return {
+    ...src,
+    add_address_name: addressPartyString(src, 'add_address_name', 'company_name', 'name'),
+    add_address_code: addressPartyString(src, 'add_address_code', 'code', 'org_code'),
+    add_address_short_code: addressPartyString(src, 'add_address_short_code', 'short_code'),
+    add_address1: addressPartyString(src, 'add_address1', 'address1', 'address_line1'),
+    add_address2: addressPartyString(src, 'add_address2', 'address2', 'address_line2'),
+    add_address3: addressPartyString(src, 'add_address3', 'address3', 'address_line3'),
+    add_contact: addressPartyString(src, 'add_contact', 'contact', 'contact_name'),
+    add_city: addressPartyString(src, 'add_city', 'city'),
+    add_state: addressPartyString(src, 'add_state', 'state', 'state_province'),
+    add_postal_code: addressPartyString(src, 'add_postal_code', 'postal_code'),
+    add_country_code: addressPartyString(src, 'add_country_code', 'country_code', 'country'),
+    add_phone: addressPartyString(src, 'add_phone', 'phone', 'telephone'),
+    add_tel: addressPartyString(src, 'add_tel', 'mobile', 'phone'),
+    add_mobile: addressPartyString(src, 'add_mobile', 'add_tel', 'mobile', 'phone'),
+    add_fax: addressPartyString(src, 'add_fax', 'fax'),
+    add_email: addressPartyString(src, 'add_email', 'email', 'email1'),
+    add_port_code: addressPartyString(src, 'add_port_code', 'port_code'),
+    add_usci: addressPartyString(src, 'add_usci'),
+    add_switchboard: addressPartyString(src, 'add_switchboard'),
+    add_tax_no: addressPartyString(src, 'add_tax_no', 'add_taxId'),
+    add_taxId: addressPartyString(src, 'add_taxId', 'add_tax_no'),
+    add_address_type: addressPartyString(src, 'add_address_type', 'address_type', 'party_type'),
+    add_address: src.add_address ?? src.pk ?? src.add_address_pk ?? '',
+    pk: src.pk ?? src.add_address_pk ?? '',
+  }
+}
+
+/** /api/whsMarket/get 返回的 consignee / notify → 订单地址表单字段 */
+export function mapWhsMarketPartyToAddress(party, addressType = '') {
+  const normalized = normalizeAddressPartyFromApi(party)
+  if (addressType) {
+    normalized.add_address_type = addressType
+  }
+  return normalized
+}
+
+/** notify.same_as_consignee：1 → Y，0 → N */
+export function resolveWhsMarketNotifySameAsConsignee(notifyParty) {
+  if (!notifyParty || typeof notifyParty !== 'object') {
+    return 'N'
+  }
+  if (notifyParty.same_as_consignee === 1 || notifyParty.same_as_consignee === true) {
+    return 'Y'
+  }
+  if (notifyParty.same_as_consignee === 0 || notifyParty.same_as_consignee === false) {
+    return 'N'
+  }
+  return resolveNotifyPartySameAsConsignee(undefined, normalizeAddressPartyFromApi(notifyParty))
 }
 
 function cloneAddressParty(addr) {
