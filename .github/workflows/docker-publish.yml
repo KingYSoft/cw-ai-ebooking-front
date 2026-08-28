@@ -1,0 +1,77 @@
+name: Deploy PRD
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: PRD image tag to publish when run manually
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.image_tag }}
+  cancel-in-progress: false
+
+jobs:
+  frontend-image:
+    runs-on: [self-hosted, linux, x64]
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ inputs.image_tag }}
+
+      - name: Login to Azure
+        run: |
+          az login --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
+
+      - name: Login to ACR
+        run: az acr login --name sjcacrprd
+
+      - name: Verify Docker Buildx
+        run: |
+          docker version
+          docker buildx version
+
+      - name: Validate image tag
+        id: validate-image-tag
+        shell: bash
+        run: |
+          IMAGE_TAG="${{ inputs.image_tag }}"
+          TAG_PATTERN='^v[0-9]{4}\.[0-9]{1,2}\.[0-9]{4}$'
+
+          if [[ ! "$IMAGE_TAG" =~ $TAG_PATTERN ]]; then
+            echo "Invalid image_tag: $IMAGE_TAG"
+            echo "Expected format examples: v2026.5.2901, v2026.12.0101"
+            exit 1
+          fi
+
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Extract Frontend Metadata
+        id: frontend-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.REGISTRY }}/${{ vars.IMAGE_NAMESPACE }}/sjc-frontend-ebooking-prd
+          tags: |
+            type=raw,value=${{ steps.validate-image-tag.outputs.image_tag }}
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            BUILD_MODE=prd
+          tags: ${{ steps.frontend-meta.outputs.tags }}
+          labels: ${{ steps.frontend-meta.outputs.labels }}
+
+      - name: Remove Local Frontend Images
+        env:
+          IMAGE_TAGS: ${{ steps.frontend-meta.outputs.tags }}
+        run: |
+          echo "$IMAGE_TAGS" | xargs -r docker image rm || true
+          docker image prune -f
