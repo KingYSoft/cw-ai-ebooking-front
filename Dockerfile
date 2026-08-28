@@ -5,10 +5,12 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 COPY . .
-RUN yarn build:uat
+ARG BUILD_MODE=uat
+RUN yarn build:${BUILD_MODE}
 
 FROM nginx:1.27-alpine AS runtime
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ARG BUILD_MODE=uat
+COPY nginx_${BUILD_MODE}.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 8080

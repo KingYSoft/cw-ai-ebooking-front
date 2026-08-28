@@ -1,0 +1,57 @@
+name: Deploy UAT
+
+on:
+  release:
+    types:
+      - published
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  frontend-image:
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        run: |
+          az login --username "${{ secrets.REGISTRY_USERNAME }}" --password "${{ secrets.REGISTRY_PASSWORD }}"
+
+      - name: Login to ACR
+        run: az acr login --name sjcacrprd
+
+      - name: Verify Docker Buildx
+        run: |
+          docker version
+          docker buildx version
+
+      - name: Extract Frontend Metadata
+        id: frontend-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.REGISTRY }}/${{ vars.IMAGE_NAMESPACE }}/sjc-frontend-ebooking
+          tags: |
+            type=raw,value=${{ github.event.release.tag_name }}
+            type=raw,value=latest
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            BUILD_MODE=uat
+          tags: ${{ steps.frontend-meta.outputs.tags }}
+          labels: ${{ steps.frontend-meta.outputs.labels }}
+
+      - name: Remove Local Frontend Images
+        env:
+          IMAGE_TAGS: ${{ steps.frontend-meta.outputs.tags }}
+        run: |
+          echo "$IMAGE_TAGS" | xargs -r docker image rm || true
+          docker image prune -f
