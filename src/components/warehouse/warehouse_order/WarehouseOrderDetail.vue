@@ -280,26 +280,31 @@
               </v-divider>
 
               <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                <FRemoteTableMenuWithCode
-                  id="1@consignee_name"
-                  v-model="inputData.consignee.add_address_name"
-                  bind-key="code"
-                  :bind-value="inputData.consignee.add_address_code"
-                  display-key="company_name"
-                  :fetch-method="organizationQueryOrgAddress"
-                  :headers="addrTableHeaders"
-                  :query-extra="{ address_type: 'CONSIGNEE' }"
-                  :text-field-props="{
-                    'min-width': '100%',
-                  }"
-                  virtual
-                  @click-clear="OnClearAddr('CONSIGNEE')"
-                  @row-select="onSelectAddr($event, 'CONSIGNEE')"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
-                  </template>
-                </FRemoteTableMenuWithCode>
+                <div class="address-name-readonly d-flex align-center ga-1">
+                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
+
+                  <v-text-field
+                    id="1@consignee_name_code"
+                    class="address-name-readonly__code"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    :model-value="inputData.consignee.add_address_code"
+                    readonly
+                    variant="outlined"
+                  />
+
+                  <v-text-field
+                    id="1@consignee_name"
+                    class="address-name-readonly__name"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    :model-value="inputData.consignee.add_address_name"
+                    readonly
+                    variant="outlined"
+                  />
+                </div>
 
                 <v-text-field
                   v-model="inputData.consignee.add_address1"
@@ -429,49 +434,29 @@
               </v-divider>
 
               <div class="address-fields-col mt-1 d-flex align-start flex-column flex-wrap ga-1">
-                <FRemoteTableMenuWithCode
-                  v-model="inputData.notify_party.add_address_name"
-                  bind-key="code"
-                  :bind-value="inputData.notify_party.add_address_code"
-                  display-key="company_name"
-                  :fetch-method="organizationQueryOrgAddress"
-                  :headers="addrTableHeaders"
-                  :query-extra="{ address_type: 'NOTIFY_PARTY' }"
-                  :text-field-props="{ 'min-width': '100%' }"
-                  virtual
-                  @click-clear="OnClearAddr('NOTIFY_PARTY')"
-                  @row-select="onSelectAddr($event, 'NOTIFY_PARTY')"
-                >
-                  <template #prepend>
-                    <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
-                  </template>
+                <div class="address-name-readonly d-flex align-center ga-1">
+                  <div class="text-caption text-end w-label-120">{{ detailField('name') }}</div>
 
-                  <template #append>
-                    <v-tooltip location="bottom">
-                      <template #activator="ssss">
-                        <v-checkbox-btn
-                          v-bind="ssss.props"
-                          v-model="inputData.notify_party_same_as_consignee"
-                          color="primary"
-                          density="compact"
-                          hide-details
-                          value="Y"
-                          @update:model-value="
-                            $event => {
-                              if ($event === 'Y') {
-                                inputData.notify_party = { add_address_name: 'SAME AS CONSIGNEE' }
-                              } else {
-                                inputData.notify_party = {}
-                              }
-                            }
-                          "
-                        />
-                      </template>
+                  <v-text-field
+                    class="address-name-readonly__code"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    :model-value="inputData.notify_party.add_address_code"
+                    readonly
+                    variant="outlined"
+                  />
 
-                      <span>{{ detailField('sameAsConsignee') }}</span>
-                    </v-tooltip>
-                  </template>
-                </FRemoteTableMenuWithCode>
+                  <v-text-field
+                    class="address-name-readonly__name"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    :model-value="inputData.notify_party.add_address_name"
+                    readonly
+                    variant="outlined"
+                  />
+                </div>
 
                 <v-text-field
                   v-model="inputData.notify_party.add_address1"
@@ -1301,7 +1286,7 @@
   import Decimal from 'decimal.js'
   import { computed, ref, toRefs, watch } from 'vue'
   import { organizationQueryOrgAddress } from '@/api/organization'
-  import { getWhsMarketOptions } from '@/api/whs-market'
+  import { getWhsMarket, getWhsMarketOptions, getWhsMarketPlantOptions } from '@/api/whs-market'
   import FDatePicker from '@/components/FDatePicker.vue'
   import FDateTimePicker from '@/components/FDateTimePicker.vue'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
@@ -1310,7 +1295,9 @@
   import { mapWarehouseAddrTableHeaders } from '@/composables/mapWarehouseOrderTableHeaders'
   import {
     defaultWhsMarketObject,
+    mapWhsMarketPartyToAddress,
     normalizeWhsMarketObject,
+    resolveWhsMarketNotifySameAsConsignee,
     syncMarketDerivedFields,
   } from '@/composables/mapWhsOrderDetail'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -1534,6 +1521,63 @@
     )
   }
 
+  const resolveGroupName = group =>
+    String(group?.market_group ?? group?.market ?? '').trim()
+
+  const findPlantOption = plantId => {
+    const pid = String(plantId ?? '').trim()
+    if (!pid) {
+      return null
+    }
+    return (
+      plantIdOptionItems.value.find(item => item.value === pid)?.raw ??
+      findMarketOption(selectedMarketName.value, pid)
+    )
+  }
+
+  const clearMarketParties = () => {
+    if (!inputData.value) {
+      return
+    }
+    inputData.value.consignee = {}
+    inputData.value.notify_party = {}
+    inputData.value.notify_party_same_as_consignee = 'N'
+  }
+
+  const setWhsOrderMarketPk = pk => {
+    if (!inputData.value) {
+      return
+    }
+    inputData.value.wso_market_pk = String(pk ?? '').trim()
+  }
+
+  /** 选中 Plant ID 后按 market pk 拉 Market 明细，填充 Consignee / Notify */
+  const loadMarketPartyDetailByPk = async marketPk => {
+    const pk = String(marketPk ?? '').trim()
+    if (!pk || !inputData.value) {
+      return
+    }
+    try {
+      const { data } = await getWhsMarket(pk)
+      if (!data) {
+        return
+      }
+      inputData.value.consignee = mapWhsMarketPartyToAddress(data.consignee, 'CONSIGNEE')
+      const notifyParty = data.notify ?? data.notify_party
+      inputData.value.notify_party = mapWhsMarketPartyToAddress(notifyParty, 'NOTIFY_PARTY')
+      inputData.value.notify_party_same_as_consignee =
+        resolveWhsMarketNotifySameAsConsignee(notifyParty)
+      if (inputData.value.notify_party_same_as_consignee === 'Y') {
+        const name = String(inputData.value.notify_party?.add_address_name ?? '').trim()
+        if (!name) {
+          inputData.value.notify_party = { add_address_name: 'SAME AS CONSIGNEE' }
+        }
+      }
+    } catch (error) {
+      console.error('loadMarketPartyDetailByPk failed:', error)
+    }
+  }
+
   const loadPlantIdOptions = async marketName => {
     const name = String(marketName ?? '').trim()
     if (!name) {
@@ -1543,10 +1587,19 @@
 
     plantIdOptionsLoading.value = true
     try {
-      const { data } = await getWhsMarketOptions({ query: name })
+      const { data } = await getWhsMarketPlantOptions({ query: name })
       const list = Array.isArray(data) ? data : []
-      marketOptions.value = mergeMarketOptions(marketOptions.value, list)
-      plantIdOptionItems.value = buildPlantIdOptionItems(list, name, { matchMarket: false })
+      const group =
+        list.find(item => resolveGroupName(item) === name) ?? (list.length === 1 ? list[0] : null)
+      plantIdOptionItems.value = buildPlantIdOptionItems(group?.plant_options ?? [], '', {
+        matchMarket: false,
+      })
+      if (plantIdOptionItems.value.length === 0) {
+        const { data: optData } = await getWhsMarketOptions({ query: name })
+        const optList = Array.isArray(optData) ? optData : []
+        marketOptions.value = mergeMarketOptions(marketOptions.value, optList)
+        plantIdOptionItems.value = buildPlantIdOptionItems(optList, name, { matchMarket: false })
+      }
     } catch (error) {
       console.error('loadPlantIdOptions failed:', error)
       plantIdOptionItems.value = buildPlantIdOptionItems(marketOptions.value, name)
@@ -1560,29 +1613,48 @@
       return
     }
     const name = String(marketName ?? '').trim()
+    const currentName = String(inputData.value?.market?.market ?? '').trim()
+    if (name === currentName) {
+      return
+    }
     syncMarketDerivedFields(inputData.value, {
       ...defaultWhsMarketObject(),
       market: name,
       plant_id: '',
     })
+    setWhsOrderMarketPk('')
+    clearMarketParties()
   }
 
-  const onOrderPlantIdChange = plantId => {
+  const onOrderPlantIdChange = async plantId => {
     if (!inputData.value) {
       return
     }
-    const name = selectedMarketName.value
+    const name =
+      selectedMarketName.value ||
+      String(inputData.value?.market?.market ?? inputData.value?.wso_market ?? '').trim()
     const pid = String(plantId ?? '').trim()
-    const matched = findMarketOption(name, pid)
-    if (matched) {
-      syncMarketDerivedFields(inputData.value, matched)
+    if (!pid) {
+      syncMarketDerivedFields(inputData.value, {
+        market: name,
+        plant_id: '',
+      })
+      setWhsOrderMarketPk('')
+      clearMarketParties()
       return
     }
+    const matched = findPlantOption(pid)
     syncMarketDerivedFields(inputData.value, {
-      ...defaultWhsMarketObject(),
       market: name,
       plant_id: pid,
+      pk: matched?.pk ?? inputData.value?.wso_market_pk ?? '',
     })
+    setWhsOrderMarketPk(matched?.pk)
+    if (matched?.pk) {
+      await loadMarketPartyDetailByPk(matched.pk)
+      return
+    }
+    clearMarketParties()
   }
 
   const ensureMarketOptionVisible = () => {
@@ -1618,9 +1690,13 @@
     }
     await loadPlantIdOptions(current.market)
     if (current.plant_id) {
-      const matched = findMarketOption(current.market, current.plant_id)
+      const matched = findPlantOption(current.plant_id) ?? findMarketOption(current.market, current.plant_id)
       if (matched) {
-        syncMarketDerivedFields(inputData.value, matched)
+        syncMarketDerivedFields(inputData.value, {
+          ...matched,
+          market: current.market,
+          plant_id: current.plant_id,
+        })
         return
       }
     }
@@ -1651,23 +1727,6 @@
         return
       }
       await loadPlantIdOptions(marketName)
-    },
-  )
-
-  watch(
-    () => inputData.value?.market?.plant_id,
-    () => {
-      if (!inputData.value) {
-        return
-      }
-      const current = normalizeWhsMarketObject(inputData.value.market)
-      if (!current?.market || !current.plant_id) {
-        return
-      }
-      const matched = findMarketOption(current.market, current.plant_id)
-      if (matched) {
-        syncMarketDerivedFields(inputData.value, matched)
-      }
     },
   )
 
@@ -1837,6 +1896,32 @@
 
   .address-fields-col,
   .address-pair-row {
+    width: 100%;
+  }
+
+  .address-name-readonly {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .address-name-readonly__code {
+    flex: 0 1 100px;
+    min-width: 72px;
+    max-width: 100px;
+  }
+
+  .address-name-readonly__name {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;
+  }
+
+  .address-name-readonly__code :deep(.v-input),
+  .address-name-readonly__code :deep(.v-field),
+  .address-name-readonly__name :deep(.v-input),
+  .address-name-readonly__name :deep(.v-text-field) {
     width: 100%;
   }
 

@@ -19,3 +19,11 @@ export const getWhsMarketPlantOptions = params =>
     method: 'get',
     params,
   })
+
+/** GET /api/whsMarket/get — Market 详情（含 consignee / notify） */
+export const getWhsMarket = pk =>
+  service({
+    url: '/api/whsMarket/get',
+    method: 'get',
+    params: { pk },
+  })
