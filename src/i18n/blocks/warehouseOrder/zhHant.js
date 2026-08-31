@@ -71,6 +71,7 @@ export default {
     warehouseTitle: '倉庫',
     newPageTitle: '新建倉庫訂單',
     newTabTitle: '新建倉庫',
+    printTitle: 'Shipping Order',
     button: {
       save: '儲存',
       submit: '提交',
@@ -98,6 +99,9 @@ export default {
       copySuccess: '訂單號已複製到剪貼板。',
       submitted: '倉庫訂單已提交。',
       unknownTab: '未知標籤頁。',
+      carrierSoRequiredForPrint: '僅當已填寫 Carrier SO number 時才可列印。',
+      generating: '正在產生文件...',
+      generatePdfFailed: '產生 PDF 失敗。',
     },
     validation: {
       required: '{0} 為必填項。',

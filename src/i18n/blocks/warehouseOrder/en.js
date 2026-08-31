@@ -71,6 +71,7 @@ export default {
     warehouseTitle: 'Warehouse',
     newPageTitle: 'New Warehouse',
     newTabTitle: 'New Warehouse',
+    printTitle: 'Shipping Order',
     button: {
       save: 'Save',
       submit: 'Submit',
@@ -98,6 +99,9 @@ export default {
       copySuccess: 'Order No. copied to clipboard.',
       submitted: 'Warehouse order submitted.',
       unknownTab: 'Unknown tab.',
+      carrierSoRequiredForPrint: 'Print is only available when Carrier SO number is filled.',
+      generating: 'Generating document...',
+      generatePdfFailed: 'Failed to generate PDF.',
     },
     validation: {
       required: '{0} is required.',

@@ -40,10 +40,15 @@
       </template>
 
       <template #item.so_release="{ item }">
-        <v-icon
-          v-if="String(item.so_release ?? '').toUpperCase() === 'Y'"
+        <v-btn
+          v-if="hasSoNumber(item)"
+          color="primary"
+          density="comfortable"
           icon="mdi-file-pdf-box"
-          @click.prevent
+          :loading="printingPk === String(item.pk ?? '')"
+          size="large"
+          variant="text"
+          @click.stop="onOpenSoReleasePdf(item)"
         />
       </template>
 
@@ -63,6 +68,14 @@
       :loading="importLoading"
       @upload="onImportUpload"
     />
+
+    <v-dialog v-model="pdfDiaVis" height="900" persistent width="1200">
+      <FPdfPreview :pdf-url="pdfUrl || ''" :template-name="pdfTitle">
+        <template #tools-btn>
+          <v-btn color="red" density="comfortable" icon="$close" @click="closePdfPreview" />
+        </template>
+      </FPdfPreview>
+    </v-dialog>
   </FPageLayout>
 </template>
 
@@ -73,12 +86,14 @@
 
   import { recognizeWhsBookingFile, whsOrderQueryPage } from '@/api/whs-order'
   import FDataTableFooter from '@/components/FDataTableFooter.vue'
+  import FPdfPreview from '@/components/FPdfPreview.vue'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesWarehouseBookingFilter from '@/components/warehouse/PagesWarehouseBookingFilter.vue'
   import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
   import { mapWhsOrderListRow } from '@/composables/mapWhsOrderDetail'
   import { WHS_ORDER_RECOGNIZE_STORAGE_KEY } from '@/composables/useWarehouseBookingForm'
+  import { useWhsOrderPrint } from '@/composables/useWhsOrderPrint'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
 
@@ -86,6 +101,8 @@
   const appStore = useAppStore()
   const router = useRouter()
   const display = useDisplay()
+  const { pdfTitle, pdfUrl, pdfDiaVis, printingPk, closePdfPreview, onPrintWhsOrder } =
+    useWhsOrderPrint()
 
   defineOptions({ name: 'WarehouseBooking' })
   definePage({
@@ -245,6 +262,17 @@
     })
 
     return vvv
+  }
+
+  const hasSoNumber = item =>
+    Boolean(String(item?.wso_so_number ?? item?.bkg_so_number ?? '').trim())
+
+  const onOpenSoReleasePdf = async item => {
+    if (!hasSoNumber(item) || printingPk.value) {
+      return
+    }
+
+    await onPrintWhsOrder(item)
   }
 
   const mapWhsOrderRow = (item, index) => mapWhsOrderListRow(item, index)

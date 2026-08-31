@@ -71,6 +71,7 @@ export default {
     warehouseTitle: 'Kho',
     newPageTitle: 'Tạo đơn kho mới',
     newTabTitle: 'Kho mới',
+    printTitle: 'Shipping Order',
     button: {
       save: 'Lưu',
       submit: 'Gửi',
@@ -98,6 +99,9 @@ export default {
       copySuccess: 'Đã sao chép số đơn vào clipboard.',
       submitted: 'Đã gửi đơn kho.',
       unknownTab: 'Tab không xác định.',
+      carrierSoRequiredForPrint: 'Chỉ in được khi đã điền Carrier SO number.',
+      generating: 'Đang tạo tài liệu...',
+      generatePdfFailed: 'Tạo PDF thất bại.',
     },
     validation: {
       required: '{0} là bắt buộc.',

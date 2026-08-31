@@ -29,8 +29,20 @@
           </div>
         </template>
 
-        <template v-if="activedTab === 1 || activedTab === 2" #actions>
+        <template v-if="showToolbarActions" #actions>
           <v-btn
+            v-if="showPrintButton"
+            color="secondary"
+            :disabled="cardLoading"
+            size="small"
+            variant="flat"
+            @click.stop="onPrintHandle"
+          >
+            {{ editButton('print') }}
+          </v-btn>
+
+          <v-btn
+            v-if="activedTab === 1 || activedTab === 2"
             color="primary"
             :disabled="cardLoading || isEditLockedByOther || isOrderReceived || (isOrderSubmitted && activedTab === 1)"
             size="small"
@@ -41,6 +53,7 @@
           </v-btn>
 
           <v-btn
+            v-if="activedTab === 1 || activedTab === 2"
             color="primary"
             :disabled="cardLoading || isEditLockedByOther || isOrderReceived || isOrderSubmitted"
             size="small"
@@ -127,6 +140,14 @@
         </template>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="pdfDiaVis" height="900" persistent width="1200">
+      <FPdfPreview :pdf-url="pdfUrl || ''" :template-name="pdfTitle">
+        <template #tools-btn>
+          <v-btn color="red" density="comfortable" icon="$close" @click="closePdfPreview" />
+        </template>
+      </FPdfPreview>
+    </v-dialog>
   </div>
 </template>
 
@@ -134,6 +155,7 @@
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { whsOrderSubmit } from '@/api/whs-order'
+  import FPdfPreview from '@/components/FPdfPreview.vue'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
@@ -145,6 +167,7 @@
     resolveWhsConsignNo,
     scheduleWhsBookingTabSync,
   } from '@/composables/useWarehouseBookingTab'
+  import { useWhsOrderPrint } from '@/composables/useWhsOrderPrint'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
   import { useAppStore } from '@/stores/app'
 
@@ -185,6 +208,7 @@
   // const activedTab = ref(1)
   const bookingEmptyVis = ref(false)
   const submitConfirmVis = ref(false)
+  const { pdfTitle, pdfUrl, pdfDiaVis, closePdfPreview, onPrintWhsOrder } = useWhsOrderPrint()
 
   const queryData = async pk => {
     try {
@@ -217,6 +241,19 @@
     return status === 'submitted' || status === 'submited'
   })
   const isOrderReceived = computed(() => resolveOrderStatus() === 'received')
+  const showPrintButton = computed(() => isOrderSubmitted.value)
+  const showToolbarActions = computed(
+    () => showPrintButton.value || activedTab.value === 1 || activedTab.value === 2,
+  )
+
+  const onPrintHandle = async () => {
+    try {
+      cardLoading.value = true
+      await onPrintWhsOrder(inputData.value)
+    } finally {
+      cardLoading.value = false
+    }
+  }
 
   const onSaveHandle = async () => {
     if (isOrderReceived.value) {
