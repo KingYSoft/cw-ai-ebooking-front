@@ -71,6 +71,7 @@ export default {
     warehouseTitle: '仓库',
     newPageTitle: '新建仓库订单',
     newTabTitle: '新建仓库',
+    printTitle: '发货订单',
     button: {
       save: '保存',
       submit: '提交',
@@ -98,6 +99,9 @@ export default {
       copySuccess: '订单号已复制到剪贴板。',
       submitted: '仓库订单已提交。',
       unknownTab: '未知标签页。',
+      carrierSoRequiredForPrint: '仅当已填写 Carrier SO number 时才可打印。',
+      generating: '正在生成文档...',
+      generatePdfFailed: '生成 PDF 失败。',
     },
     validation: {
       required: '{0} 为必填项。',
