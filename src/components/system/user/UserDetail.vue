@@ -188,24 +188,14 @@
               no-data-text="$vuetify.custom.app.searchMore"
               no-filter
               variant="outlined"
-              @update:focused="
-                $event => {
-                  if ($event) {
-                    loadCountryOptions(inputData.country_code)
-                  }
-                }
-              "
-              @update:model-value="
-                $event => {
-                  inputData.country_code = $event || null
-                }
-              "
-              @update:search="loadCountryOptions"
+              @update:focused="onCountryFocused"
+              @update:model-value="onCountryModelValue"
+              @update:search="onCountrySearch"
             >
               <template #item="{ props: itemProps, item }">
                 <v-list-item
                   v-bind="itemProps"
-                  :subtitle="item.raw?.subtitle || ''"
+                  :subtitle="item.raw?.desc || ''"
                   :title="item.raw?.code"
                 />
               </template>
@@ -256,21 +246,9 @@
               return-object
               :rules="inputDataRules.org_header"
               variant="outlined"
-              @update:focused="
-                $event => {
-                  if ($event) {
-                    loadOrgHeaderList(inputData.org_header_code)
-                  }
-                }
-              "
-              @update:model-value="
-                $event => {
-                  inputData.org_header_pk = $event?.pk ?? null
-                  inputData.org_header_code = $event?.org_code ?? null
-                  inputData.org_header_name = $event?.org_full_name ?? null
-                }
-              "
-              @update:search="loadOrgHeaderList"
+              @update:focused="onOrgHeaderFocused"
+              @update:model-value="onOrgHeaderModelValue"
+              @update:search="onOrgHeaderSearch"
             >
               <template #item="{ props, item }">
                 <v-list-item
@@ -302,28 +280,18 @@
               :loading="portLoading"
               :menu-props="{ maxWidth: '100%' }"
               min-width="100%"
-              :model-value="inputData.port_code"
+              :model-value="inputData.home_port"
               no-data-text="$vuetify.custom.app.searchMore"
               no-filter
               variant="outlined"
-              @update:focused="
-                $event => {
-                  if ($event) {
-                    loadPortOptions(inputData.port_code)
-                  }
-                }
-              "
-              @update:model-value="
-                $event => {
-                  inputData.port_code = $event || null
-                }
-              "
-              @update:search="loadPortOptions"
+              @update:focused="onPortFocused"
+              @update:model-value="onPortModelValue"
+              @update:search="onPortSearch"
             >
               <template #item="{ props: itemProps, item }">
                 <v-list-item
                   v-bind="itemProps"
-                  :subtitle="item.raw?.subtitle || ''"
+                  :subtitle="item.raw?.rl_port_name || ''"
                   :title="item.raw?.code"
                 />
               </template>
@@ -341,7 +309,8 @@
 
 <script setup>
   import { ref } from 'vue'
-  import { organizationQueryOrgAddress } from '@/api/organization'
+  import { queryCountryList } from '@/api/dict'
+  import { portCodeQueryOptions } from '@/api/port_code'
   import { userQueryOrgHeader } from '@/api/user'
   import { debounceFn } from '@/api/utils'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -369,6 +338,49 @@
     default: () => ({}),
   })
 
+  /**
+   * Vuetify autocomplete emits update:search with '' (or selected title) on select/blur.
+   * Only query while focused; after select, suppress sync search until user types again.
+   */
+  const createRemoteSearchControl = ({ getSelected, load, onSelect }) => {
+    const focused = ref(false)
+    let suppressSearch = false
+
+    const onFocused = isFocused => {
+      focused.value = !!isFocused
+      if (isFocused) {
+        suppressSearch = false
+        load(getSelected())
+      }
+    }
+
+    const onModelValue = value => {
+      onSelect?.(value)
+      // Selected: ignore following search sync. Cleared: allow next search.
+      suppressSearch = value != null && value !== ''
+    }
+
+    const onSearch = query => {
+      if (!focused.value) {
+        return
+      }
+      const q = String(query ?? '')
+      const selected = String(getSelected() ?? '')
+      if (suppressSearch) {
+        if (q === '' || q === selected) {
+          return
+        }
+        suppressSearch = false
+      }
+      if (q === selected) {
+        return
+      }
+      load(query)
+    }
+
+    return { onFocused, onModelValue, onSearch }
+  }
+
   const orgHeaderList = ref([])
   const orgHeaderLoading = ref(false)
   const loadOrgHeaderList = debounceFn(async (query, signal) => {
@@ -382,43 +394,26 @@
       orgHeaderLoading.value = false
     }
   })
-
-  const mapOrgAddressCodeOptions = (items, codeKey) => {
-    const seen = new Set()
-    const options = []
-    for (const item of items ?? []) {
-      const code = String(item?.[codeKey] ?? '').trim()
-      if (!code || seen.has(code)) {
-        continue
-      }
-      seen.add(code)
-      options.push({
-        code,
-        subtitle: item.company_name || item.code || '',
-        raw: item,
-      })
-    }
-    return options
-  }
+  const {
+    onFocused: onOrgHeaderFocused,
+    onModelValue: onOrgHeaderModelValue,
+    onSearch: onOrgHeaderSearch,
+  } = createRemoteSearchControl({
+    getSelected: () => inputData.value?.org_header_code,
+    load: loadOrgHeaderList,
+    onSelect: value => {
+      inputData.value.org_header_pk = value?.pk ?? null
+      inputData.value.org_header_code = value?.org_code ?? null
+      inputData.value.org_header_name = value?.org_full_name ?? null
+    },
+  })
 
   const ensureSelectedOption = (options, selectedCode) => {
     const code = String(selectedCode ?? '').trim()
     if (!code || options.some(item => item.code === code)) {
       return options
     }
-    return [{ code, subtitle: '' }, ...options]
-  }
-
-  const queryOrgAddressOptions = async (query, codeKey, signal) => {
-    const { data } = await organizationQueryOrgAddress(
-      {
-        query,
-        skipCount: 0,
-        maxResultCount: 50,
-      },
-      signal,
-    )
-    return mapOrgAddressCodeOptions(data?.items ?? [], codeKey)
+    return [{ code, desc: '', rl_port_name: '' }, ...options]
   }
 
   const countryOptions = ref([])
@@ -426,7 +421,15 @@
   const loadCountryOptions = debounceFn(async (query, signal) => {
     countryLoading.value = true
     try {
-      const options = await queryOrgAddressOptions(query, 'country_code', signal)
+      const { data } = await queryCountryList({ query }, signal)
+      const list = Array.isArray(data?.list) ? data.list : []
+      const options = list
+        .map(item => ({
+          ...item,
+          code: String(item?.code ?? '').trim(),
+          desc: item?.desc ?? '',
+        }))
+        .filter(item => item.code)
       countryOptions.value = ensureSelectedOption(options, inputData.value?.country_code)
     } catch (error) {
       console.log(error)
@@ -434,18 +437,48 @@
       countryLoading.value = false
     }
   })
+  const {
+    onFocused: onCountryFocused,
+    onModelValue: onCountryModelValue,
+    onSearch: onCountrySearch,
+  } = createRemoteSearchControl({
+    getSelected: () => inputData.value?.country_code,
+    load: loadCountryOptions,
+    onSelect: value => {
+      inputData.value.country_code = value || null
+    },
+  })
 
   const portOptions = ref([])
   const portLoading = ref(false)
   const loadPortOptions = debounceFn(async (query, signal) => {
     portLoading.value = true
     try {
-      const options = await queryOrgAddressOptions(query, 'port_code', signal)
-      portOptions.value = ensureSelectedOption(options, inputData.value?.port_code)
+      const { data } = await portCodeQueryOptions({ query }, signal)
+      const list = Array.isArray(data?.list) ? data.list : []
+      const options = list
+        .map(item => ({
+          ...item,
+          code: String(item?.rl_code ?? '').trim(),
+          rl_port_name: item?.rl_port_name ?? '',
+        }))
+        .filter(item => item.code)
+      portOptions.value = ensureSelectedOption(options, inputData.value?.home_port)
     } catch (error) {
       console.log(error)
     } finally {
       portLoading.value = false
     }
+  })
+  const {
+    onFocused: onPortFocused,
+    onModelValue: onPortModelValue,
+    onSearch: onPortSearch,
+  } = createRemoteSearchControl({
+    getSelected: () => inputData.value?.home_port,
+    load: loadPortOptions,
+    onSelect: value => {
+      inputData.value.home_port = value || null
+    },
   })
 </script>

@@ -64,7 +64,7 @@
     email_address: '',
     mobile_phone: '',
     country_code: '',
-    port_code: '',
+    home_port: '',
     can_login: 1,
     is_admin: 0,
     is_active: 1,
