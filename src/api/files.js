@@ -23,3 +23,18 @@ export const previewFile = (params, signal) =>
     responseType: 'blob',
     signal,
   })
+
+/** GET pdfPath（如 /files/pdf/...）并返回 blob */
+export const previewFileByPath = (pdfPath, signal) => {
+  const url = String(pdfPath ?? '').trim()
+  if (!url) {
+    return Promise.reject(new Error('pdfPath is empty'))
+  }
+
+  return service({
+    url,
+    method: 'get',
+    responseType: 'blob',
+    signal,
+  })
+}
