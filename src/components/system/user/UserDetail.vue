@@ -64,8 +64,39 @@
               </template>
             </v-text-field>
           </v-col>
+
+          <v-col :cols="rescols('c12m6')">
+            <v-switch
+              v-model="inputData.can_login"
+              color="primary"
+              density="compact"
+              :false-value="0"
+              hide-details
+              :true-value="1"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120 mr-2">{{ userField('canLogin') }}:</div>
+              </template>
+            </v-switch>
+          </v-col>
+
+          <v-col :cols="rescols('c12m6')">
+            <v-switch
+              v-model="inputData.is_active"
+              color="success"
+              density="compact"
+              :false-value="0"
+              hide-details
+              :true-value="1"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120 mr-2">{{ userField('isActive') }}:</div>
+              </template>
+            </v-switch>
+          </v-col>
         </v-row>
       </v-card-text>
+
       <!-- Employee Details -->
       <v-card-text class="py-2">
         <v-divider>
@@ -140,18 +171,49 @@
           </v-col>
 
           <v-col :cols="rescols('c12m6')">
-            <v-switch
-              v-model="inputData.can_login"
+            <v-autocomplete
+              auto-select-first
+              autocomplete="off"
+              clearable
               color="primary"
               density="compact"
-              :false-value="0"
               hide-details
-              :true-value="1"
+              item-title="code"
+              item-value="code"
+              :items="countryOptions"
+              :loading="countryLoading"
+              :menu-props="{ maxWidth: '100%' }"
+              min-width="100%"
+              :model-value="inputData.country_code"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    loadCountryOptions(inputData.country_code)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.country_code = $event || null
+                }
+              "
+              @update:search="loadCountryOptions"
             >
-              <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">{{ userField('canLogin') }}:</div>
+              <template #item="{ props: itemProps, item }">
+                <v-list-item
+                  v-bind="itemProps"
+                  :subtitle="item.raw?.subtitle || ''"
+                  :title="item.raw?.code"
+                />
               </template>
-            </v-switch>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('country') }}:</div>
+              </template>
+            </v-autocomplete>
           </v-col>
 
           <v-col :cols="rescols('c12m6')">
@@ -171,7 +233,7 @@
             </v-text-field>
           </v-col>
 
-          <v-col :cols="rescols('c12')">
+          <v-col :cols="rescols('c12m6')">
             <v-autocomplete
               id="1@org_header"
               auto-select-first
@@ -225,30 +287,51 @@
               </template>
             </v-autocomplete>
           </v-col>
-        </v-row>
-      </v-card-text>
 
-      <v-card-text class="py-2">
-        <v-divider>
-          <div class="text-center text-caption text-uppercase text-on-surface opacity-70 mb-8">
-            {{ userSection('employeeStatus') }}
-          </div>
-        </v-divider>
-
-        <v-row dense>
           <v-col :cols="rescols('c12m6')">
-            <v-switch
-              v-model="inputData.is_active"
-              color="success"
+            <v-autocomplete
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
               density="compact"
-              :false-value="0"
               hide-details
-              :true-value="1"
+              item-title="code"
+              item-value="code"
+              :items="portOptions"
+              :loading="portLoading"
+              :menu-props="{ maxWidth: '100%' }"
+              min-width="100%"
+              :model-value="inputData.port_code"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    loadPortOptions(inputData.port_code)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.port_code = $event || null
+                }
+              "
+              @update:search="loadPortOptions"
             >
-              <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">{{ userField('isActive') }}:</div>
+              <template #item="{ props: itemProps, item }">
+                <v-list-item
+                  v-bind="itemProps"
+                  :subtitle="item.raw?.subtitle || ''"
+                  :title="item.raw?.code"
+                />
               </template>
-            </v-switch>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('port') }}:</div>
+              </template>
+            </v-autocomplete>
           </v-col>
         </v-row>
       </v-card-text>
@@ -257,7 +340,8 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
+  import { organizationQueryOrgAddress } from '@/api/organization'
   import { userQueryOrgHeader } from '@/api/user'
   import { debounceFn } from '@/api/utils'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -284,6 +368,7 @@
     type: Object,
     default: () => ({}),
   })
+
   const orgHeaderList = ref([])
   const orgHeaderLoading = ref(false)
   const loadOrgHeaderList = debounceFn(async (query, signal) => {
@@ -297,5 +382,70 @@
       orgHeaderLoading.value = false
     }
   })
-  onMounted(() => {})
+
+  const mapOrgAddressCodeOptions = (items, codeKey) => {
+    const seen = new Set()
+    const options = []
+    for (const item of items ?? []) {
+      const code = String(item?.[codeKey] ?? '').trim()
+      if (!code || seen.has(code)) {
+        continue
+      }
+      seen.add(code)
+      options.push({
+        code,
+        subtitle: item.company_name || item.code || '',
+        raw: item,
+      })
+    }
+    return options
+  }
+
+  const ensureSelectedOption = (options, selectedCode) => {
+    const code = String(selectedCode ?? '').trim()
+    if (!code || options.some(item => item.code === code)) {
+      return options
+    }
+    return [{ code, subtitle: '' }, ...options]
+  }
+
+  const queryOrgAddressOptions = async (query, codeKey, signal) => {
+    const { data } = await organizationQueryOrgAddress(
+      {
+        query,
+        skipCount: 0,
+        maxResultCount: 50,
+      },
+      signal,
+    )
+    return mapOrgAddressCodeOptions(data?.items ?? [], codeKey)
+  }
+
+  const countryOptions = ref([])
+  const countryLoading = ref(false)
+  const loadCountryOptions = debounceFn(async (query, signal) => {
+    countryLoading.value = true
+    try {
+      const options = await queryOrgAddressOptions(query, 'country_code', signal)
+      countryOptions.value = ensureSelectedOption(options, inputData.value?.country_code)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      countryLoading.value = false
+    }
+  })
+
+  const portOptions = ref([])
+  const portLoading = ref(false)
+  const loadPortOptions = debounceFn(async (query, signal) => {
+    portLoading.value = true
+    try {
+      const options = await queryOrgAddressOptions(query, 'port_code', signal)
+      portOptions.value = ensureSelectedOption(options, inputData.value?.port_code)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      portLoading.value = false
+    }
+  })
 </script>

@@ -37,7 +37,7 @@
   import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
 
-  const { common, userEdit } = useSystemPageI18n()
+  const { common, userEdit, userEditTab } = useSystemPageI18n()
 
   defineOptions({ name: 'SystemUserNew' })
   definePage({
@@ -63,6 +63,8 @@
     full_name: '',
     email_address: '',
     mobile_phone: '',
+    country_code: '',
+    port_code: '',
     can_login: 1,
     is_admin: 0,
     is_active: 1,
