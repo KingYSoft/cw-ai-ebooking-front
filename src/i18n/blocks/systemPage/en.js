@@ -67,6 +67,8 @@ export default {
           mobilePhone: 'Mobile Phone',
           canLogin: 'Can Login',
           lastLogonDate: 'Last Logon Date',
+          country: 'Country',
+          port: 'Port',
           orgHeader: 'Org Header',
           isActive: 'Is Active',
         },

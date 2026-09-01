@@ -64,8 +64,39 @@
               </template>
             </v-text-field>
           </v-col>
+
+          <v-col :cols="rescols('c12m6')">
+            <v-switch
+              v-model="inputData.can_login"
+              color="primary"
+              density="compact"
+              :false-value="0"
+              hide-details
+              :true-value="1"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120 mr-2">{{ userField('canLogin') }}:</div>
+              </template>
+            </v-switch>
+          </v-col>
+
+          <v-col :cols="rescols('c12m6')">
+            <v-switch
+              v-model="inputData.is_active"
+              color="success"
+              density="compact"
+              :false-value="0"
+              hide-details
+              :true-value="1"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120 mr-2">{{ userField('isActive') }}:</div>
+              </template>
+            </v-switch>
+          </v-col>
         </v-row>
       </v-card-text>
+
       <!-- Employee Details -->
       <v-card-text class="py-2">
         <v-divider>
@@ -140,18 +171,39 @@
           </v-col>
 
           <v-col :cols="rescols('c12m6')">
-            <v-switch
-              v-model="inputData.can_login"
+            <v-autocomplete
+              auto-select-first
+              autocomplete="off"
+              clearable
               color="primary"
               density="compact"
-              :false-value="0"
               hide-details
-              :true-value="1"
+              item-title="code"
+              item-value="code"
+              :items="countryOptions"
+              :loading="countryLoading"
+              :menu-props="{ maxWidth: '100%' }"
+              min-width="100%"
+              :model-value="inputData.country_code"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              variant="outlined"
+              @update:focused="onCountryFocused"
+              @update:model-value="onCountryModelValue"
+              @update:search="onCountrySearch"
             >
-              <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">{{ userField('canLogin') }}:</div>
+              <template #item="{ props: itemProps, item }">
+                <v-list-item
+                  v-bind="itemProps"
+                  :subtitle="item.raw?.desc || ''"
+                  :title="item.raw?.code"
+                />
               </template>
-            </v-switch>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('country') }}:</div>
+              </template>
+            </v-autocomplete>
           </v-col>
 
           <v-col :cols="rescols('c12m6')">
@@ -171,7 +223,7 @@
             </v-text-field>
           </v-col>
 
-          <v-col :cols="rescols('c12')">
+          <v-col :cols="rescols('c12m6')">
             <v-autocomplete
               id="1@org_header"
               auto-select-first
@@ -194,21 +246,9 @@
               return-object
               :rules="inputDataRules.org_header"
               variant="outlined"
-              @update:focused="
-                $event => {
-                  if ($event) {
-                    loadOrgHeaderList(inputData.org_header_code)
-                  }
-                }
-              "
-              @update:model-value="
-                $event => {
-                  inputData.org_header_pk = $event?.pk ?? null
-                  inputData.org_header_code = $event?.org_code ?? null
-                  inputData.org_header_name = $event?.org_full_name ?? null
-                }
-              "
-              @update:search="loadOrgHeaderList"
+              @update:focused="onOrgHeaderFocused"
+              @update:model-value="onOrgHeaderModelValue"
+              @update:search="onOrgHeaderSearch"
             >
               <template #item="{ props, item }">
                 <v-list-item
@@ -225,30 +265,41 @@
               </template>
             </v-autocomplete>
           </v-col>
-        </v-row>
-      </v-card-text>
 
-      <v-card-text class="py-2">
-        <v-divider>
-          <div class="text-center text-caption text-uppercase text-on-surface opacity-70 mb-8">
-            {{ userSection('employeeStatus') }}
-          </div>
-        </v-divider>
-
-        <v-row dense>
           <v-col :cols="rescols('c12m6')">
-            <v-switch
-              v-model="inputData.is_active"
-              color="success"
+            <v-autocomplete
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
               density="compact"
-              :false-value="0"
               hide-details
-              :true-value="1"
+              item-title="code"
+              item-value="code"
+              :items="portOptions"
+              :loading="portLoading"
+              :menu-props="{ maxWidth: '100%' }"
+              min-width="100%"
+              :model-value="inputData.home_port"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              variant="outlined"
+              @update:focused="onPortFocused"
+              @update:model-value="onPortModelValue"
+              @update:search="onPortSearch"
             >
-              <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">{{ userField('isActive') }}:</div>
+              <template #item="{ props: itemProps, item }">
+                <v-list-item
+                  v-bind="itemProps"
+                  :subtitle="item.raw?.rl_port_name || ''"
+                  :title="item.raw?.code"
+                />
               </template>
-            </v-switch>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('port') }}:</div>
+              </template>
+            </v-autocomplete>
           </v-col>
         </v-row>
       </v-card-text>
@@ -257,7 +308,9 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { ref } from 'vue'
+  import { queryCountryList } from '@/api/dict'
+  import { portCodeQueryOptions } from '@/api/port_code'
   import { userQueryOrgHeader } from '@/api/user'
   import { debounceFn } from '@/api/utils'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -284,6 +337,50 @@
     type: Object,
     default: () => ({}),
   })
+
+  /**
+   * Vuetify autocomplete emits update:search with '' (or selected title) on select/blur.
+   * Only query while focused; after select, suppress sync search until user types again.
+   */
+  const createRemoteSearchControl = ({ getSelected, load, onSelect }) => {
+    const focused = ref(false)
+    let suppressSearch = false
+
+    const onFocused = isFocused => {
+      focused.value = !!isFocused
+      if (isFocused) {
+        suppressSearch = false
+        load(getSelected())
+      }
+    }
+
+    const onModelValue = value => {
+      onSelect?.(value)
+      // Selected: ignore following search sync. Cleared: allow next search.
+      suppressSearch = value != null && value !== ''
+    }
+
+    const onSearch = query => {
+      if (!focused.value) {
+        return
+      }
+      const q = String(query ?? '')
+      const selected = String(getSelected() ?? '')
+      if (suppressSearch) {
+        if (q === '' || q === selected) {
+          return
+        }
+        suppressSearch = false
+      }
+      if (q === selected) {
+        return
+      }
+      load(query)
+    }
+
+    return { onFocused, onModelValue, onSearch }
+  }
+
   const orgHeaderList = ref([])
   const orgHeaderLoading = ref(false)
   const loadOrgHeaderList = debounceFn(async (query, signal) => {
@@ -297,5 +394,91 @@
       orgHeaderLoading.value = false
     }
   })
-  onMounted(() => {})
+  const {
+    onFocused: onOrgHeaderFocused,
+    onModelValue: onOrgHeaderModelValue,
+    onSearch: onOrgHeaderSearch,
+  } = createRemoteSearchControl({
+    getSelected: () => inputData.value?.org_header_code,
+    load: loadOrgHeaderList,
+    onSelect: value => {
+      inputData.value.org_header_pk = value?.pk ?? null
+      inputData.value.org_header_code = value?.org_code ?? null
+      inputData.value.org_header_name = value?.org_full_name ?? null
+    },
+  })
+
+  const ensureSelectedOption = (options, selectedCode) => {
+    const code = String(selectedCode ?? '').trim()
+    if (!code || options.some(item => item.code === code)) {
+      return options
+    }
+    return [{ code, desc: '', rl_port_name: '' }, ...options]
+  }
+
+  const countryOptions = ref([])
+  const countryLoading = ref(false)
+  const loadCountryOptions = debounceFn(async (query, signal) => {
+    countryLoading.value = true
+    try {
+      const { data } = await queryCountryList({ query }, signal)
+      const list = Array.isArray(data?.list) ? data.list : []
+      const options = list
+        .map(item => ({
+          ...item,
+          code: String(item?.code ?? '').trim(),
+          desc: item?.desc ?? '',
+        }))
+        .filter(item => item.code)
+      countryOptions.value = ensureSelectedOption(options, inputData.value?.country_code)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      countryLoading.value = false
+    }
+  })
+  const {
+    onFocused: onCountryFocused,
+    onModelValue: onCountryModelValue,
+    onSearch: onCountrySearch,
+  } = createRemoteSearchControl({
+    getSelected: () => inputData.value?.country_code,
+    load: loadCountryOptions,
+    onSelect: value => {
+      inputData.value.country_code = value || null
+    },
+  })
+
+  const portOptions = ref([])
+  const portLoading = ref(false)
+  const loadPortOptions = debounceFn(async (query, signal) => {
+    portLoading.value = true
+    try {
+      const { data } = await portCodeQueryOptions({ query }, signal)
+      const list = Array.isArray(data?.list) ? data.list : []
+      const options = list
+        .map(item => ({
+          ...item,
+          code: String(item?.rl_code ?? '').trim(),
+          rl_port_name: item?.rl_port_name ?? '',
+        }))
+        .filter(item => item.code)
+      portOptions.value = ensureSelectedOption(options, inputData.value?.home_port)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      portLoading.value = false
+    }
+  })
+  const {
+    onFocused: onPortFocused,
+    onModelValue: onPortModelValue,
+    onSearch: onPortSearch,
+  } = createRemoteSearchControl({
+    getSelected: () => inputData.value?.home_port,
+    load: loadPortOptions,
+    onSelect: value => {
+      inputData.value.home_port = value || null
+    },
+  })
 </script>

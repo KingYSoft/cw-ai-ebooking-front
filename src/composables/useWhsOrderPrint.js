@@ -1,5 +1,5 @@
 import { onBeforeUnmount, ref } from 'vue'
-import { previewFile } from '@/api/files'
+import { previewFile, previewFileByPath } from '@/api/files'
 import { shipmentPdfGenerate } from '@/api/shipment'
 import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
 import { useAppStore } from '@/stores/app'
@@ -36,6 +36,22 @@ export function useWhsOrderPrint() {
   const hasCarrierSoNumber = order =>
     Boolean(String(order?.bkg_so_number ?? order?.wso_so_number ?? '').trim())
 
+  const resolvePdfBlob = async data => {
+    const pdfPath = String(data?.pdfPath ?? data?.pdf_path ?? '').trim()
+    if (pdfPath) {
+      return previewFileByPath(pdfPath)
+    }
+
+    if (data?.document_pk && data?.document_source) {
+      return previewFile({
+        document_source: data.document_source,
+        document_pk: data.document_pk,
+      })
+    }
+
+    return null
+  }
+
   const generateWhsOrderPdf = async order => {
     const businessId = order?.id
     const businessPk = String(order?.pk ?? '').trim()
@@ -56,7 +72,7 @@ export function useWhsOrderPrint() {
         template_code: WHS_PRINT_TEMPLATE_CODE,
         version_no: 'v1',
       })
-      if (!success || !data?.document_pk || !data?.document_source) {
+      if (!success || !data) {
         appStore.openMessage({
           content: editMessage('generatePdfFailed'),
           color: 'error',
@@ -64,10 +80,15 @@ export function useWhsOrderPrint() {
         return false
       }
 
-      const blob = await previewFile({
-        document_source: data.document_source,
-        document_pk: data.document_pk,
-      })
+      const blob = await resolvePdfBlob(data)
+      if (!blob) {
+        appStore.openMessage({
+          content: editMessage('generatePdfFailed'),
+          color: 'error',
+        })
+        return false
+      }
+
       revokePreviewUrl()
       previewObjectUrl = URL.createObjectURL(blob)
       pdfUrl.value = previewObjectUrl

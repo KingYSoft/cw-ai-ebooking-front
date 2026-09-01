@@ -67,6 +67,8 @@ export default {
           mobilePhone: 'Điện thoại',
           canLogin: 'Có thể đăng nhập',
           lastLogonDate: 'Ngày đăng nhập cuối',
+          country: 'Quốc gia',
+          port: 'Cảng',
           orgHeader: 'Tổ chức đầu mối',
           isActive: 'Đang hoạt động',
         },

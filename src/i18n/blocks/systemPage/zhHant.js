@@ -67,6 +67,8 @@ export default {
           mobilePhone: '手機號碼',
           canLogin: '可登入',
           lastLogonDate: '最後登入日期',
+          country: '國家',
+          port: '港口',
           orgHeader: '組織抬頭',
           isActive: '是否啟用',
         },
