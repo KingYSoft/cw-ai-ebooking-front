@@ -772,9 +772,14 @@ export function buildWhsOrderSaveWithItemFilesFormData(form, options = {}) {
 }
 
 export function mapWhsOrderListRow(item, index) {
+  const warehouseCode = String(item?.wso_warehouse_code ?? item?.warehouse_code ?? '').trim()
   return {
     ...item,
     index,
+    wso_warehouse_code: warehouseCode || item?.wso_warehouse_code || null,
+    warehouse_code: warehouseCode || item?.warehouse_code || null,
+    wso_market: item?.wso_market ?? item?.market?.market ?? null,
+    wso_delivery_mode: item?.wso_delivery_mode ?? item?.bkg_delivery_mode ?? null,
     shipper_name: item.shipper_name ?? item.shipper?.add_address_name ?? null,
     consignee_name: item.consignee_name ?? item.consignee?.add_address_name ?? null,
   }
