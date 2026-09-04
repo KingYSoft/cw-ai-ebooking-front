@@ -127,74 +127,29 @@
 
   const defaultData = () => ({
     field1: {
-      key: 'wso_etd',
-      title: filter('etd'),
-      keyItems: [{ key: 'wso_etd', title: filter('etd') }],
+      key: 'CreationTime',
+      title: filter('creationTime'),
+      keyItems: [
+        { key: 'wso_etd', title: filter('etd') },
+        { key: 'CreationTime', title: filter('creationTime') },
+      ],
       val: '',
       op: '=',
-      start: appStore.utils.formatDate(appStore.utils.addDays(new Date(), -20)),
-      end: appStore.utils.formatDate(appStore.utils.addDays(new Date(), 20)),
+      start: appStore.utils.formatDate(appStore.utils.addDays(new Date(), -7)),
+      end: appStore.utils.formatDate(new Date()),
     },
     field2: {
       key: 'wso_consign_no',
-      title: filter('jobNumber'),
-      keyItems: [{ key: 'wso_consign_no', title: filter('jobNumber') }],
-      val: '',
-      op: '=',
-    },
-    wso_consign_no: {
-      key: 'wso_consign_no',
-      title: filter('jobNo'),
-      val: '',
-      op: '=',
-      componentProps: {},
-      componentType: 'v-text-field',
-      more: true,
-    },
-    wso_house_bill: {
-      key: 'wso_house_bill',
-      title: filter('hblNo'),
-      val: '',
-      op: '=',
-      componentProps: {},
-      componentType: 'v-text-field',
-      more: true,
-    },
-    wso_so_number: {
-      key: 'wso_so_number',
       title: filter('soNumber'),
+      keyItems: [{ key: 'wso_consign_no', title: filter('soNumber') }],
       val: '',
       op: '=',
-      componentProps: {},
-      componentType: 'v-text-field',
-      more: true,
     },
-    wso_booking_reference: {
-      key: 'wso_booking_reference',
-      title: filter('bookingNo'),
+    wso_market: {
+      key: 'wso_market',
+      title: filter('marketId'),
       val: '',
       op: '=',
-      componentProps: {},
-      componentType: 'v-text-field',
-      more: true,
-    },
-    wso_origin: {
-      key: 'wso_origin',
-      title: filter('origin'),
-      val: '',
-      op: '=',
-      componentProps: {},
-      componentType: 'v-text-field',
-      more: true,
-    },
-    wso_destination: {
-      key: 'wso_destination',
-      title: filter('destination'),
-      val: '',
-      op: '=',
-      componentProps: {},
-      componentType: 'v-text-field',
-      more: true,
     },
   })
 
@@ -213,31 +168,60 @@
   const totalCount = ref(0)
 
   const tblHeaders = computed(() => [
+    { title: header('warehouse'), key: 'wso_warehouse_code', align: 'start', minWidth: '120px' },
     { title: header('status'), key: 'wso_status', align: 'start', minWidth: '90px' },
-    { title: header('orderNo'), key: 'wso_consign_no', align: 'start', minWidth: '140px' },
-    { title: header('soRelease'), key: 'so_release', align: 'start', minWidth: '100px' },
-    { title: header('transMode'), key: 'wso_transport_mode', align: 'start', minWidth: '110px' },
-    { title: header('container'), key: 'wso_shipment_type', align: 'start', minWidth: '110px' },
-    { title: header('houseBill'), key: 'wso_house_bill', align: 'start', minWidth: '120px' },
-    { title: header('soNumber'), key: 'wso_so_number', align: 'start', minWidth: '130px' },
-    { title: header('bookingRef'), key: 'wso_booking_reference', align: 'start', minWidth: '120px' },
+    { title: header('soNumber'), key: 'wso_consign_no', align: 'start', minWidth: '165px' },
     {
-      title: header('descriptionOfGoods'),
-      key: 'wso_goods_description',
+      title: header('containerNumber'),
+      key: 'wso_so_number',
       align: 'start',
       minWidth: '180px',
-      cellProps: { class: 'text-truncate' },
+      width: '180px',
     },
-    { title: header('origin'), key: 'wso_origin', align: 'start', minWidth: '100px' },
-    { title: header('destination'), key: 'wso_destination', align: 'start', minWidth: '100px' },
-    { title: header('targetDelivery'), key: 'wso_delivery_due_date', align: 'start', minWidth: '120px' },
-    { title: header('crd'), key: 'wso_cargo_ready', align: 'start', minWidth: '100px' },
+    {
+      title: header('soRelease'),
+      key: 'so_release',
+      align: 'center',
+      minWidth: '120px',
+      width: '120px',
+    },
+    { title: header('marketId'), key: 'wso_market', align: 'start', minWidth: '120px' },
+    {
+      title: header('deliveryMode'),
+      key: 'wso_delivery_mode',
+      align: 'start',
+      minWidth: '120px',
+    },
+    { title: header('container'), key: 'wso_shipment_type', align: 'start', minWidth: '110px' },
+    { title: header('origin'), key: 'wso_origin', align: 'start', minWidth: '90px' },
+    { title: header('destination'), key: 'wso_destination', align: 'start', minWidth: '90px' },
+    {
+      title: header('targetDelivery'),
+      key: 'wso_delivery_due_date',
+      align: 'start',
+      minWidth: '120px',
+    },
     { title: header('etd'), key: 'wso_etd', align: 'start', minWidth: '100px' },
     { title: header('eta'), key: 'wso_eta', align: 'start', minWidth: '100px' },
-    { title: header('grossWeight'), key: 'wso_actual_weight', align: 'end', minWidth: '140px' },
-    { title: header('cbm'), key: 'wso_actual_volume', align: 'end', minWidth: '100px' },
-    { title: header('chargeable'), key: 'wso_actual_chargeable', align: 'end', minWidth: '100px' },
-    { title: header('packages'), key: 'wso_total_package_count', align: 'end', minWidth: '100px' },
+    {
+      title: header('grossWeight'),
+      key: 'wso_actual_weight',
+      align: 'start',
+      minWidth: '100px',
+    },
+    { title: header('cbm'), key: 'wso_actual_volume', align: 'start', minWidth: '80px' },
+    {
+      title: header('chargeable'),
+      key: 'wso_actual_chargeable',
+      align: 'start',
+      minWidth: '100px',
+    },
+    {
+      title: header('packages'),
+      key: 'wso_total_package_count',
+      align: 'start',
+      minWidth: '90px',
+    },
     { title: header('createUser'), key: 'create_user', align: 'start', minWidth: '100px' },
     { title: header('modifyUser'), key: 'last_modify_user', align: 'start', minWidth: '100px' },
   ])
@@ -254,12 +238,10 @@
       { key: inputSearchData.value.field2.key, op: '=', val: inputSearchData.value.field2.val },
     ]
 
-    Object.keys(inputSearchData.value).forEach(key => {
-      const ee = inputSearchData.value[key]
-      if (ee?.more) {
-        vvv.push({ key: ee.key, op: ee.op, val: ee.val })
-      }
-    })
+    const marketVal = String(inputSearchData.value.wso_market?.val ?? '').trim()
+    if (marketVal) {
+      vvv.push({ key: 'wso_market', op: '=', val: marketVal })
+    }
 
     return vvv
   }

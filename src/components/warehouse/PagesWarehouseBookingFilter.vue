@@ -5,7 +5,7 @@
     @on-search="onSearch"
   >
     <template #default>
-      <v-col :cols="rescols('c12m4s6')">
+      <v-col cols="auto">
         <div class="d-flex align-center ga-1">
           <v-select
             v-model="inputSearchData.field1.key"
@@ -16,12 +16,8 @@
             item-title="title"
             item-value="key"
             :items="inputSearchData.field1.keyItems"
-            :list-props="{
-              density: 'compact',
-            }"
-            :menu-props="{
-              'max-width': 'auto',
-            }"
+            :list-props="{ density: 'compact' }"
+            :menu-props="{ 'max-width': 'auto' }"
             no-data-text="$vuetify.custom.app.searchMore"
             no-filter
             variant="underlined"
@@ -32,7 +28,7 @@
             v-model:date-value="inputSearchData.field1.start"
             :date-props="{
               placeholder: filter('startDate'),
-              clearable: false,
+              clearable: true,
             }"
             :max="inputSearchData.field1.end ?? '2099-12-31'"
             min="2000-01-01"
@@ -44,7 +40,7 @@
             v-model:date-value="inputSearchData.field1.end"
             :date-props="{
               placeholder: filter('endDate'),
-              clearable: false,
+              clearable: true,
             }"
             max="2099-12-31"
             :min="inputSearchData.field1.start ?? '2000-01-01'"
@@ -54,8 +50,8 @@
         </div>
       </v-col>
 
-      <v-col :cols="rescols('c12m4s6')">
-        <div class="d-flex align-center ga-1">
+      <v-col cols="auto">
+        <div class="d-flex align-center ga-1 filter-field-compact">
           <v-select
             v-model="inputSearchData.field2.key"
             auto-select-first
@@ -65,63 +61,60 @@
             item-title="title"
             item-value="key"
             :items="inputSearchData.field2.keyItems"
-            :list-props="{
-              density: 'compact',
-            }"
-            max-width="120"
-            :menu-props="{
-              'max-width': 'auto',
-            }"
-            min-width="120"
+            :list-props="{ density: 'compact' }"
+            :menu-props="{ 'max-width': 'auto' }"
             no-data-text="$vuetify.custom.app.searchMore"
             no-filter
             variant="underlined"
-            width="120"
+            width="88"
           />
 
           <v-text-field
             v-model="inputSearchData.field2.val"
-            class="flex-1-0"
             clearable
             color="primary"
             density="compact"
             hide-details
-            min-width="auto"
-            :placeholder="filter('shipperJobPlaceholder')"
+            :placeholder="filter('searchPlaceholder')"
             type="input"
             variant="outlined"
-            width="auto"
+            width="168"
           />
         </div>
       </v-col>
-    </template>
 
-    <template #more>
-      <v-col v-for="ii in getMoreItems" :key="ii.key" :cols="rescols('c12m6l4')">
-        <f-input
-          v-model="inputSearchData[ii.key].val"
-          v-model:op="inputSearchData[ii.key].op"
-          :component-props="inputSearchData[ii.key].componentProps"
-          :component-type="inputSearchData[ii.key].componentType"
-        >
-          <template #prepend>
-            <div class="text-caption text-end w-label">{{ inputSearchData[ii.key].title }}:</div>
-          </template>
-        </f-input>
+      <v-col cols="auto">
+        <div class="d-flex align-center ga-1 filter-field-compact">
+          <div class="text-caption text-end filter-label">{{ filter('marketId') }}:</div>
+
+          <v-select
+            v-model="inputSearchData.wso_market.val"
+            auto-select-first
+            autocomplete="off"
+            clearable
+            density="compact"
+            hide-details
+            item-title="market"
+            item-value="market"
+            :items="marketOptions"
+            :menu-props="{ maxWidth: '280px' }"
+            no-filter
+            variant="outlined"
+            width="160"
+          />
+        </div>
       </v-col>
     </template>
   </PageFilterBar>
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-
+  import { onMounted, ref } from 'vue'
+  import { getWhsMarketOptions } from '@/api/whs-market'
   import PageFilterBar from '@/components/PageFilterBar.vue'
-  import { useLayoutCols } from '@/composables/useLayoutCols'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
 
   const { filter } = useWarehouseOrderPageI18n()
-  const { rescols } = useLayoutCols()
 
   defineOptions({
     name: 'PagesWarehouseBookingFilter',
@@ -133,6 +126,21 @@
   })
 
   const emit = defineEmits(['on-search', 'on-reset-more'])
+  const marketOptions = ref([])
+
+  const loadMarketOptions = async () => {
+    try {
+      const { data } = await getWhsMarketOptions()
+      marketOptions.value = Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error(error)
+      marketOptions.value = []
+    }
+  }
+
+  onMounted(() => {
+    loadMarketOptions()
+  })
 
   const onResetMore = () => {
     emit('on-reset-more')
@@ -141,16 +149,14 @@
   const onSearch = () => {
     emit('on-search')
   }
-
-  const getMoreItems = computed(() => {
-    const items = inputSearchData.value
-    const aa = []
-    Object.keys(items).forEach(key => {
-      const ee = items[key]
-      if (ee.more) {
-        aa.push(ee)
-      }
-    })
-    return aa
-  })
 </script>
+
+<style lang="scss" scoped>
+  .filter-field-compact {
+    flex-wrap: nowrap;
+  }
+
+  .filter-label {
+    min-width: 64px;
+  }
+</style>
