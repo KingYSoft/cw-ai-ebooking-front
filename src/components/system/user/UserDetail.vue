@@ -1,6 +1,56 @@
 <template>
   <v-row dense>
     <v-col :cols="rescols('c12m6')">
+      <v-card-text class="user-role-options py-2 pb-0">
+        <div class="user-role-options__row">
+          <v-checkbox
+            v-model="inputData.is_freight"
+            class="ma-0"
+            color="primary"
+            density="compact"
+            :false-value="0"
+            hide-details
+            :true-value="1"
+          >
+            <template #label>
+              <span class="text-caption text-no-wrap">{{ userField('moduleFreight') }}</span>
+            </template>
+          </v-checkbox>
+
+          <v-checkbox
+            v-model="inputData.is_warehouse"
+            class="ma-0"
+            color="primary"
+            density="compact"
+            :false-value="0"
+            hide-details
+            :true-value="1"
+          >
+            <template #label>
+              <span class="text-caption text-no-wrap">{{ userField('moduleWarehouse') }}</span>
+            </template>
+          </v-checkbox>
+        </div>
+
+        <v-radio-group
+          v-model="inputData.user_type"
+          class="user-role-options__radios ma-0 pa-0"
+          color="primary"
+          density="compact"
+          hide-details
+        >
+          <v-radio
+            v-for="option in userTypeOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            <template #label>
+              <span class="text-caption text-no-wrap">{{ option.title }}</span>
+            </template>
+          </v-radio>
+        </v-radio-group>
+      </v-card-text>
+
       <!-- Login Info -->
       <v-card-text class="py-2">
         <v-divider>
@@ -224,46 +274,28 @@
           </v-col>
 
           <v-col :cols="rescols('c12m6')">
-            <v-autocomplete
+            <FRemoteTableMenu
               id="1@org_header"
-              auto-select-first
-              autocomplete="off"
-              clearable
-              color="primary"
-              density="compact"
-              hide-details
-              item-title="org_code"
-              item-value="org_code"
-              :items="orgHeaderList"
-              :loading="orgHeaderLoading"
-              :menu-props="{
-                'max-width': '100%',
+              v-model="inputData.org_header_code"
+              bind-key="code"
+              :bind-value="inputData.org_header_code"
+              display-key="code"
+              :fetch-method="organizationQueryOrgAddress"
+              :headers="addrTableHeaders"
+              :text-field-props="{
+                'min-width': '100%',
+                rules: inputDataRules.org_header,
               }"
-              min-width="100%"
-              :model-value="inputData.org_header_code"
-              no-data-text="$vuetify.custom.app.searchMore"
-              no-filter
-              return-object
-              :rules="inputDataRules.org_header"
-              variant="outlined"
-              @update:focused="onOrgHeaderFocused"
-              @update:model-value="onOrgHeaderModelValue"
-              @update:search="onOrgHeaderSearch"
+              virtual
+              @click-clear="onClearOrgHeader"
+              @row-select="onSelectOrgHeader"
             >
-              <template #item="{ props, item }">
-                <v-list-item
-                  v-bind="props"
-                  :subtitle="item.raw?.org_full_name || ''"
-                  :title="item.raw?.org_code"
-                />
-              </template>
-
               <template #prepend>
                 <div class="text-caption text-end w-label-120">
                   {{ userField('orgHeader') }}<span class="text-red">*</span>:
                 </div>
               </template>
-            </v-autocomplete>
+            </FRemoteTableMenu>
           </v-col>
 
           <v-col :cols="rescols('c12m6')">
@@ -301,6 +333,74 @@
               </template>
             </v-autocomplete>
           </v-col>
+
+          <v-col cols="12">
+            <v-text-field
+              v-model="inputData.company_name"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('companyName') }}:</div>
+              </template>
+            </v-text-field>
+          </v-col>
+
+          <v-col cols="12">
+            <v-text-field
+              v-model="inputData.address1"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('address1') }}:</div>
+              </template>
+            </v-text-field>
+          </v-col>
+
+          <v-col cols="12">
+            <v-text-field
+              v-model="inputData.address2"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('address2') }}:</div>
+              </template>
+            </v-text-field>
+          </v-col>
+
+          <v-col :cols="rescols('c12m6')">
+            <v-text-field
+              v-model="inputData.sj_department"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              readonly
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-120">{{ userField('sjDepartment') }}:</div>
+              </template>
+            </v-text-field>
+          </v-col>
         </v-row>
       </v-card-text>
     </v-col>
@@ -308,17 +408,21 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { queryCountryList } from '@/api/dict'
+  import { organizationQueryOrgAddress } from '@/api/organization'
   import { portCodeQueryOptions } from '@/api/port_code'
-  import { userQueryOrgHeader } from '@/api/user'
   import { debounceFn } from '@/api/utils'
+  import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
+  import { mapWarehouseAddrTableHeaders } from '@/composables/mapWarehouseOrderTableHeaders'
   import { useLayoutCols } from '@/composables/useLayoutCols'
   import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
+  import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
 
   defineOptions({ name: 'UserDetail' })
 
   const { userField, userSection } = useSystemPageI18n()
+  const { addrTable } = useWarehouseOrderPageI18n()
   const { rescols } = useLayoutCols()
 
   defineProps({
@@ -337,6 +441,16 @@
     type: Object,
     default: () => ({}),
   })
+
+  if (!inputData.value.user_type) {
+    inputData.value.user_type = 'SHIPPER'
+  }
+  if (inputData.value.is_freight == null) {
+    inputData.value.is_freight = 0
+  }
+  if (inputData.value.is_warehouse == null) {
+    inputData.value.is_warehouse = 0
+  }
 
   /**
    * Vuetify autocomplete emits update:search with '' (or selected title) on select/blur.
@@ -381,32 +495,81 @@
     return { onFocused, onModelValue, onSearch }
   }
 
-  const orgHeaderList = ref([])
-  const orgHeaderLoading = ref(false)
-  const loadOrgHeaderList = debounceFn(async (query, signal) => {
-    orgHeaderLoading.value = true
-    try {
-      const { data } = await userQueryOrgHeader({ query, skipCount: 0, maxResultCount: 50 }, signal)
-      orgHeaderList.value = Array.isArray(data?.items) ? data.items : []
-    } catch (error) {
-      console.log(error)
-    } finally {
-      orgHeaderLoading.value = false
+  const userTypeOptions = computed(() => [
+    { value: 'SHIPPER', title: userField('userTypeShipper') },
+    { value: 'CUSTOMER', title: userField('userTypeCustomer') },
+    { value: 'AGENT', title: userField('userTypeAgent') },
+    { value: 'SJ_STAFF', title: userField('userTypeSjStaff') },
+  ])
+
+  const applyOrgAddressToUser = row => {
+    if (!row) {
+      inputData.value.org_header_pk = null
+      inputData.value.org_header_code = null
+      inputData.value.org_header_name = null
+      inputData.value.company_name = null
+      inputData.value.address1 = null
+      inputData.value.address2 = null
+      inputData.value.sj_department = null
+      return
     }
-  })
-  const {
-    onFocused: onOrgHeaderFocused,
-    onModelValue: onOrgHeaderModelValue,
-    onSearch: onOrgHeaderSearch,
-  } = createRemoteSearchControl({
-    getSelected: () => inputData.value?.org_header_code,
-    load: loadOrgHeaderList,
-    onSelect: value => {
-      inputData.value.org_header_pk = value?.pk ?? null
-      inputData.value.org_header_code = value?.org_code ?? null
-      inputData.value.org_header_name = value?.org_full_name ?? null
-    },
-  })
+
+    inputData.value.org_header_pk = row.org_pk ?? row.org_header_pk ?? row.pk ?? null
+    inputData.value.org_header_code = row.code ?? row.org_code ?? row.short_code ?? null
+    inputData.value.org_header_name =
+      row.company_name ?? row.org_full_name ?? row.address_name ?? null
+    inputData.value.company_name = row.company_name ?? row.org_full_name ?? null
+    inputData.value.address1 = row.address1 ?? null
+    inputData.value.address2 = row.address2 ?? null
+    inputData.value.sj_department =
+      row.sj_department ?? row.dept_name ?? row.department ?? row.dept_code ?? null
+  }
+
+  const onSelectOrgHeader = row => {
+    applyOrgAddressToUser(row)
+  }
+
+  const onClearOrgHeader = () => {
+    applyOrgAddressToUser(null)
+  }
+
+  const addrTableHeaders = computed(() =>
+    mapWarehouseAddrTableHeaders(
+      [
+        {
+          key: 'code',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        {
+          key: 'company_name',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        {
+          key: 'address_code',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        {
+          key: 'address1',
+          align: 'start',
+          maxWidth: '200',
+          cellProps: { class: 'text-truncate' },
+          minWidth: '140',
+        },
+        { key: 'city', align: 'start', minWidth: '140' },
+        { key: 'country_code', align: 'start', minWidth: '140' },
+      ],
+      addrTable,
+    ),
+  )
 
   const ensureSelectedOption = (options, selectedCode) => {
     const code = String(selectedCode ?? '').trim()
@@ -482,3 +645,53 @@
     },
   })
 </script>
+
+<style lang="scss" scoped>
+  .user-role-options {
+    display: flex;
+    flex-direction: column;
+    padding-left: 32px;
+
+    :deep(.v-selection-control) {
+      --v-selection-control-size: 28px;
+    }
+
+    :deep(.v-selection-control__input .v-icon) {
+      font-size: 18px;
+    }
+  }
+
+  .user-role-options__row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+
+    :deep(.v-checkbox) {
+      flex: 0 0 7.5rem;
+      width: 7.5rem;
+      max-width: 7.5rem;
+    }
+  }
+
+  .user-role-options__radios {
+    display: flex !important;
+    flex: none;
+    flex-direction: column;
+    width: 100%;
+
+    :deep(.v-input__control),
+    :deep(.v-selection-control-group) {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+    }
+
+    :deep(.v-selection-control) {
+      flex: 0 0 7.5rem;
+      width: 7.5rem;
+      max-width: 7.5rem;
+    }
+  }
+</style>
