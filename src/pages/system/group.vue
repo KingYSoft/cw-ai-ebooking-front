@@ -82,6 +82,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
+      permissions: 'PERMISSION_SYSTEM_GROUP',
     },
   })
 
@@ -176,7 +177,9 @@
   queryData()
 
   function onRowDblClick(event, { item }) {
-    if (event?.target?.closest?.('.v-selection-control, button, a, input, textarea, [role="button"]'))
+    if (
+      event?.target?.closest?.('.v-selection-control, button, a, input, textarea, [role="button"]')
+    )
       return
     router.push({
       name: 'system_group_edit-pk',

@@ -86,15 +86,15 @@
 
   import { recognizeWhsBookingFile, whsOrderQueryPage } from '@/api/whs-order'
   import FDataTableFooter from '@/components/FDataTableFooter.vue'
-  import FPdfPreview from '@/components/FPdfPreview.vue'
   import FPageLayout from '@/components/FPageLayout.vue'
+  import FPdfPreview from '@/components/FPdfPreview.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import PagesWarehouseBookingFilter from '@/components/warehouse/PagesWarehouseBookingFilter.vue'
   import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
   import { mapWhsOrderListRow } from '@/composables/mapWhsOrderDetail'
   import { WHS_ORDER_RECOGNIZE_STORAGE_KEY } from '@/composables/useWarehouseBookingForm'
-  import { useWhsOrderPrint } from '@/composables/useWhsOrderPrint'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
+  import { useWhsOrderPrint } from '@/composables/useWhsOrderPrint'
   import { useAppStore } from '@/stores/app'
 
   const { filter, header, list, import: importI18n } = useWarehouseOrderPageI18n()
@@ -114,6 +114,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
+      permissions: 'PERMISSION_WAREHOUSE_BOOKING',
     },
   })
 

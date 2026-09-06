@@ -197,6 +197,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
+      permissions: 'PERMISSION_FREIGHT_BOOKING',
     },
   })
 
@@ -279,8 +280,18 @@
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
     { title: tableHeader('bookingNo'), key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
     { title: tableHeader('status'), key: 'bkg_status', align: 'start', minWidth: '100px' },
-    { title: tableHeader('transMode'), key: 'bkg_transport_mode', align: 'start', minWidth: '120px' },
-    { title: tableHeader('containerMode'), key: 'bkg_packing_mode', align: 'start', minWidth: '140px' },
+    {
+      title: tableHeader('transMode'),
+      key: 'bkg_transport_mode',
+      align: 'start',
+      minWidth: '120px',
+    },
+    {
+      title: tableHeader('containerMode'),
+      key: 'bkg_packing_mode',
+      align: 'start',
+      minWidth: '140px',
+    },
     // { title: 'Shipment No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
     { title: tableHeader('houseBill'), key: 'bkg_house_bill', align: 'start', minWidth: '120px' },
     {
@@ -300,13 +311,28 @@
       cellProps: { class: 'text-truncate' },
     },
     { title: tableHeader('origin'), key: 'bkg_origin', align: 'start', minWidth: '100px' },
-    { title: tableHeader('destination'), key: 'bkg_destination', align: 'start', minWidth: '100px' },
+    {
+      title: tableHeader('destination'),
+      key: 'bkg_destination',
+      align: 'start',
+      minWidth: '100px',
+    },
     { title: tableHeader('crd'), key: 'bkg_cargo_ready', align: 'start', minWidth: '100px' },
     { title: tableHeader('etd'), key: 'bkg_etd', align: 'start', minWidth: '100px' },
     { title: tableHeader('eta'), key: 'bkg_eta', align: 'start', minWidth: '100px' },
-    { title: tableHeader('grossWeight'), key: 'bkg_actual_weight', align: 'start', minWidth: '120px' },
+    {
+      title: tableHeader('grossWeight'),
+      key: 'bkg_actual_weight',
+      align: 'start',
+      minWidth: '120px',
+    },
     { title: tableHeader('cbm'), key: 'bkg_actual_volume', align: 'start', minWidth: '80px' },
-    { title: tableHeader('freightTerm'), key: 'bkg_freight_terms', align: 'start', minWidth: '120px' },
+    {
+      title: tableHeader('freightTerm'),
+      key: 'bkg_freight_terms',
+      align: 'start',
+      minWidth: '120px',
+    },
     { title: tableHeader('inco'), key: 'bkg_inco', align: 'start', minWidth: '80px' },
   ])
 

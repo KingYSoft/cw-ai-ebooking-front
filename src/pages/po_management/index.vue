@@ -14,7 +14,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      //   permissions: 'PERMISSION_PO_MANAGEMENT',
+      permissions: 'PERMISSION_PO_MANAGEMENT',
     },
   })
   const { t } = useLocale()

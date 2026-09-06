@@ -63,7 +63,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      //   permissions: 'PERMISSION_SYSTEM',
+      permissions: 'PERMISSION_SYSTEM_SECURITY',
     },
   })
   const skeletonLoading = ref(true)

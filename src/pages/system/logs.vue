@@ -268,6 +268,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
+      permissions: 'PERMISSION_SYSTEM_LOGS',
     },
   })
 
@@ -350,12 +351,32 @@
   const tblHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '40px' },
     { title: '#', key: 'index', align: 'center', sortable: false, minWidth: '40px' },
-    { title: logsList('headers.serviceName'), key: 'servicename', align: 'start', minWidth: '180px' },
+    {
+      title: logsList('headers.serviceName'),
+      key: 'servicename',
+      align: 'start',
+      minWidth: '180px',
+    },
     { title: logsList('headers.methodName'), key: 'methodname', align: 'start', minWidth: '180px' },
-    { title: logsList('headers.clientIp'), key: 'clientipaddress', align: 'start', minWidth: '140px' },
+    {
+      title: logsList('headers.clientIp'),
+      key: 'clientipaddress',
+      align: 'start',
+      minWidth: '140px',
+    },
     { title: logsList('headers.userName'), key: 'user_name', align: 'start', minWidth: '140px' },
-    { title: logsList('headers.executionTime'), key: 'executiontime', align: 'start', minWidth: '180px' },
-    { title: logsList('headers.durationMs'), key: 'executionduration', align: 'start', minWidth: '130px' },
+    {
+      title: logsList('headers.executionTime'),
+      key: 'executiontime',
+      align: 'start',
+      minWidth: '180px',
+    },
+    {
+      title: logsList('headers.durationMs'),
+      key: 'executionduration',
+      align: 'start',
+      minWidth: '130px',
+    },
   ])
 
   const buildFilter = () => {
