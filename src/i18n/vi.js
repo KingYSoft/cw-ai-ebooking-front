@@ -1,4 +1,5 @@
 import bookingPage from './blocks/bookingPage/vi'
+import dashboardPage from './blocks/dashboardPage/vi'
 import systemPage from './blocks/systemPage/vi'
 import warehouseOrder from './blocks/warehouseOrder/vi'
 
@@ -190,6 +191,7 @@ export default {
       system_security: 'Bảo mật',
       system_logs: 'Nhật ký',
     },
+    dashboardPage,
     poPage: {
       title: {
         list: 'Danh sách PO',
