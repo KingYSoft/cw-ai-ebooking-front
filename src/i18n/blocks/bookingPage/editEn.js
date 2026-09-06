@@ -12,7 +12,7 @@ export default {
     booking: 'Booking',
     additionalDetails: 'Additional Details',
     docs: 'Docs',
-    log: 'Log',
+    shippingInstruction: 'Shipping Instruction',
   },
   detail: {
     section: {
@@ -33,6 +33,10 @@ export default {
       container: 'Container',
       origin: 'Origin',
       destination: 'Destination',
+      polLoad: 'POL(Load)',
+      podDischarge: 'POD(Discharge)',
+      vessel: 'Vessel',
+      voyage: 'Voyage',
       grossWeight: 'Gross Weight',
       cbm: 'CBM',
       volumeWeight: 'Volume Weight',

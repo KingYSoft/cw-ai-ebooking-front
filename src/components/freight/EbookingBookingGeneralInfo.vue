@@ -11,7 +11,7 @@
 
           <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
             <FRemoteTableMenu
-              id="1@shipper_name"
+              :id="`${fieldIdPrefix}@shipper_name`"
               v-model="inputData.shipper.add_address_name"
               bind-key="code"
               :bind-value="inputData.shipper.add_address_code"
@@ -91,7 +91,7 @@
 
           <div class="mt-1 d-flex align-start flex-column flex-wrap ga-1">
             <FRemoteTableMenu
-              id="1@consignee_name"
+              :id="`${fieldIdPrefix}@consignee_name`"
               v-model="inputData.consignee.add_address_name"
               bind-key="code"
               :bind-value="inputData.consignee.add_address_code"
@@ -298,11 +298,11 @@
         </v-col>
       </v-row> -->
 
-      <v-row dense>
+      <v-row v-if="showCargoFields" dense>
         <v-col :cols="rescols('c12l3s6')">
           <div class="d-flex align-start flex-column flex-wrap ga-1">
             <v-select
-              id="1@bkg_transport_mode"
+              :id="`${fieldIdPrefix}@bkg_transport_mode`"
               v-model="inputData.bkg_transport_mode"
               auto-select-first
               autocomplete="off"
@@ -329,7 +329,7 @@
             </v-select>
 
             <v-select
-              id="1@bkg_packing_mode"
+              :id="`${fieldIdPrefix}@bkg_packing_mode`"
               v-model="inputData.bkg_packing_mode"
               auto-select-first
               autocomplete="off"
@@ -355,7 +355,7 @@
             </v-select>
 
             <v-autocomplete
-              id="1@bkg_origin"
+              :id="`${fieldIdPrefix}@bkg_origin`"
               auto-select-first
               autocomplete="off"
               clearable
@@ -406,7 +406,7 @@
             </v-autocomplete>
 
             <v-autocomplete
-              id="1@bkg_destination"
+              :id="`${fieldIdPrefix}@bkg_destination`"
               auto-select-first
               autocomplete="off"
               clearable
@@ -457,7 +457,7 @@
             </v-autocomplete>
 
             <v-number-input
-              id="1@bkg_actual_weight"
+              :id="`${fieldIdPrefix}@bkg_actual_weight`"
               v-model="inputData.bkg_actual_weight"
               class="hide-step"
               color="primary"
@@ -502,7 +502,7 @@
             </v-number-input>
 
             <v-number-input
-              id="1@bkg_actual_volume"
+              :id="`${fieldIdPrefix}@bkg_actual_volume`"
               v-model="inputData.bkg_actual_volume"
               class="hide-step"
               color="primary"
@@ -628,7 +628,7 @@
 
             <div class="d-flex align-center ga-0 w-100">
               <v-number-input
-                id="1@bkg_total_package_count"
+                :id="`${fieldIdPrefix}@bkg_total_package_count`"
                 v-model="inputData.bkg_total_package_count"
                 class="hide-step flex-1-1"
                 color="primary"
@@ -677,7 +677,7 @@
         <v-col :cols="rescols('c12l3s6')">
           <div class="d-flex align-start flex-column flex-wrap ga-1">
             <FDatePicker
-              id="1@bkg_etd"
+              :id="`${fieldIdPrefix}@bkg_etd`"
               v-model:date-value="inputData.bkg_etd"
               max="2099-12-31"
               min="2000-01-01"
@@ -688,7 +688,7 @@
             </FDatePicker>
 
             <FDatePicker
-              id="1@bkg_eta"
+              :id="`${fieldIdPrefix}@bkg_eta`"
               v-model:date-value="inputData.bkg_eta"
               max="2099-12-31"
               min="2000-01-01"
@@ -699,7 +699,7 @@
             </FDatePicker>
 
             <FDatePicker
-              id="1@bkg_cargo_ready"
+              :id="`${fieldIdPrefix}@bkg_cargo_ready`"
               v-model:date-value="inputData.bkg_cargo_ready"
               max="2099-12-31"
               min="2000-01-01"
@@ -710,7 +710,7 @@
             </FDatePicker>
 
             <v-select
-              id="1@bkg_release_type"
+              :id="`${fieldIdPrefix}@bkg_release_type`"
               v-model="inputData.bkg_release_type"
               auto-select-first
               autocomplete="off"
@@ -733,7 +733,7 @@
             </v-select>
 
             <v-select
-              id="1@bkg_service_level"
+              :id="`${fieldIdPrefix}@bkg_service_level`"
               v-model="inputData.bkg_service_level"
               auto-select-first
               autocomplete="off"
@@ -756,7 +756,7 @@
             </v-select>
 
             <v-select
-              id="1@bkg_delivery_mode"
+              :id="`${fieldIdPrefix}@bkg_delivery_mode`"
               v-model="inputData.bkg_delivery_mode"
               auto-select-first
               autocomplete="off"
@@ -798,7 +798,7 @@
         <v-col :cols="rescols('c12l3s6')">
           <div class="d-flex align-start flex-column flex-wrap ga-1">
             <v-select
-              id="1@bkg_inco"
+              :id="`${fieldIdPrefix}@bkg_inco`"
               v-model="inputData.bkg_inco"
               auto-select-first
               autocomplete="off"
@@ -825,7 +825,7 @@
             </v-select>
 
             <v-select
-              id="1@bkg_freight_terms"
+              :id="`${fieldIdPrefix}@bkg_freight_terms`"
               v-model="inputData.bkg_freight_terms"
               auto-select-first
               autocomplete="off"
@@ -851,7 +851,7 @@
             </v-select>
 
             <v-number-input
-              id="1@bkg_goods_value"
+              :id="`${fieldIdPrefix}@bkg_goods_value`"
               v-model="inputData.bkg_goods_value"
               class="hide-step"
               color="primary"
@@ -885,7 +885,7 @@
 
               <template #append>
                 <v-select
-                  id="1@bkg_goods_value_currency"
+                  :id="`${fieldIdPrefix}@bkg_goods_value_currency`"
                   v-model="inputData.bkg_goods_value_currency"
                   auto-select-first
                   autocomplete="off"
@@ -906,7 +906,7 @@
             </v-number-input>
 
             <v-number-input
-              id="1@bkg_insurance_value"
+              :id="`${fieldIdPrefix}@bkg_insurance_value`"
               v-model="inputData.bkg_insurance_value"
               class="hide-step"
               color="primary"
@@ -940,7 +940,7 @@
 
               <template #append>
                 <v-select
-                  id="1@bkg_insurance_currency"
+                  :id="`${fieldIdPrefix}@bkg_insurance_currency`"
                   v-model="inputData.bkg_insurance_currency"
                   auto-select-first
                   autocomplete="off"
@@ -1038,6 +1038,14 @@
           </div>
         </v-col>
       </v-row>
+
+      <BookingShippingInstructionRoute
+        v-if="showSiRouteFields"
+        v-model:input-data="inputData"
+        :input-data-rules="inputDataRules"
+        :query-port-list="queryPortList"
+        @query-port="queryPort"
+      />
     </v-card-text>
 
     <template v-if="showContainerTable">
@@ -1082,7 +1090,7 @@
 
         <template #item.pac_container_type="{ item }">
           <FRemoteTableMenu
-            :id="'1@pac_container_type' + item.id"
+            :id="`${fieldIdPrefix}@pac_container_type${item.id}`"
             v-model="item.pac_container_type"
             display-key="code"
             :fetch-method="fetchContainerTypes"
@@ -1099,7 +1107,7 @@
 
         <template #item.pac_container_count="{ item }">
           <v-number-input
-            :id="'1@pac_container_count' + item.id"
+            :id="`${fieldIdPrefix}@pac_container_count${item.id}`"
             v-model="item.pac_container_count"
             color="primary"
             control-variant="hidden"
@@ -1351,6 +1359,18 @@
       type: Array,
       default: () => [],
     },
+    fieldIdPrefix: {
+      type: [String, Number],
+      default: '1',
+    },
+    showSiRouteFields: {
+      type: Boolean,
+      default: false,
+    },
+    showCargoFields: {
+      type: Boolean,
+      default: true,
+    },
   })
   const { inputDataRules, queryPortList } = toRefs(props)
 
@@ -1400,7 +1420,9 @@
 
   const showContainerTable = computed(
     () =>
-      inputData.value.bkg_transport_mode === 'SEA' && inputData.value.bkg_packing_mode === 'FCL',
+      props.showCargoFields &&
+      inputData.value.bkg_transport_mode === 'SEA' &&
+      inputData.value.bkg_packing_mode === 'FCL',
   )
 
   const onTransportChange = mode => {
