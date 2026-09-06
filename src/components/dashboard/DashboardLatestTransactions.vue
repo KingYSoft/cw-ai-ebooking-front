@@ -1,11 +1,7 @@
 <template>
   <v-card class="dashboard-panel" elevation="2" rounded="lg">
-    <div class="dashboard-panel__header d-flex align-center justify-space-between px-5 pt-5 pb-2">
+    <div class="dashboard-panel__header d-flex align-center px-5 pt-5 pb-2">
       <div class="dashboard-panel__title text-h6 font-weight-bold">{{ title }}</div>
-
-      <v-btn color="primary" size="small" variant="flat" @click="$emit('more')">
-        {{ moreLabel }}
-      </v-btn>
     </div>
 
     <v-card-text class="dashboard-panel__body pt-2 pb-4 px-4">
@@ -48,10 +44,6 @@
       type: String,
       required: true,
     },
-    moreLabel: {
-      type: String,
-      required: true,
-    },
     emptyText: {
       type: String,
       default: '',
@@ -62,7 +54,7 @@
     },
   })
 
-  defineEmits(['more', 'select'])
+  defineEmits(['select'])
 </script>
 
 <style lang="scss" scoped>
@@ -86,10 +78,6 @@
 
   .dashboard-panel__header {
     flex: 0 0 auto;
-  }
-
-  .dashboard-panel__header .v-btn {
-    flex-shrink: 0;
   }
 
   .dashboard-panel__body {

@@ -13,9 +13,7 @@
         <DashboardLatestTransactions
           :empty-text="d('emptyTransactions')"
           :items="transactionItems"
-          :more-label="d('more')"
           :title="d('latestTransactions')"
-          @more="goBookingList"
           @select="openBooking"
         />
       </v-col>
