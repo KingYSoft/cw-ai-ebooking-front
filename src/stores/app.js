@@ -174,11 +174,7 @@ export const useAppStore = defineStore('app', {
          * @returns
          */
         isValidDate(dateStr) {
-          if (
-            !/^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[0-5])$/.test(
-              dateStr,
-            )
-          ) {
+          if (!/^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[0-5])$/.test(dateStr)) {
             return false
           }
           const [year, month, day] = dateStr.split('-').map(a => Number(a))

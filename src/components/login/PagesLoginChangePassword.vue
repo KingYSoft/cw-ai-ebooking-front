@@ -183,4 +183,10 @@
       }
     }
   }
+  watch(
+    () => diaVis.value,
+    () => {
+      inputPwd.value = {}
+    },
+  )
 </script>
