@@ -37,8 +37,6 @@
           </v-list>
         </v-menu>
       </template>
-
-      <template #bottom />
     </v-data-table>
 
     <v-dialog v-model="userDialogVisible" max-width="1100" persistent>
