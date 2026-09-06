@@ -10,6 +10,8 @@
     <FLoadingDialog :dia-vis="!appStore.appAlive" :title="t('$vuetify.custom.app.loading')" />
     <MessageSnack />
   </template>
+  <!-- 重新登录弹框挂在 App 根节点，任何页面收到 401 都能直接弹出。 -->
+  <GlobalReloginDialog />
 </template>
 
 <script setup>

@@ -143,7 +143,7 @@
               <v-divider />
 
               <v-card-actions>
-                <!-- <v-btn
+                <v-btn
                   color="on-surface"
                   prepend-icon="mdi-lock"
                   variant="text"
@@ -155,7 +155,7 @@
                   "
                 >
                   Change Password
-                </v-btn> -->
+                </v-btn>
 
                 <v-spacer />
 
