@@ -93,6 +93,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
+      permissions: 'PERMISSION_SYSTEM_USER',
     },
   })
 
@@ -144,7 +145,12 @@
     { title: userList('headers.loginName'), key: 'login_name', align: 'start', minWidth: '160px' },
     { title: userList('headers.fullName'), key: 'full_name', align: 'start', minWidth: '160px' },
     { title: userList('headers.email'), key: 'email_address', align: 'start', minWidth: '220px' },
-    { title: userList('headers.mobilePhone'), key: 'mobile_phone', align: 'start', minWidth: '150px' },
+    {
+      title: userList('headers.mobilePhone'),
+      key: 'mobile_phone',
+      align: 'start',
+      minWidth: '150px',
+    },
     { title: userList('headers.canLogin'), key: 'can_login', align: 'center', minWidth: '120px' },
     { title: userList('headers.admin'), key: 'is_admin', align: 'center', minWidth: '100px' },
     { title: userList('headers.status'), key: 'is_active', align: 'center', minWidth: '110px' },

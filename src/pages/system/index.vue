@@ -14,7 +14,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      //   permissions: 'PERMISSION_SYSTEM',
+      permissions: 'PERMISSION_SYSTEM',
     },
   })
   const { t } = useLocale()

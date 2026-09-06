@@ -15,6 +15,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
+      permissions: 'PERMISSION_WAREHOUSE',
     },
   })
 
