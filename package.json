@@ -10,6 +10,7 @@
     "build-only": "vite build",
     "build:uat": "yarn type-check && yarn build-only --mode uat",
     "build:sit": "yarn type-check && yarn build-only --mode sit",
+    "build:prd": "yarn type-check && yarn build-only --mode prd",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --fix --ignore-pattern \"src/components/DataTableFilter.vue\"",
     "build:test": "yarn type-check && yarn build-only --mode test",

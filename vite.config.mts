@@ -1,5 +1,7 @@
 // Utilities
-import type { UserConfig } from 'vite'
+import type { Plugin, UserConfig } from 'vite'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
 // Plugins
@@ -12,6 +14,27 @@ import { defineConfig, mergeConfig } from 'vite'
 import viteCompression from 'vite-plugin-compression'
 import Layouts from 'vite-plugin-vue-layouts-next'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+
+function createBuildVersionPlugin(mode: string): Plugin {
+  let outputDir = 'dist'
+
+  return {
+    name: 'generate-build-version',
+    configResolved(config) {
+      outputDir = isAbsolute(config.build.outDir)
+        ? config.build.outDir
+        : resolve(config.root, config.build.outDir)
+    },
+    async writeBundle() {
+      const buildTime = new Date().toISOString()
+      const version = buildTime.replace(/\D/g, '').slice(0, 14)
+      const content = `${JSON.stringify({ version, buildTime, mode }, null, 2)}\n`
+
+      await mkdir(outputDir, { recursive: true })
+      await writeFile(join(outputDir, 'version.json'), content, 'utf8')
+    },
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
@@ -91,6 +114,7 @@ export default defineConfig(async ({ mode }) => {
         algorithm: 'gzip',
         ext: '.gz',
       }),
+      createBuildVersionPlugin(mode),
     ],
     optimizeDeps: {
       exclude: [
@@ -153,7 +177,8 @@ export default defineConfig(async ({ mode }) => {
       cssCodeSplit: true,
     },
     esbuild: {
-      drop: ['console', 'debugger'],
+      drop:
+        mode === 'test' || mode === 'sit' || mode === 'development' ? [] : ['console', 'debugger'],
     },
     server: {
       port: 3000,
