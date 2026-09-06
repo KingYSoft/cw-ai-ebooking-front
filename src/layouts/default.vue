@@ -479,6 +479,7 @@
   import { useAppStore } from '@/stores/app'
   import { useRightDrawerStore } from '@/stores/right-drawer'
   import { useSignalrStore } from '@/stores/signalr'
+  import { buildAuthQuery, clearAuthSession, getRefreshToken } from '@/utils/authSession'
 
   const signalrStore = useSignalrStore()
   const { mobile } = useDisplay()
@@ -619,14 +620,19 @@
       query: payload.query ?? payload.to?.query ?? {},
     })
   }
+  const restartSignalr = () => {
+    // access token 刷新、切换分支或重新登录后，SignalR 使用最新 token 重建连接。
+    signalrStore.restartWithLatestToken()
+  }
 
   onMounted(() => {
     console.log('layout onMounted')
     timerInit = true
-    const token = sessionStorage.getItem('token')
-    const qs = token ? `enc_auth_token=${encodeURIComponent(token)}` : null
-    signalrStore.connect(qs)
+    // 页面初始化连接 SignalR 时使用当前最新 access token。
+    signalrStore.connect(buildAuthQuery())
+
     appStore.event.on('abp.signalr.connected', onAbpSignalrConnected)
+    appStore.event.on('auth.tokenRefreshed', restartSignalr)
 
     // Listen for closeTab event
     appStore.event.on('closeTab', onCloseTabPage)
@@ -651,6 +657,7 @@
     })
     timerInit = false
     appStore.event.off('abp.signalr.connected', onAbpSignalrConnected)
+    appStore.event.off('auth.tokenRefreshed', restartSignalr)
     appStore.event.off('closeTab', onCloseTabPage)
     appStore.event.off('replaceBookingEditTab', onReplaceBookingEditTab)
     signalrStore.stop()
@@ -812,8 +819,22 @@
       }
     },
   )
-  const logoutHandle = () => {
-    sessionStorage.removeItem('token')
+  const logoutHandle = async () => {
+    // sessionStorage.removeItem('token')
+    // router.replace({ path: '/login' })
+    try {
+      const refreshToken = getRefreshToken()
+      if (refreshToken) {
+        // 用户主动登出时先通知后端撤销 refresh token；后端会静默处理所有异常。
+        await logout({ refresh_token: refreshToken })
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      // 无论后端登出结果如何，前端都清理本地 token 并断开 SignalR。
+      clearAuthSession()
+      await signalrStore.stop()
+    }
     router.replace({ path: '/login' })
   }
   const updateHandle = () => {

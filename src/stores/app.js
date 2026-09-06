@@ -5,6 +5,10 @@ import { routes } from 'vue-router/auto-routes'
 import { appAllConfig } from '@/api/app'
 import { userChangeSetting } from '@/api/user'
 import vuetify from '@/plugins/vuetify'
+import { getAccessToken } from '@/utils/authSession'
+
+let fetchAppConfigPromise = null
+let fetchAppConfigPromiseToken = null
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -34,6 +38,9 @@ export const useAppStore = defineStore('app', {
       setting: {
         values: {},
       },
+      custom: {
+        isAuthenticated: false,
+      },
     },
     defaultSourceName: '',
     appMenus: [],
@@ -47,6 +54,10 @@ export const useAppStore = defineStore('app', {
     unsavedInputDataConfirmAction: null,
     // 强制关闭或跳转时跳过下一次路由未保存检查，避免再次拦截。
     skipUnsavedInputDataOnce: false,
+    // 登录成功后已经刷新过配置，跳过紧随其后的路由守卫配置请求。
+    skipNextAppConfigFetchOnce: false,
+    // 登录失效时由 axios 拦截器打开，全局弹框完成重新登录。
+    reloginDialogOpen: false,
   }),
   getters: {
     /**
@@ -155,7 +166,7 @@ export const useAppStore = defineStore('app', {
          */
         isValidTime(timeStr) {
           // /^[1-9]{1}[0-9]{3}-(0[1-9]{1}|1[0-2]{1})-(0[1-9]{1}|[1-2]{1}[0-9]{1}|3[0-5]{1})T([0-1]{1}[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}$/
-          return /^([0-1]{1}[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}$/.test(timeStr)
+          return /^([01]\d|2[0-3]):[0-5]\d$/.test(timeStr)
         },
         /**
          * 验证日期 yyyy-MM-dd
@@ -164,7 +175,7 @@ export const useAppStore = defineStore('app', {
          */
         isValidDate(dateStr) {
           if (
-            !/^[1-9]{1}[0-9]{3}-(0[1-9]{1}|1[0-2]{1})-(0[1-9]{1}|[1-2]{1}[0-9]{1}|3[0-5]{1})$/.test(
+            !/^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[0-5])$/.test(
               dateStr,
             )
           ) {
@@ -339,7 +350,7 @@ export const useAppStore = defineStore('app', {
       console.log(state.appAlive)
       const name = localStorage.getItem('nick_name')
       const email = localStorage.getItem('email')
-      return name ?? (email ? email.split('@')[0] : '')
+      return name ?? (email ? email.split('@', 1)[0] : '')
     },
     emailAddress: state => {
       console.log(state.appAlive)
@@ -361,6 +372,9 @@ export const useAppStore = defineStore('app', {
           }
         },
       }
+    },
+    hasUserSession(state) {
+      return state.config.custom && Boolean(state.config.custom.isAuthenticated)
     },
     userSession: state => {
       return {
@@ -434,10 +448,16 @@ export const useAppStore = defineStore('app', {
       }
     },
     env: state => {
+      console.log(state.messageOpen)
       return {
         isUAT() {
-          console.log(state.messageOpen)
           return import.meta.env.VITE_APP_LOCATION === 'uat'
+        },
+        isPRD() {
+          return import.meta.env.VITE_APP_LOCATION === 'prd'
+        },
+        isSIT() {
+          return import.meta.env.VITE_APP_LOCATION === 'sit'
         },
       }
     },
@@ -481,6 +501,14 @@ export const useAppStore = defineStore('app', {
     },
     closeGlobalLoading() {
       this.globalLoading = false
+    },
+    // 打开全局重新登录弹框，保持当前页面不跳转。
+    openReloginDialog() {
+      this.reloginDialogOpen = true
+    },
+    // 重新登录成功后关闭弹框。
+    closeReloginDialog() {
+      this.reloginDialogOpen = false
     },
     // 页面挂载时注册对应 tab 的未保存检查器。
     registerUnsavedInputDataGuard(tabValue, checker) {
@@ -552,11 +580,27 @@ export const useAppStore = defineStore('app', {
       this.skipUnsavedInputDataOnce = false
       return true
     },
+    // 登录成功后会先刷新配置，随后路由跳转只需要消费一次这个标记。
+    skipNextAppConfigFetch() {
+      this.skipNextAppConfigFetchOnce = true
+    },
+    consumeSkipNextAppConfigFetch() {
+      if (!this.skipNextAppConfigFetchOnce) {
+        return false
+      }
+      this.skipNextAppConfigFetchOnce = false
+      return true
+    },
     setAppConfig(data) {
       if (data) {
-        this.config = { ...data }
-        if (data.custom && data.custom.defaultSourceName) {
-          this.defaultSourceName = data.custom.defaultSourceName
+        const custom = {
+          ...data.custom,
+          isAuthenticated: Boolean(data.custom.isAuthenticated),
+        }
+
+        this.config = { ...data, custom }
+        if (custom.defaultSourceName) {
+          this.defaultSourceName = custom.defaultSourceName
         }
         // if (data.auth && data.auth.grantedPermissions) {
         //   sessionStorage.setItem('auth', JSON.stringify(data.auth.grantedPermissions))
@@ -606,109 +650,133 @@ export const useAppStore = defineStore('app', {
      * @param {*} callback
      */
     async fetchAppConfig(callback) {
-      const that = this
-      const excludeName = that.env.isUAT() ? ['po_management', 'bi'] : []
-      if (that.configLoading) {
-        return
-      }
-      try {
-        that.configLoading = true
-        const { data } = await appAllConfig()
-        if (data) {
-          const allMenus = []
-          /**
-           * 根据 权限 生成 菜单
-           * @param {*} items
-           * @param {*} parentPath
-           * @returns
-           */
-          const getMenus = items => {
-            const newMenus = []
-            items.forEach(v => {
-              if (v.name && (v.children ?? []).length <= 0) {
-                if (v.menu === true) {
-                  const r = {
-                    code: v.name,
-                    title: vuetify.locale.t(`$vuetify.custom.menuPage.` + v.name),
-                    icon: v.icon,
-                    order: v.order ?? 99,
-                    path: v.path,
-                    children: [],
-                  }
-                  let pass = true
-                  if (v.meta.permissions) {
-                    pass = that.auth.isGranted(v.meta.permissions)
-                  }
-                  if (excludeName.includes(v.name)) {
-                    pass = false
-                  }
-                  if (pass) {
-                    newMenus.push(r)
-                    allMenus.push(r)
-                  }
-                }
-              } else {
-                // 父级
-                const v0 = v.children[0]
-                // 子集的一个的path，如果是空这表示，是父级的信息
-                if (v0.path) {
-                  // 文件夹下必须要有 index.vue
-                } else {
-                  if (v0.menu === true) {
-                    const myPath = v.path.indexOf('/') === 0 ? v.path : '/' + v.path
-                    const p = {
-                      code: v0.name,
-                      title: vuetify.locale.t(`$vuetify.custom.menuPage.` + v0.name),
-                      order: v0.order ?? 99,
-                      icon: v0.icon,
-                      path: myPath,
+      const currentToken = getAccessToken()
+      const excludeName = this.env.isUAT() || this.env.isPRD() ? ['po_management', 'bi'] : []
+
+      if (!fetchAppConfigPromise || fetchAppConfigPromiseToken !== currentToken) {
+        const requestToken = currentToken
+        const requestPromise = (async () => {
+          const { data } = await appAllConfig()
+          // const { data } = await AppService.getAppAllConfig()
+          if (data && getAccessToken() === requestToken) {
+            const allMenus = []
+            /**
+             * 根据 权限 生成 菜单
+             * @param {*} items
+             * @param {*} parentPath
+             * @returns
+             */
+            const getMenus = items => {
+              const newMenus = []
+              items.forEach(v => {
+                if (v.name && (v.children ?? []).length <= 0) {
+                  if (v.menu === true) {
+                    const r = {
+                      code: v.name,
+                      title: vuetify.locale.t(`$vuetify.custom.menuPage.` + v.name),
+                      icon: v.icon,
+                      order: v.order ?? 99,
+                      path: v.path,
                       children: [],
                     }
                     let pass = true
-                    if (v0.meta.permissions) {
-                      pass = that.auth.isGranted(v0.meta.permissions)
+                    if (v.meta && v.meta.permissions) {
+                      pass = this.auth.isGranted(v.meta.permissions)
                     }
-                    if (excludeName.includes(v0.name)) {
+                    if (excludeName.includes(v.name)) {
                       pass = false
                     }
                     if (pass) {
-                      const newChild = []
-                      for (let i = 0; i < v.children.length; i++) {
-                        const el = v.children[i]
-                        if (el.path) {
-                          newChild.push({ ...el, path: p.path + '/' + el.path })
+                      newMenus.push(r)
+                      allMenus.push(r)
+                    }
+                  }
+                } else {
+                  // 父级
+                  const v0 = v.children ? v.children[0] : null
+                  if (v0) {
+                    // 子集的一个的path，如果是空这表示，是父级的信息
+                    if (v0.path) {
+                      // 文件夹下必须要有 index.vue
+                    } else {
+                      if (v0.menu === true) {
+                        const myPath = v.path.indexOf('/') === 0 ? v.path : '/' + v.path
+                        const p = {
+                          code: v0.name,
+                          title: vuetify.locale.t(`$vuetify.custom.menuPage.` + v0.name),
+                          order: v0.order ?? 99,
+                          icon: v0.icon,
+                          path: myPath,
+                          children: [],
+                        }
+                        let pass = true
+                        if (v0.meta && v0.meta.permissions) {
+                          pass = this.auth.isGranted(v0.meta.permissions)
+                        }
+                        if (excludeName.includes(v0.name)) {
+                          pass = false
+                        }
+                        if (pass) {
+                          if (v.children) {
+                            const newChild = []
+                            for (let i = 0; i < v.children.length; i++) {
+                              const el = v.children[i]
+                              if (el.path) {
+                                const c = {
+                                  ...el,
+                                  path: p.path + '/' + el.path,
+                                }
+                                newChild.push(c)
+                              }
+                            }
+                            if (newChild.length > 0) {
+                              p.children = getMenus(newChild)
+                            }
+                          }
+                          newMenus.push(p)
                         }
                       }
-                      if (newChild.length > 0) {
-                        p.children = getMenus(newChild)
-                      }
-                      newMenus.push(p)
                     }
                   }
                 }
+              })
+              // 排序
+              if (newMenus.length > 0) {
+                const aa = newMenus.map(item => item).sort((a, b) => a.order - b.order)
+                return aa
+              } else {
+                return []
               }
-            })
-            // 排序
-            if (newMenus.length > 0) {
-              const aa = newMenus.map(item => item).sort((a, b) => a.order - b.order)
-              return aa
-            } else {
-              return []
             }
-          }
 
-          that.setAppConfig(data)
-          const appMenus = getMenus(routes)
-          that.setAppMenus(appMenus, allMenus)
-          if (callback && that.utils.isFunction(callback)) {
-            callback(data)
+            this.setAppConfig({
+              ...data,
+              custom: data.custom,
+            })
+            const appMenus = getMenus(routes)
+            this.setAppMenus(appMenus, allMenus)
           }
-        }
-      } catch (error) {
-        console.log(error)
-      } finally {
-        that.configLoading = false
+          return data
+        })()
+          .catch(error => {
+            console.log(error)
+            return null
+          })
+          .finally(() => {
+            if (fetchAppConfigPromise === requestPromise) {
+              fetchAppConfigPromise = null
+              fetchAppConfigPromiseToken = null
+            }
+          })
+        fetchAppConfigPromise = requestPromise
+        fetchAppConfigPromiseToken = requestToken
       }
+
+      const data = await fetchAppConfigPromise
+      if (data && callback && this.utils.isFunction(callback)) {
+        callback(data)
+      }
+      return data
     },
 
     async toggleMenuFav(name) {

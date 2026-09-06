@@ -4,9 +4,9 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
+import { visualizer } from 'rollup-plugin-visualizer'
 // Plugins
 import AutoImport from 'unplugin-auto-import/vite'
-import Fonts from 'unplugin-fonts/vite'
 import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
@@ -57,33 +57,33 @@ export default defineConfig(async ({ mode }) => {
       Components({
         dts: 'src/components.d.ts',
       }),
-      Fonts({
-        // google: {
-        //   families: [
-        //     {
-        //       name: 'Roboto',
-        //       styles: 'wght@100;300;400;500;700;900',
-        //     },
-        //   ],
-        // },
-        google: {
-          families: [
-            {
-              name: 'Inter',
-              styles: 'wght@100;300;400;500;600;700;900',
-            },
-          ],
-        },
-        // fontsource: {
-        //   families: [
-        //     {
-        //       name: 'Roboto',
-        //       weights: [100, 300, 400, 500, 700, 900],
-        //       styles: ['normal', 'italic'],
-        //     },
-        //   ],
-        // },
-      }),
+      // Fonts({
+      //   // google: {
+      //   //   families: [
+      //   //     {
+      //   //       name: 'Roboto',
+      //   //       styles: 'wght@100;300;400;500;700;900',
+      //   //     },
+      //   //   ],
+      //   // },
+      //   google: {
+      //     families: [
+      //       {
+      //         name: 'Inter',
+      //         styles: 'wght@100;300;400;500;600;700;900',
+      //       },
+      //     ],
+      //   },
+      //   // fontsource: {
+      //   //   families: [
+      //   //     {
+      //   //       name: 'Roboto',
+      //   //       weights: [100, 300, 400, 500, 700, 900],
+      //   //       styles: ['normal', 'italic'],
+      //   //     },
+      //   //   ],
+      //   // },
+      // }),
       AutoImport({
         imports: [
           'vue',
@@ -114,6 +114,16 @@ export default defineConfig(async ({ mode }) => {
         algorithm: 'gzip',
         ext: '.gz',
       }),
+      ...(mode === 'analyze'
+        ? [
+            visualizer({
+              filename: 'dist/bundle-report.html',
+              gzipSize: true,
+              brotliSize: true,
+              template: 'treemap',
+            }),
+          ]
+        : []),
       createBuildVersionPlugin(mode),
     ],
     optimizeDeps: {

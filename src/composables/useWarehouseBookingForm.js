@@ -190,7 +190,7 @@ export function useWarehouseBookingForm() {
           e.errorMessages && e.errorMessages.length > 0 ? e.errorMessages[0] : 'data valid fail.'
 
         if (e.id.indexOf('@') >= 0) {
-          const tab = e.id.split('@')[0]
+          const tab = e.id.split('@', 1)[0]
           if (!Number.isNaN(Number(tab)) && Number(tab) > 0) {
             err.push({ tab: Number(tab), msg })
           }

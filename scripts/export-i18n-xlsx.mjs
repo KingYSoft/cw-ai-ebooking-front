@@ -42,7 +42,7 @@ async function loadI18nModule(filePath) {
 
   const depNames = Object.keys(deps)
   const body = source
-    .replace(/^import\s+.+$/gm, '')
+    .replace(/^import\s+(?:\S.*|[\t\v\f \u00A0\u1680\u2000-\u200A\u202F\u205F\u3000\uFEFF])$/gm, '')
     .replace(/export\s+default\s+/, 'return ')
 
   const evaluate = new Function(...depNames, body)

@@ -69,6 +69,9 @@ const vuetify = createVuetify({
       density: 'compact',
       // class: 'pa-0',
     },
+    VDialog: {
+      persistent: true,
+    },
   },
   theme: {
     defaultTheme: 'light',
