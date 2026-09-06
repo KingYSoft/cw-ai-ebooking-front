@@ -48,7 +48,7 @@
       permissionItems.value = data?.list ?? []
 
       const aa = permissionItems.value.length > 0 ? permissionItems.value[0] : null
-      openOneLevel.value = aa ? (aa.permission_name ? [aa.permission_name] : []) : []
+      openOneLevel.value = aa && aa.permission_name ? [aa.permission_name] : []
     } finally {
       loading.value = false
     }

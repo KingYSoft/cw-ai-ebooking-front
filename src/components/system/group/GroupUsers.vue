@@ -14,6 +14,7 @@
       :height="maxHeight"
       item-value="pk"
       :items="inputData.users"
+      :items-per-page="-1"
       :show-select="false"
       striped="even"
     >
@@ -86,6 +87,7 @@
             hover
             item-value="pk"
             :items="userOptions"
+            :items-per-page="-1"
             return-object
             :search="userQuerySearch"
             :show-select="true"
@@ -141,11 +143,36 @@
     return display.height.value - 320
   })
   const userHeaders = computed(() => [
-    { title: groupEdit('users.headers.loginName'), key: 'login_name', align: 'start', minWidth: '160px' },
-    { title: groupEdit('users.headers.fullName'), key: 'full_name', align: 'start', minWidth: '160px' },
-    { title: groupEdit('users.headers.email'), key: 'email_address', align: 'start', minWidth: '220px' },
-    { title: groupEdit('users.headers.short'), key: 'short_code', align: 'start', minWidth: '140px' },
-    { title: groupEdit('users.headers.active'), key: 'is_active', align: 'start', minWidth: '140px' },
+    {
+      title: groupEdit('users.headers.loginName'),
+      key: 'login_name',
+      align: 'start',
+      minWidth: '160px',
+    },
+    {
+      title: groupEdit('users.headers.fullName'),
+      key: 'full_name',
+      align: 'start',
+      minWidth: '160px',
+    },
+    {
+      title: groupEdit('users.headers.email'),
+      key: 'email_address',
+      align: 'start',
+      minWidth: '220px',
+    },
+    {
+      title: groupEdit('users.headers.short'),
+      key: 'short_code',
+      align: 'start',
+      minWidth: '140px',
+    },
+    {
+      title: groupEdit('users.headers.active'),
+      key: 'is_active',
+      align: 'start',
+      minWidth: '140px',
+    },
   ])
   const selectedUserHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', width: '60px', sortable: false },

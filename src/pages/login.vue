@@ -168,6 +168,8 @@
   import logoSrc from '@/assets/images/login/logo.png'
   import { useLayoutCols } from '@/composables/useLayoutCols'
   import { useAppStore } from '@/stores/app'
+  import { clearAuthSession, setAuthSession } from '@/utils/authSession'
+  import { resolveLoginRedirect } from '@/utils/loginRedirect'
 
   const { rescols } = useLayoutCols()
 
@@ -227,25 +229,44 @@
   const loginRealHandle = async () => {
     loading.value = true
     try {
+      // 普通登录前清理旧会话，避免旧 token 干扰新登录。
+      clearAuthSession()
       const { data } = await login({
         email: email.value,
         password: pwd.value,
       })
       if (data && data.access_token) {
-        sessionStorage.setItem('token', data.access_token)
+        // sessionStorage.setItem('token', data.access_token)
+        // localStorage.setItem('email', email.value)
+
+        // localStorage.removeItem('remind-last-timer')
+        // appInit()
+        // const redirect = route.query.redirect
+        // if (redirect) {
+        //   router.replace({ path: redirect })
+        // } else {
+        //   if (appStore.firstMenuPath) {
+        //     router.replace({ path: appStore.firstMenuPath })
+        //   } else {
+        //     router.replace({ path: '/404' })
+        //   }
+        // }
+        // 登录成功后统一写入 access token、refresh token 和本地过期时间。
+        setAuthSession(data)
         localStorage.setItem('email', email.value)
 
         localStorage.removeItem('remind-last-timer')
-        appInit()
-        const redirect = route.query.redirect
+        await appInit()
+        if (appStore.hasUserSession) {
+          appStore.skipNextAppConfigFetch()
+        }
+        const redirect = resolveLoginRedirect(route.query.redirect)
         if (redirect) {
-          router.replace({ path: redirect })
+          router.replace(redirect)
+        } else if (appStore.firstMenuPath) {
+          router.replace({ path: appStore.firstMenuPath })
         } else {
-          if (appStore.firstMenuPath) {
-            router.replace({ path: appStore.firstMenuPath })
-          } else {
-            router.replace({ path: '/404' })
-          }
+          router.replace({ name: '401' })
         }
       }
     } catch (error) {

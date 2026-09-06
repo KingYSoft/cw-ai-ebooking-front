@@ -155,8 +155,8 @@
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { whsOrderSubmit } from '@/api/whs-order'
-  import FPdfPreview from '@/components/FPdfPreview.vue'
   import FPageLayout from '@/components/FPageLayout.vue'
+  import FPdfPreview from '@/components/FPdfPreview.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesWarehouseOrderEdit from '@/components/warehouse/PagesWarehouseOrderEdit.vue'
   import { hasWhsOrderItemBatteryFile } from '@/composables/mapWhsOrderDetail'
@@ -167,8 +167,8 @@
     resolveWhsConsignNo,
     scheduleWhsBookingTabSync,
   } from '@/composables/useWarehouseBookingTab'
-  import { useWhsOrderPrint } from '@/composables/useWhsOrderPrint'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
+  import { useWhsOrderPrint } from '@/composables/useWhsOrderPrint'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'WarehouseBookingEdit' })

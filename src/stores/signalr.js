@@ -128,6 +128,11 @@ export const useSignalrStore = defineStore('signalr', {
         this.qs = ''
       }
     },
+    async restartWithLatestToken() {
+      // token 变更后先断开旧连接，再用最新 access token 建立新连接。
+      await this.stop()
+      this.connect()
+    },
     /**
      * 向服务器发送消息
      * @param {*} methodName 方法名，使用 小驼峰，如 sendDemoMessage

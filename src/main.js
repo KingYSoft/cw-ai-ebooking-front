@@ -13,11 +13,15 @@ import { registerPlugins } from '@/plugins'
 // Components
 import App from './App.vue'
 
+import '@fontsource/inter/latin-400.css'
+import '@fontsource/inter/latin-500.css'
+import '@fontsource/inter/latin-600.css'
+import '@fontsource/inter/latin-700.css'
 import '@/assets/global.scss'
 import '@/assets/ref-form.scss'
 import '@/assets/table-filter.scss'
 // Styles
-import 'unfonts.css'
+// import 'unfonts.css'
 
 const app = createApp(App)
 

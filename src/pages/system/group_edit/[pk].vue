@@ -129,7 +129,7 @@
 
   const handleValidateErrors = errors => {
     const firstError = errors?.[0]
-    const tab = firstError?.id?.includes('@') ? Number(firstError.id.split('@')[0]) : 1
+    const tab = firstError?.id?.includes('@') ? Number(firstError.id.split('@', 1)[0]) : 1
     activedTab.value = Number.isNaN(tab) ? 1 : tab
     appStore.openMessage({
       content: firstError?.errorMessages?.[0] || 'data valid fail.',

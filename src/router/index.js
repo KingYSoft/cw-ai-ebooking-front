@@ -9,6 +9,7 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 import { handleHotUpdate, routes } from 'vue-router/auto-routes'
 import { useAppStore } from '@/stores/app'
+import { clearAuthSession, getAccessToken } from '@/utils/authSession'
 
 const newRouters = []
 // 生成 路由
@@ -67,9 +68,29 @@ router.beforeEach(async (to, from) => {
     return false
   }
   if (to.meta.requiresAuth) {
-    await appStore.fetchAppConfig()
-    const tt = sessionStorage.getItem('token')
+    const tt = getAccessToken()
     if (tt) {
+      const skipAppConfigFetch = appStore.consumeSkipNextAppConfigFetch() && appStore.hasUserSession
+      if (!skipAppConfigFetch) {
+        await appStore.fetchAppConfig()
+      }
+      if (!appStore.hasUserSession) {
+        clearAuthSession()
+        if (from.name) {
+          appStore.openReloginDialog()
+          appStore.appLoading = false
+          return false
+        } else {
+          // 刷新浏览器
+          return {
+            name: 'login',
+            query: {
+              redirect: to.fullPath,
+            },
+            replace: true,
+          }
+        }
+      }
       // await checkSession()
       let p = true
       if (to.meta.permissions) {

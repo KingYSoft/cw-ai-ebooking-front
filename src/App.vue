@@ -21,6 +21,8 @@
 
   import { useAppStore } from '@/stores/app'
   import { useUserStore } from '@/stores/user'
+  import { getHtmlLang } from '@/utils/locale'
+
   const appStore = useAppStore()
   const userStore = useUserStore()
 
@@ -28,14 +30,8 @@
   const theme = useTheme()
 
   const appThemeIcon = ref('light')
-  const htmlLangMap = {
-    en: 'en',
-    zhHans: 'zh-CN',
-    zhHant: 'zh-TW',
-    vi: 'vi-VN',
-  }
 
-  const appInit = async callback => {
+  const appInit = async () => {
     // 关闭错误弹框
     appStore.closeMessage()
     // 设置语言
@@ -43,7 +39,7 @@
       const lang = localStorage.getItem('lang')
       current.value = lang
       document.title = t('$vuetify.custom.app.title')
-      document.documentElement.lang = htmlLangMap[lang] ?? 'en'
+      document.documentElement.lang = getHtmlLang(lang)
       localStorage.setItem('lang', lang)
     } else {
       // 默认 en
@@ -63,27 +59,43 @@
       }
     }
 
+    // // 设置当前时区
+    // const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    // userStore.changeSetting('Abp.Timing.TimeZone', timeZone)
+
     // 设置当前时区
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    userStore.changeSetting('Abp.Timing.TimeZone', timeZone)
+    console.log(timeZone, 'timeZone')
+    userStore.changeSetting(
+      'Abp.Timing.TimeZone',
+      timeZone ? (timeZone === 'UTC' ? 'Etc/UTC' : timeZone) : 'Etc/UTC',
+    )
 
-    // callback
-    if (callback && appStore.utils.isFunction(callback)) {
-      callback()
-    }
+    // // callback
+    // if (callback && appStore.utils.isFunction(callback)) {
+    //   callback()
+    // }
+    appStore.appAlive = false
+    const data = await appStore.fetchAppConfig()
+    await new Promise(resolve => setTimeout(resolve, 10))
+    await nextTick()
+    appStore.appAlive = true
+
+    return data
   }
 
   const reload = () => {
-    appInit(() => {
-      appStore.fetchAppConfig(() => {
-        appStore.appAlive = false
-        setTimeout(() => {
-          nextTick(() => {
-            appStore.appAlive = true
-          })
-        }, 10)
-      })
-    })
+    // appInit(() => {
+    //   appStore.fetchAppConfig(() => {
+    //     appStore.appAlive = false
+    //     setTimeout(() => {
+    //       nextTick(() => {
+    //         appStore.appAlive = true
+    //       })
+    //     }, 10)
+    //   })
+    // })
+    appInit()
   }
   // 注入
   provide('reload', reload)
@@ -93,9 +105,7 @@
    * 2.reload router-view reload
    * 需要加载配置文件
    */
-  appInit(() => {
-    reload()
-  })
+  appInit()
 
   // 注入
   provide('appInit', appInit)
