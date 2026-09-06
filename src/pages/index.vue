@@ -24,14 +24,12 @@
         <DashboardBookingAnalysis
           v-model:period="analysisPeriod"
           :empty-text="d('emptyAnalysis')"
-          :more-label="d('more')"
           :period-items="periodItems"
           :segments="analysis.segments"
           :summaries="analysisSummaries"
           :title="d('bookingAnalysis')"
           :total="analysis.total"
           :total-label="d('total')"
-          @more="goBookingList"
         />
       </v-col>
     </v-row>
