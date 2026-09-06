@@ -12,7 +12,7 @@ export default {
     booking: '订舱',
     additionalDetails: '附加信息',
     docs: '文档',
-    log: '日志',
+    shippingInstruction: 'Shipping Instruction',
   },
   detail: {
     section: {
@@ -33,6 +33,10 @@ export default {
       container: '装箱方式',
       origin: '起运地',
       destination: '目的地',
+      polLoad: 'POL(Load)',
+      podDischarge: 'POD(Discharge)',
+      vessel: '船名',
+      voyage: '航次',
       grossWeight: '毛重',
       cbm: 'CBM',
       volumeWeight: '体积重量',

@@ -41,6 +41,12 @@ export function useFreightBookingForm() {
     bkg_po_number: '',
     bkg_actual_chargeable: null,
     bkg_volume_weight: null,
+    bkg_load_port: '',
+    bkg_load_port_name: '',
+    bkg_discharge_port: '',
+    bkg_discharge_port_name: '',
+    bkg_intended_vessel: '',
+    bkg_voyage: '',
   })
   // 初始化 表单
   const inputData = ref(defaultData())

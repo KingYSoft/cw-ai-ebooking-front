@@ -1,6 +1,6 @@
 <template>
   <v-sheet color="transparent">
-    <div v-show="activedTab === 1">
+    <div v-if="activedTab !== 4" v-show="activedTab === 1">
       <EbookingBookingGeneralInfo
         v-model:input-data="inputData"
         :addr-table-headers="addrTableHeaders"
@@ -28,8 +28,21 @@
       <v-card-text class="text-medium-emphasis">Docs (coming soon)</v-card-text>
     </div>
 
-    <div v-show="activedTab === 4">
-      <v-card-text class="text-medium-emphasis">Log (coming soon)</v-card-text>
+    <div v-if="activedTab === 4">
+      <EbookingBookingGeneralInfo
+        v-model:input-data="inputData"
+        :addr-table-headers="addrTableHeaders"
+        field-id-prefix="4"
+        :input-data-rules="inputDataRules"
+        :query-port-list="queryPortList"
+        :show-cargo-fields="false"
+        show-si-route-fields
+        @add-container="emit('add-container')"
+        @on-clear-addr="onClearAddr"
+        @on-select-addr="onSelectAddr"
+        @query-port="queryPort"
+        @remove-container="emit('remove-container')"
+      />
     </div>
   </v-sheet>
 </template>
@@ -317,12 +330,48 @@
         }
       },
     ],
+    bkg_discharge_port: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.bkg_discharge_port.err')
+        }
+      },
+    ],
+    bkg_intended_vessel: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.bkg_intended_vessel.err')
+        }
+      },
+    ],
+    bkg_voyage: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.bkg_voyage.err')
+        }
+      },
+    ],
     bkg_etd: [
       value => {
         if (value) {
           return true
         } else {
           return t('$vuetify.custom.bookingPage.form.bkg_etd.err')
+        }
+      },
+    ],
+    bkg_eta: [
+      value => {
+        if (value) {
+          return true
+        } else {
+          return t('$vuetify.custom.bookingPage.form.bkg_eta.err')
         }
       },
     ],

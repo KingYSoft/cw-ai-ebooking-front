@@ -12,7 +12,7 @@ export default {
     booking: 'Đặt chỗ',
     additionalDetails: 'Chi tiết bổ sung',
     docs: 'Tài liệu',
-    log: 'Nhật ký',
+    shippingInstruction: 'Shipping Instruction',
   },
   detail: {
     section: {
@@ -33,6 +33,10 @@ export default {
       container: 'Loại container',
       origin: 'Điểm đi',
       destination: 'Điểm đến',
+      polLoad: 'POL(Load)',
+      podDischarge: 'POD(Discharge)',
+      vessel: 'Tàu',
+      voyage: 'Chuyến',
       grossWeight: 'Trọng lượng tổng',
       cbm: 'CBM',
       volumeWeight: 'Trọng lượng thể tích',

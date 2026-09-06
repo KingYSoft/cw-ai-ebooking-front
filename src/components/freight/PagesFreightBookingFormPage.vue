@@ -28,7 +28,7 @@
         </div>
       </template>
 
-      <template v-if="activedTab === 1 || activedTab === 2" #actions>
+      <template v-if="activedTab === 1 || activedTab === 2 || activedTab === 4" #actions>
         <v-btn
           color="primary"
           :disabled="cardLoading || isEditLockedByOther"
@@ -48,7 +48,7 @@
       <v-tab :value="1">{{ editTab('booking') }}</v-tab>
       <v-tab :value="2">{{ editTab('additionalDetails') }}</v-tab>
       <v-tab :value="3">{{ editTab('docs') }}</v-tab>
-      <v-tab :value="4">{{ editTab('log') }}</v-tab>
+      <v-tab :value="4">{{ editTab('shippingInstruction') }}</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -229,7 +229,8 @@
       cardLoading.value = true
       switch (activedTab.value) {
         case 1:
-        case 2: {
+        case 2:
+        case 4: {
           await bookingSaveHandle()
           if (!isEditMode.value) {
             router.push({

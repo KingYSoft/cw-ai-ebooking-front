@@ -20,6 +20,15 @@ export default {
     bkg_load_port: {
       err: 'Load 不能為空。',
     },
+    bkg_discharge_port: {
+      err: 'POD (Discharge) 不能為空。',
+    },
+    bkg_intended_vessel: {
+      err: 'Vessel 不能為空。',
+    },
+    bkg_voyage: {
+      err: 'Voyage 不能為空。',
+    },
     bkg_etd: {
       err: 'ETD 不能為空。',
     },
