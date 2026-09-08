@@ -16,6 +16,7 @@
                   :readonly="readonly"
                   required
                   :rules="warehouseRules"
+                  @update:model-value="onWarehouseCodeChange"
                 />
               </div>
             </v-col>
@@ -1487,6 +1488,17 @@
     return true
   }
   const warehouseRules = [warehouseRequiredRule]
+
+  const onWarehouseCodeChange = value => {
+    if (readonly.value) {
+      return
+    }
+    if (!String(value ?? '').trim()) {
+      return
+    }
+    inputData.value.wso_delivery_mode = 'CFS/CY'
+    inputData.value.bkg_delivery_mode = 'CFS/CY'
+  }
 
   const orderLineQtyTotal = computed(() => {
     let rows = []
