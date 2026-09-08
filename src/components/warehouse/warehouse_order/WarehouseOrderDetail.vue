@@ -16,6 +16,7 @@
                   :readonly="readonly"
                   required
                   :rules="warehouseRules"
+                  @update:model-value="onWarehouseCodeChange"
                 />
               </div>
             </v-col>
@@ -1076,11 +1077,10 @@
                   max="2099-12-31"
                   min="2000-01-01"
                   min-width="100%"
-                  :rules="cfsCutOffRules"
                 >
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">
-                      {{ detailField('cfsCutOff') }}<span class="text-error"> *</span>
+                      {{ detailField('cfsCutOff') }}
                     </div>
                   </template>
                 </FDateTimePicker>
@@ -1336,7 +1336,6 @@
 
   const estDeliveryRules = computed(() => [requiredRule(validationField('estDelivery'))])
   const deliveryModeRules = [requiredRule(validationField('deliveryMode'))]
-  const cfsCutOffRules = [requiredRule(validationField('cfsCutOff'))]
   const tradeTypeRules = [requiredRule(validationField('tradeType'))]
 
   const inputData = defineModel('input-data', {
@@ -1489,6 +1488,17 @@
     return true
   }
   const warehouseRules = [warehouseRequiredRule]
+
+  const onWarehouseCodeChange = value => {
+    if (readonly.value) {
+      return
+    }
+    if (!String(value ?? '').trim()) {
+      return
+    }
+    inputData.value.wso_delivery_mode = 'CFS/CY'
+    inputData.value.bkg_delivery_mode = 'CFS/CY'
+  }
 
   const orderLineQtyTotal = computed(() => {
     let rows = []
