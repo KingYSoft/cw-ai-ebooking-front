@@ -1,4 +1,5 @@
 import bookingPage from './blocks/bookingPage/zhHant'
+import dashboardPage from './blocks/dashboardPage/zhHant'
 import systemPage from './blocks/systemPage/zhHant'
 import warehouseOrder from './blocks/warehouseOrder/zhHant'
 
@@ -190,6 +191,7 @@ export default {
       system_security: '安全性',
       system_logs: '記錄',
     },
+    dashboardPage,
     poPage: {
       title: {
         list: 'PO 清單',

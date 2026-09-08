@@ -1,4 +1,5 @@
 import bookingPageEdit from './blocks/bookingPage/editZhHans'
+import dashboardPage from './blocks/dashboardPage/zhHans'
 import systemPage from './blocks/systemPage/zhHans'
 import warehouseOrder from './blocks/warehouseOrder/zhHans'
 
@@ -190,6 +191,7 @@ export default {
       system_security: '权限',
       system_logs: '日志',
     },
+    dashboardPage,
     poPage: {
       title: {
         list: 'PO 列表',

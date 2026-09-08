@@ -1,4 +1,5 @@
 import bookingPageEdit from './blocks/bookingPage/editEn'
+import dashboardPage from './blocks/dashboardPage/en'
 import systemPage from './blocks/systemPage/en'
 import warehouseOrder from './blocks/warehouseOrder/en'
 
@@ -190,6 +191,7 @@ export default {
       system_security: 'Security',
       system_logs: 'Logs',
     },
+    dashboardPage,
     poPage: {
       title: {
         list: 'PO List',
