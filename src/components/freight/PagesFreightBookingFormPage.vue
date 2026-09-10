@@ -28,20 +28,54 @@
         </div>
       </template>
 
-      <template v-if="activedTab === 1 || activedTab === 2 || activedTab === 4" #actions>
+      <template v-if="showToolbarActions" #actions>
         <v-btn
+          v-if="showSaveButton"
           color="primary"
-          :disabled="cardLoading || isEditLockedByOther"
+          :disabled="cardLoading || isEditLockedByOther || isBookingCancelled"
           size="small"
           variant="flat"
           @click="onSaveHandle"
         >
           {{ editButton('save') }}
         </v-btn>
+
+        <v-btn
+          v-if="showBookingActionButtons"
+          color="primary"
+          :disabled="actionDisabled"
+          size="small"
+          variant="tonal"
+          @click="onSubmitClick"
+        >
+          {{ editButton('submit') }}
+        </v-btn>
+
+        <v-btn
+          v-if="showBookingActionButtons"
+          color="primary"
+          :disabled="actionDisabled"
+          size="small"
+          variant="tonal"
+          @click="onSiSubmitClick"
+        >
+          {{ editButton('siSubmit') }}
+        </v-btn>
+
+        <v-btn
+          v-if="showBookingActionButtons"
+          color="red"
+          :disabled="actionDisabled"
+          size="small"
+          variant="flat"
+          @click="onCancelClick"
+        >
+          {{ editButton('cancelBooking') }}
+        </v-btn>
       </template>
     </LayoutWithToolbar>
 
-    <BookingFreightStepper v-model:status="inputData.freight_status" />
+    <BookingFreightStepper v-model:status="inputData.active_status" />
     <v-divider />
 
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
@@ -64,12 +98,138 @@
       </v-form>
     </v-sheet>
   </FPageLayout>
+
+  <v-dialog v-model="submitConfirmVis" max-width="420" persistent>
+    <v-card
+      :disabled="cardLoading"
+      :loading="cardLoading"
+      prepend-icon="mdi-send-check-outline"
+      :title="editDialog('submitConfirm', 'title')"
+    >
+      <template #loader="{ isActive }">
+        <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
+      </template>
+
+      <v-card-text class="pb-2">
+        {{ editDialog('submitConfirm', 'message') }}
+      </v-card-text>
+
+      <template #actions>
+        <v-spacer />
+
+        <v-btn :text="editButton('cancel')" variant="text" @click="submitConfirmVis = false" />
+
+        <v-btn color="primary" :text="editButton('submit')" variant="flat" @click="onSubmitConfirm" />
+      </template>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="siSubmitConfirmVis" max-width="420" persistent>
+    <v-card
+      :disabled="cardLoading"
+      :loading="cardLoading"
+      prepend-icon="mdi-file-send-outline"
+      :title="editDialog('siSubmitConfirm', 'title')"
+    >
+      <template #loader="{ isActive }">
+        <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
+      </template>
+
+      <v-card-text class="pb-2">
+        {{ editDialog('siSubmitConfirm', 'message') }}
+      </v-card-text>
+
+      <template #actions>
+        <v-spacer />
+
+        <v-btn :text="editButton('cancel')" variant="text" @click="siSubmitConfirmVis = false" />
+
+        <v-btn
+          color="primary"
+          :text="editButton('siSubmit')"
+          variant="flat"
+          @click="onSiSubmitConfirm"
+        />
+      </template>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="cancelConfirmVis" max-width="420" persistent>
+    <v-card
+      :disabled="cardLoading"
+      :loading="cardLoading"
+      prepend-icon="mdi-close-circle-outline"
+      :title="editDialog('cancelConfirm', 'title')"
+    >
+      <template #loader="{ isActive }">
+        <v-progress-linear :active="isActive" color="red" height="4" indeterminate />
+      </template>
+
+      <v-card-text class="pb-2">
+        {{ editDialog('cancelConfirm', 'message') }}
+      </v-card-text>
+
+      <template #actions>
+        <v-spacer />
+
+        <v-btn :text="editButton('cancel')" variant="text" @click="cancelConfirmVis = false" />
+
+        <v-btn
+          color="red"
+          :text="editButton('confirm')"
+          variant="flat"
+          @click="onCancelFirstConfirm"
+        />
+      </template>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="cancelReasonVis" max-width="480" persistent>
+    <v-card
+      :disabled="cardLoading"
+      :loading="cardLoading"
+      prepend-icon="mdi-text-box-outline"
+      :title="editDialog('cancelReason', 'title')"
+    >
+      <template #loader="{ isActive }">
+        <v-progress-linear :active="isActive" color="red" height="4" indeterminate />
+      </template>
+
+      <v-card-text class="pb-2">
+        <div class="mb-3">{{ editDialog('cancelReason', 'message') }}</div>
+
+        <v-textarea
+          v-model="cancelReason"
+          auto-grow
+          density="compact"
+          :label="editDialog('cancelReason', 'reason')"
+          :rules="cancelReasonRules"
+          rows="3"
+          variant="outlined"
+        />
+      </v-card-text>
+
+      <template #actions>
+        <v-spacer />
+
+        <v-btn :text="editButton('back')" variant="text" @click="onCancelReasonBack" />
+
+        <v-btn
+          color="red"
+          :disabled="!String(cancelReason || '').trim()"
+          :text="editButton('cancelBooking')"
+          variant="flat"
+          @click="onCancelConfirm"
+        />
+      </template>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
   import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { bookingDetail } from '@/api/booking'
+  import { bookingCancel, bookingDetail, bookingSiSubmit, bookingSubmit } from '@/api/booking'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
   import BookingFreightStepper from '@/components/freight/BookingFreightStepper.vue'
@@ -89,7 +249,7 @@
   })
   const { isEditMode, pageTitle } = toRefs(props)
 
-  const { edit, editButton, editTab } = useBookingPageI18n()
+  const { edit, editButton, editDialog, editMessage, editTab } = useBookingPageI18n()
 
   const router = useRouter()
   const route = useRoute()
@@ -118,6 +278,31 @@
   const editLockWarningText = computed(() => editLockGuard.lockWarningText.value)
 
   const bookingEmptyVis = ref(false)
+  const submitConfirmVis = ref(false)
+  const siSubmitConfirmVis = ref(false)
+  const cancelConfirmVis = ref(false)
+  const cancelReasonVis = ref(false)
+  const cancelReason = ref('')
+  const cancelReasonRules = [v => Boolean(String(v ?? '').trim()) || editDialog('cancelReason', 'reasonRequired')]
+
+  const freightStatus = computed(() =>
+    String(inputData.value?.freight_status || inputData.value?.bkg_status || '').toLowerCase(),
+  )
+  const isBookingCancelled = computed(
+    () => freightStatus.value === 'cancelled' || Boolean(inputData.value?.bkg_is_cancelled),
+  )
+  const showSaveButton = computed(
+    () => activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4,
+  )
+  const showBookingActionButtons = computed(
+    () => isEditMode.value && Boolean(String(inputData.value?.pk || route.params.pk || '').trim()),
+  )
+  const showToolbarActions = computed(
+    () => showSaveButton.value || showBookingActionButtons.value,
+  )
+  const actionDisabled = computed(
+    () => cardLoading.value || isEditLockedByOther.value || isBookingCancelled.value,
+  )
 
   const applyBookingInput = el => {
     if (!el || typeof el !== 'object') {
@@ -257,6 +442,155 @@
 
   const checkBookingLocked = () => {
     return false
+  }
+
+  const bookingIdentity = () => ({
+    id: inputData.value?.id || 0,
+    pk: String(inputData.value?.pk || route.params.pk || '').trim(),
+  })
+
+  const canRunBookingAction = () => {
+    if (!showBookingActionButtons.value || isBookingCancelled.value) {
+      return false
+    }
+    if (!editLockGuard.ensureCanSave()) {
+      return false
+    }
+    if (checkBookingLocked()) {
+      return false
+    }
+    return Boolean(bookingIdentity().pk)
+  }
+
+  const reloadBookingDetail = async () => {
+    const { pk } = bookingIdentity()
+    if (!pk) {
+      return
+    }
+    const { success, data } = await bookingDetail(pk)
+    if (success && data) {
+      applyBookingInput(data)
+      markInputDataSaved()
+    }
+  }
+
+  const saveThenRun = async run => {
+    const { valid, errors } = await refDataForm.value.validate()
+    if (!valid) {
+      handleValidationErrors(errors)
+      return false
+    }
+    const saved = await bookingSaveHandle({ showMessage: false })
+    if (!saved) {
+      return false
+    }
+    const { success } = await run(bookingIdentity())
+    return Boolean(success)
+  }
+
+  const onSubmitClick = () => {
+    if (!canRunBookingAction()) {
+      return
+    }
+    submitConfirmVis.value = true
+  }
+
+  const onSubmitConfirm = async () => {
+    submitConfirmVis.value = false
+    if (!canRunBookingAction()) {
+      return
+    }
+    try {
+      cardLoading.value = true
+      const ok = await saveThenRun(payload => bookingSubmit(payload))
+      if (ok) {
+        appStore.openMessage({
+          content: editMessage('submitted'),
+          color: 'success',
+        })
+        await reloadBookingDetail()
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
+    }
+  }
+
+  const onSiSubmitClick = () => {
+    if (!canRunBookingAction()) {
+      return
+    }
+    siSubmitConfirmVis.value = true
+  }
+
+  const onSiSubmitConfirm = async () => {
+    siSubmitConfirmVis.value = false
+    if (!canRunBookingAction()) {
+      return
+    }
+    try {
+      cardLoading.value = true
+      const ok = await saveThenRun(payload => bookingSiSubmit(payload))
+      if (ok) {
+        appStore.openMessage({
+          content: editMessage('siSubmitted'),
+          color: 'success',
+        })
+        await reloadBookingDetail()
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
+    }
+  }
+
+  const onCancelClick = () => {
+    if (!canRunBookingAction()) {
+      return
+    }
+    cancelReason.value = ''
+    cancelConfirmVis.value = true
+  }
+
+  const onCancelFirstConfirm = () => {
+    cancelConfirmVis.value = false
+    cancelReasonVis.value = true
+  }
+
+  const onCancelReasonBack = () => {
+    cancelReasonVis.value = false
+    cancelConfirmVis.value = true
+  }
+
+  const onCancelConfirm = async () => {
+    const reason = String(cancelReason.value ?? '').trim()
+    if (!reason) {
+      return
+    }
+    if (!canRunBookingAction()) {
+      return
+    }
+    cancelReasonVis.value = false
+    try {
+      cardLoading.value = true
+      const { success } = await bookingCancel({
+        ...bookingIdentity(),
+        cancel_reason: reason,
+      })
+      if (success) {
+        appStore.openMessage({
+          content: editMessage('cancelled'),
+          color: 'success',
+        })
+        await reloadBookingDetail()
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
+    }
   }
 
   const tabTitle = computed(() => {

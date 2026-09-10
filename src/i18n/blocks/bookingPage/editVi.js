@@ -6,7 +6,36 @@ export default {
   button: {
     save: 'Lưu',
     submit: 'Gửi',
+    siSubmit: 'Gửi SI',
     cancel: 'Hủy',
+    cancelBooking: 'Hủy',
+    back: 'Quay lại',
+    confirm: 'Xác nhận',
+  },
+  dialog: {
+    submitConfirm: {
+      title: 'Xác nhận gửi',
+      message: 'Bạn có chắc muốn gửi booking này?',
+    },
+    siSubmitConfirm: {
+      title: 'Xác nhận gửi SI',
+      message: 'Bạn có chắc muốn gửi Shipping Instruction?',
+    },
+    cancelConfirm: {
+      title: 'Xác nhận hủy',
+      message: 'Bạn có chắc muốn hủy booking này?',
+    },
+    cancelReason: {
+      title: 'Lý do hủy',
+      message: 'Vui lòng nhập lý do hủy.',
+      reason: 'Lý do',
+      reasonRequired: 'Vui lòng nhập lý do hủy.',
+    },
+  },
+  message: {
+    submitted: 'Booking đã được gửi.',
+    siSubmitted: 'Shipping Instruction đã được gửi.',
+    cancelled: 'Booking đã bị hủy.',
   },
   tab: {
     booking: 'Đặt chỗ',

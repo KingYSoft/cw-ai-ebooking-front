@@ -6,7 +6,36 @@ export default {
   button: {
     save: '保存',
     submit: '提交',
+    siSubmit: '提交 SI',
     cancel: '取消',
+    cancelBooking: '取消',
+    back: '返回',
+    confirm: '确认',
+  },
+  dialog: {
+    submitConfirm: {
+      title: '确认提交',
+      message: '确定要提交这份订舱吗？',
+    },
+    siSubmitConfirm: {
+      title: '确认提交 SI',
+      message: '确定要提交 Shipping Instruction 吗？',
+    },
+    cancelConfirm: {
+      title: '确认取消',
+      message: '确定要取消这份订舱吗？',
+    },
+    cancelReason: {
+      title: '取消原因',
+      message: '请填写取消原因。',
+      reason: '原因',
+      reasonRequired: '请填写取消原因。',
+    },
+  },
+  message: {
+    submitted: '订舱已提交。',
+    siSubmitted: 'Shipping Instruction 已提交。',
+    cancelled: '订舱已取消。',
   },
   tab: {
     booking: '订舱',

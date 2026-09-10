@@ -6,7 +6,36 @@ export default {
   button: {
     save: 'Save',
     submit: 'Submit',
+    siSubmit: 'SI Submit',
     cancel: 'Cancel',
+    cancelBooking: 'Cancel',
+    back: 'Back',
+    confirm: 'Confirm',
+  },
+  dialog: {
+    submitConfirm: {
+      title: 'Confirm Submit',
+      message: 'Are you sure you want to submit this booking?',
+    },
+    siSubmitConfirm: {
+      title: 'Confirm SI Submit',
+      message: 'Are you sure you want to submit the shipping instruction?',
+    },
+    cancelConfirm: {
+      title: 'Confirm Cancel',
+      message: 'Are you sure you want to cancel this booking?',
+    },
+    cancelReason: {
+      title: 'Cancel Reason',
+      message: 'Please enter the cancel reason.',
+      reason: 'Reason',
+      reasonRequired: 'Reason is required.',
+    },
+  },
+  message: {
+    submitted: 'Booking submitted.',
+    siSubmitted: 'Shipping instruction submitted.',
+    cancelled: 'Booking cancelled.',
   },
   tab: {
     booking: 'Booking',
