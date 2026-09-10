@@ -8,6 +8,8 @@ export function useBookingPageI18n() {
   const menu = key => bp(`list.menu.${key}`)
   const edit = key => bp(`edit.${key}`)
   const editButton = key => bp(`edit.button.${key}`)
+  const editDialog = (name, key) => bp(`edit.dialog.${name}.${key}`)
+  const editMessage = key => bp(`edit.message.${key}`)
   const editTab = key => bp(`edit.tab.${key}`)
   const detailSection = key => bp(`edit.detail.section.${key}`)
   const detailField = key => bp(`edit.detail.field.${key}`)
@@ -27,6 +29,8 @@ export function useBookingPageI18n() {
     menu,
     edit,
     editButton,
+    editDialog,
+    editMessage,
     editTab,
     detailSection,
     detailField,

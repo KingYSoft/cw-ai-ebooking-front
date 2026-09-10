@@ -24,6 +24,30 @@ export const bookingSave = data =>
     data,
   })
 
+/** POST /booking/submit — 提交 */
+export const bookingSubmit = data =>
+  service({
+    url: '/booking/submit',
+    method: 'post',
+    data,
+  })
+
+/** POST /booking/si-submit — 提交 SI */
+export const bookingSiSubmit = data =>
+  service({
+    url: '/booking/si-submit',
+    method: 'post',
+    data,
+  })
+
+/** POST /booking/cancel — 取消 */
+export const bookingCancel = data =>
+  service({
+    url: '/booking/cancel',
+    method: 'post',
+    data,
+  })
+
 // --- 以下接口暂未对接，保留 stub 供其他模块使用 ---
 
 const ok = (data = null) => Promise.resolve({ success: true, data })
