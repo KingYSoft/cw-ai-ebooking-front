@@ -534,6 +534,7 @@ const WSO_PASSTHROUGH_KEYS = [
   'wso_si_cut_off',
   'wso_org_header_pk',
   'wso_status',
+  'wso_temp_number',
   'create_user',
   'last_modify_user',
 ]

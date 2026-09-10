@@ -322,7 +322,10 @@
   }
 
   const handleCopyOrderNo = () => {
-    const orderNo = inputData.value.wso_consign_no || inputData.value.wso_consign_no || ''
+    const orderNo = resolveWhsConsignNo({ route, inputData: inputData.value })
+    if (!orderNo) {
+      return
+    }
     navigator.clipboard.writeText(orderNo)
     appStore.openMessage({
       content: editMessage('copySuccess'),
