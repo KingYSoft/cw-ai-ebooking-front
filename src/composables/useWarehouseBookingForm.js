@@ -128,6 +128,19 @@ async function queryWhsOrderDetail(inputDataRef, pk) {
   return false
 }
 
+function applyDefaultDeliveryModeFromWarehouse(form) {
+  if (!form) {
+    return
+  }
+  const warehouse = String(form.wso_warehouse_code ?? form.warehouse_code ?? '').trim()
+  const deliveryMode = String(form.wso_delivery_mode ?? form.bkg_delivery_mode ?? '').trim()
+  if (!warehouse || deliveryMode) {
+    return
+  }
+  form.wso_delivery_mode = 'CFS/CY'
+  form.bkg_delivery_mode = 'CFS/CY'
+}
+
 function buildRecognizePrefillForm(mapped) {
   return buildWhsOrderFormFromMapped(mapped, { clearIdentity: true })
 }
@@ -150,6 +163,7 @@ export function applyRecognizePrefillToInputData(inputDataRef, route) {
     const loginShipper = { ...inputDataRef.value?.shipper }
     inputDataRef.value = buildRecognizePrefillForm(mapped)
     inputDataRef.value.shipper = loginShipper
+    applyDefaultDeliveryModeFromWarehouse(inputDataRef.value)
     return true
   } catch (error) {
     console.error('Failed to parse recognize warehouse order data:', error)
