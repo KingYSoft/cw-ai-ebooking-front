@@ -100,10 +100,11 @@
     can_login: 1,
     is_admin: 0,
     is_active: 1,
-    user_type: 'SHIPPER',
+    role_type: 'SHIPPER',
     is_freight: 0,
     is_warehouse: 0,
     warehouse_list: [],
+    group_list: [],
   })
 
   const cardLoading = ref(false)
