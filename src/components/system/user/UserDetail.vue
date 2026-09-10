@@ -4,20 +4,21 @@
       <v-card-text class="user-role-options py-2 pb-0">
         <div class="user-role-options__row">
           <v-checkbox
-            v-model="inputData.is_freight"
+            v-for="(item, idx) in groupList"
+            :key="idx"
+            v-model="inputData.group_list"
             class="ma-0"
             color="primary"
             density="compact"
-            :false-value="0"
             hide-details
-            :true-value="1"
+            :value="item.pk"
           >
             <template #label>
-              <span class="text-caption text-no-wrap">{{ userField('moduleFreight') }}</span>
+              <span class="text-caption text-no-wrap">{{ item.code }}</span>
             </template>
           </v-checkbox>
 
-          <v-checkbox
+          <!-- <v-checkbox
             v-model="inputData.is_warehouse"
             class="ma-0"
             color="primary"
@@ -29,21 +30,17 @@
             <template #label>
               <span class="text-caption text-no-wrap">{{ userField('moduleWarehouse') }}</span>
             </template>
-          </v-checkbox>
+          </v-checkbox> -->
         </div>
 
         <v-radio-group
-          v-model="inputData.user_type"
+          v-model="inputData.role_type"
           class="user-role-options__radios ma-0 pa-0"
           color="primary"
           density="compact"
           hide-details
         >
-          <v-radio
-            v-for="option in userTypeOptions"
-            :key="option.value"
-            :value="option.value"
-          >
+          <v-radio v-for="option in userTypeOptions" :key="option.value" :value="option.value">
             <template #label>
               <span class="text-caption text-no-wrap">{{ option.title }}</span>
             </template>
@@ -125,7 +122,9 @@
               :true-value="1"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">{{ userField('canLogin') }}:</div>
+                <div class="text-caption text-end w-label-120 mr-2">
+                  {{ userField('canLogin') }}:
+                </div>
               </template>
             </v-switch>
           </v-col>
@@ -140,7 +139,9 @@
               :true-value="1"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">{{ userField('isActive') }}:</div>
+                <div class="text-caption text-end w-label-120 mr-2">
+                  {{ userField('isActive') }}:
+                </div>
               </template>
             </v-switch>
           </v-col>
@@ -199,7 +200,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">{{ userField('emailAddress') }}:</div>
+                <div class="text-caption text-end w-label-120">
+                  {{ userField('emailAddress') }}:
+                </div>
               </template>
             </v-text-field>
           </v-col>
@@ -268,7 +271,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">{{ userField('lastLogonDate') }}:</div>
+                <div class="text-caption text-end w-label-120">
+                  {{ userField('lastLogonDate') }}:
+                </div>
               </template>
             </v-text-field>
           </v-col>
@@ -292,7 +297,16 @@
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-120">
-                  {{ userField('orgHeader') }}<span class="text-red">*</span>:
+                  {{
+                    inputData.role_type === 'SHIPPER'
+                      ? userField('roleTypeShipper')
+                      : inputData.role_type === 'CONSIGNEE'
+                        ? userField('roleTypeConsignee')
+                        : inputData.role_type === 'AGENT'
+                          ? userField('roleTypeAgent')
+                          : ''
+                  }}
+                  <span class="text-red">*</span>:
                 </div>
               </template>
             </FRemoteTableMenu>
@@ -336,7 +350,7 @@
 
           <v-col cols="12">
             <v-text-field
-              v-model="inputData.company_name"
+              v-model="inputData.org_header_name"
               color="primary"
               density="compact"
               hide-details
@@ -384,23 +398,6 @@
               </template>
             </v-text-field>
           </v-col>
-
-          <v-col :cols="rescols('c12m6')">
-            <v-text-field
-              v-model="inputData.sj_department"
-              color="primary"
-              density="compact"
-              hide-details
-              min-width="100%"
-              readonly
-              type="input"
-              variant="outlined"
-            >
-              <template #prepend>
-                <div class="text-caption text-end w-label-120">{{ userField('sjDepartment') }}:</div>
-              </template>
-            </v-text-field>
-          </v-col>
         </v-row>
       </v-card-text>
     </v-col>
@@ -410,6 +407,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { queryCountryList } from '@/api/dict'
+  import { queryGroupPage } from '@/api/group'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { portCodeQueryOptions } from '@/api/port_code'
   import { debounceFn } from '@/api/utils'
@@ -442,16 +440,9 @@
     default: () => ({}),
   })
 
-  if (!inputData.value.user_type) {
-    inputData.value.user_type = 'SHIPPER'
+  if (!inputData.value.role_type) {
+    inputData.value.role_type = 'SHIPPER'
   }
-  if (inputData.value.is_freight == null) {
-    inputData.value.is_freight = 0
-  }
-  if (inputData.value.is_warehouse == null) {
-    inputData.value.is_warehouse = 0
-  }
-
   /**
    * Vuetify autocomplete emits update:search with '' (or selected title) on select/blur.
    * Only query while focused; after select, suppress sync search until user types again.
@@ -496,10 +487,9 @@
   }
 
   const userTypeOptions = computed(() => [
-    { value: 'SHIPPER', title: userField('userTypeShipper') },
-    { value: 'CUSTOMER', title: userField('userTypeCustomer') },
-    { value: 'AGENT', title: userField('userTypeAgent') },
-    { value: 'SJ_STAFF', title: userField('userTypeSjStaff') },
+    { value: 'SHIPPER', title: userField('roleTypeShipper') },
+    { value: 'CONSIGNEE', title: userField('roleTypeConsignee') },
+    { value: 'AGENT', title: userField('roleTypeAgent') },
   ])
 
   const applyOrgAddressToUser = row => {
@@ -507,22 +497,18 @@
       inputData.value.org_header_pk = null
       inputData.value.org_header_code = null
       inputData.value.org_header_name = null
-      inputData.value.company_name = null
       inputData.value.address1 = null
       inputData.value.address2 = null
-      inputData.value.sj_department = null
+      inputData.value.country_code = null
       return
     }
 
-    inputData.value.org_header_pk = row.org_pk ?? row.org_header_pk ?? row.pk ?? null
-    inputData.value.org_header_code = row.code ?? row.org_code ?? row.short_code ?? null
-    inputData.value.org_header_name =
-      row.company_name ?? row.org_full_name ?? row.address_name ?? null
-    inputData.value.company_name = row.company_name ?? row.org_full_name ?? null
+    inputData.value.org_header_pk = row.org_header ?? null
+    inputData.value.org_header_code = row.org_code ?? null
+    inputData.value.org_header_name = row.org_full_name ?? null
     inputData.value.address1 = row.address1 ?? null
     inputData.value.address2 = row.address2 ?? null
-    inputData.value.sj_department =
-      row.sj_department ?? row.dept_name ?? row.department ?? row.dept_code ?? null
+    inputData.value.country_code = row.country_code ?? null
   }
 
   const onSelectOrgHeader = row => {
@@ -644,6 +630,24 @@
       inputData.value.home_port = value || null
     },
   })
+  const groupList = ref([])
+  const loadGroupList = async () => {
+    try {
+      const { data } = await queryGroupPage({
+        filters: [
+          {
+            key: 'is_admin',
+            op: '=',
+            val: 'N',
+          },
+        ],
+      })
+      groupList.value = data.items ?? []
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  loadGroupList()
 </script>
 
 <style lang="scss" scoped>
