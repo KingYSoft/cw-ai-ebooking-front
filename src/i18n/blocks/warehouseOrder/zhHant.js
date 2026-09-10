@@ -31,6 +31,7 @@ export default {
   headers: {
     warehouse: '倉庫',
     status: '狀態',
+    bookingNo: '訂艙號',
     orderNo: '訂單號',
     soNumber: 'SO 編號',
     containerNumber: '櫃號',

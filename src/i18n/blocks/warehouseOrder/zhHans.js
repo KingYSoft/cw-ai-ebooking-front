@@ -31,6 +31,7 @@ export default {
   headers: {
     warehouse: '仓库',
     status: '状态',
+    bookingNo: '订舱号',
     orderNo: '订单号',
     soNumber: 'SO 编号',
     containerNumber: '柜号',

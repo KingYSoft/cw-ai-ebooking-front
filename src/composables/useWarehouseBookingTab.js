@@ -1,6 +1,22 @@
 import { nextTick } from 'vue'
 
+function isWhsDraft(inputData) {
+  const status = String(
+    inputData?.wso_status ?? inputData?.wso_shipment_status ?? '',
+  )
+    .trim()
+    .toLowerCase()
+  return status === 'draft'
+}
+
 export function resolveWhsConsignNo({ route, inputData } = {}) {
+  if (isWhsDraft(inputData)) {
+    const tempNo = String(inputData?.wso_temp_number ?? '').trim()
+    if (tempNo) {
+      return tempNo
+    }
+  }
+
   return String(
     inputData?.wso_consign_no ??
     inputData?.bkg_consign_no ??

@@ -534,6 +534,7 @@ const WSO_PASSTHROUGH_KEYS = [
   'wso_si_cut_off',
   'wso_org_header_pk',
   'wso_status',
+  'wso_temp_number',
   'create_user',
   'last_modify_user',
 ]
@@ -780,6 +781,7 @@ export function mapWhsOrderListRow(item, index) {
     warehouse_code: warehouseCode || item?.warehouse_code || null,
     wso_market: item?.wso_market ?? item?.market?.market ?? null,
     wso_delivery_mode: item?.wso_delivery_mode ?? item?.bkg_delivery_mode ?? null,
+    wso_temp_number: item?.wso_temp_number ?? item?.temp_number ?? null,
     shipper_name: item.shipper_name ?? item.shipper?.add_address_name ?? null,
     consignee_name: item.consignee_name ?? item.consignee?.add_address_name ?? null,
   }
