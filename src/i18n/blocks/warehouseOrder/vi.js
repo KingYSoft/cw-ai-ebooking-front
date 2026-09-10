@@ -31,6 +31,7 @@ export default {
   headers: {
     warehouse: 'Kho',
     status: 'Trạng thái',
+    bookingNo: 'Booking No.',
     orderNo: 'Số đơn',
     soNumber: 'Số SO',
     containerNumber: 'Số container',

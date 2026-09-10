@@ -31,6 +31,7 @@ export default {
   headers: {
     warehouse: 'Warehouse',
     status: 'Sts.',
+    bookingNo: 'Booking No.',
     orderNo: 'Order No.',
     soNumber: 'SO No.',
     containerNumber: 'Container Number',
