@@ -41,7 +41,7 @@
         </v-btn>
 
         <v-btn
-          v-if="showBookingActionButtons"
+          v-if="showSubmitButton"
           color="primary"
           :disabled="actionDisabled"
           size="small"
@@ -52,7 +52,7 @@
         </v-btn>
 
         <v-btn
-          v-if="showBookingActionButtons"
+          v-if="showSiSubmitButton"
           color="primary"
           :disabled="actionDisabled"
           size="small"
@@ -63,7 +63,7 @@
         </v-btn>
 
         <v-btn
-          v-if="showBookingActionButtons"
+          v-if="showCancelButton"
           color="red"
           :disabled="actionDisabled"
           size="small"
@@ -297,6 +297,16 @@
   const showBookingActionButtons = computed(
     () => isEditMode.value && Boolean(String(inputData.value?.pk || route.params.pk || '').trim()),
   )
+  const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
+  const showSubmitButton = computed(
+    () => showBookingActionButtons.value && Boolean(activeStatusTitle.value),
+  )
+  const showSiSubmitButton = computed(
+    () => showBookingActionButtons.value && activeStatusTitle.value === 'Booking Released',
+  )
+  const showCancelButton = computed(
+    () => showBookingActionButtons.value && Boolean(activeStatusTitle.value),
+  )
   const showToolbarActions = computed(
     () => showSaveButton.value || showBookingActionButtons.value,
   )
@@ -489,7 +499,7 @@
   }
 
   const onSubmitClick = () => {
-    if (!canRunBookingAction()) {
+    if (!canRunBookingAction() || !showSubmitButton.value) {
       return
     }
     submitConfirmVis.value = true
@@ -497,7 +507,7 @@
 
   const onSubmitConfirm = async () => {
     submitConfirmVis.value = false
-    if (!canRunBookingAction()) {
+    if (!canRunBookingAction() || !showSubmitButton.value) {
       return
     }
     try {
@@ -518,7 +528,7 @@
   }
 
   const onSiSubmitClick = () => {
-    if (!canRunBookingAction()) {
+    if (!canRunBookingAction() || !showSiSubmitButton.value) {
       return
     }
     siSubmitConfirmVis.value = true
@@ -526,7 +536,7 @@
 
   const onSiSubmitConfirm = async () => {
     siSubmitConfirmVis.value = false
-    if (!canRunBookingAction()) {
+    if (!canRunBookingAction() || !showSiSubmitButton.value) {
       return
     }
     try {
@@ -547,7 +557,7 @@
   }
 
   const onCancelClick = () => {
-    if (!canRunBookingAction()) {
+    if (!canRunBookingAction() || !showCancelButton.value) {
       return
     }
     cancelReason.value = ''
@@ -569,7 +579,7 @@
     if (!reason) {
       return
     }
-    if (!canRunBookingAction()) {
+    if (!canRunBookingAction() || !showCancelButton.value) {
       return
     }
     cancelReasonVis.value = false
