@@ -12,26 +12,16 @@
           hide-details
           item-title="rl_code"
           item-value="rl_code"
-          :items="portItems('bkg_origin', 'bkg_origin_name')"
+          :items="originPortItems(inputData.bkg_origin, inputData.bkg_origin_name)"
           :menu-props="{
             'max-width': '100%',
           }"
           min-width="100%"
           :model-value="inputData.bkg_origin"
-          no-data-text="$vuetify.custom.app.searchMore"
-          no-filter
           return-object
           :rules="inputDataRules.bkg_origin"
           variant="outlined"
-          @update:focused="
-            $event => {
-              if ($event) {
-                queryPort(inputData.bkg_origin)
-              }
-            }
-          "
           @update:model-value="onSelectPort($event, 'bkg_origin', 'bkg_origin_name')"
-          @update:search="queryPort"
         >
           <template #item="scope">
             <v-list-item
@@ -267,6 +257,7 @@
 <script setup>
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { originPortItems } from '@/constants/bookingOriginPorts'
 
   defineOptions({
     name: 'BookingShippingInstructionRoute',

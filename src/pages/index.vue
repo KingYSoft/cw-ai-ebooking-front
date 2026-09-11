@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
   import { useDashboardData } from '@/composables/useDashboardData'
@@ -63,7 +63,7 @@
     cardCounts,
     latestTransactions,
     periodCounts,
-    analysisByPeriod,
+    analysis,
     loadData,
     formatBookingNo,
     itemTimestamp,
@@ -94,8 +94,6 @@
     { key: 'weekly', label: d('weekly'), value: periodCounts.value.weekly },
     { key: 'monthly', label: d('monthly'), value: periodCounts.value.monthly },
   ])
-
-  const analysis = computed(() => analysisByPeriod(analysisPeriod.value))
 
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -152,7 +150,9 @@
     })
   }
 
-  loadData()
+  watch(analysisPeriod, period => {
+    loadData(period)
+  }, { immediate: true })
 </script>
 
 <style lang="scss" scoped>

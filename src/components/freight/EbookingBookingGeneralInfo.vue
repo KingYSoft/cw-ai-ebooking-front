@@ -364,31 +364,21 @@
               hide-details
               item-title="rl_code"
               item-value="rl_code"
-              :items="queryPortList"
+              :items="originPortItems(inputData.bkg_origin, inputData.bkg_origin_name)"
               :menu-props="{
                 'max-width': '100%',
               }"
               min-width="100%"
               :model-value="inputData.bkg_origin"
-              no-data-text="$vuetify.custom.app.searchMore"
-              no-filter
               return-object
               :rules="inputDataRules.bkg_origin"
               variant="outlined"
-              @update:focused="
-                $event => {
-                  if ($event) {
-                    queryPort(inputData.bkg_origin)
-                  }
-                }
-              "
               @update:model-value="
                 $event => {
                   inputData.bkg_origin = $event?.rl_code ?? null
                   inputData.bkg_origin_name = $event?.rl_port_name ?? null
                 }
               "
-              @update:search="queryPort"
             >
               <template #item="scope">
                 <v-list-item
@@ -1334,6 +1324,7 @@
     fetchPackageTypes,
     packageTypeTableHeaders,
   } from '@/composables/usePackageTypeRemoteMenu'
+  import { originPortItems } from '@/constants/bookingOriginPorts'
   import { BOOKING_CUT_OFF_FIELDS } from '@/constants/bookingPartyFields'
   import { useAppStore } from '@/stores/app'
 

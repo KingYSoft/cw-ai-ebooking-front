@@ -20,7 +20,7 @@
           <span class="dashboard-txn-list__date text-medium-emphasis">{{ item.dateLabel }}</span>
 
           <span class="dashboard-txn-list__main">
-            <span class="dashboard-txn-list__name">{{ item.title }}</span>
+            <span class="dashboard-txn-list__name text-primary">{{ item.title }}</span>
 
             <span class="dashboard-txn-list__sub text-medium-emphasis">{{ item.subtitle }}</span>
           </span>
