@@ -72,7 +72,7 @@ export default {
       },
     },
     app: {
-      title: 'SJ Clemenger EBooking',
+      title: 'SJ Clemenger Booking Portal',
       search: 'Tìm kiếm',
       searchPlaceholder: 'Nhập từ khóa tìm kiếm',
       action: 'Thao tác',

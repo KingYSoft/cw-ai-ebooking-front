@@ -3,7 +3,7 @@ export default {
     pendingSubmit: 'Pending for Submit',
     waitingApproval: 'Waiting for Approval',
     pendingSi: 'Pending for Submit SI',
-    rejected: 'Rejected',
+    rejected: 'Cancel',
   },
   latestTransactions: 'Latest transactions',
   bookingAnalysis: 'Booking Analysis',
