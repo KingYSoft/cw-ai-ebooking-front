@@ -2,41 +2,29 @@
   <v-row class="mt-2" dense>
     <v-col :cols="rescols('c12l3s6')">
       <div class="d-flex align-start flex-column flex-wrap ga-1">
-        <v-autocomplete
+        <FRemoteTableMenu
           id="4@si_bkg_origin"
-          auto-select-first
-          autocomplete="off"
-          clearable
-          color="primary"
-          density="compact"
-          hide-details
-          item-title="rl_code"
+          v-model="inputData.bkg_origin"
+          bind-key="rl_code"
+          :bind-value="inputData.bkg_origin"
+          display-key="rl_code"
+          :fetch-method="fetchOriginTypes"
+          :headers="originTableHeaders"
           item-value="rl_code"
-          :items="originPortItems(inputData.bkg_origin, inputData.bkg_origin_name)"
-          :menu-props="{
-            'max-width': '100%',
+          :text-field-props="{
+            'min-width': '100%',
+            rules: inputDataRules.bkg_origin,
           }"
-          min-width="100%"
-          :model-value="inputData.bkg_origin"
-          return-object
-          :rules="inputDataRules.bkg_origin"
-          variant="outlined"
-          @update:model-value="onSelectPort($event, 'bkg_origin', 'bkg_origin_name')"
+          virtual
+          @click-clear="onClearOrigin"
+          @row-select="onSelectOrigin"
         >
-          <template #item="scope">
-            <v-list-item
-              v-bind="scope.props"
-              :subtitle="scope.item.raw.rl_port_name"
-              :title="scope.item.raw.rl_code"
-            />
-          </template>
-
           <template #prepend>
             <div class="text-caption text-end w-label-110">
               {{ detailField('origin') }}<span class="text-red">*</span>:
             </div>
           </template>
-        </v-autocomplete>
+        </FRemoteTableMenu>
 
         <v-autocomplete
           id="4@si_bkg_destination"
@@ -257,7 +245,8 @@
 <script setup>
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
-  import { originPortItems } from '@/constants/bookingOriginPorts'
+  import { fetchOriginTypesFromList, ORIGIN_TABLE_HEADERS } from '@/constants/bookingOriginPorts'
+  import { useAppStore } from '@/stores/app'
 
   defineOptions({
     name: 'BookingShippingInstructionRoute',
@@ -278,6 +267,21 @@
   const emit = defineEmits(['query-port'])
   const { detailField } = useBookingPageI18n()
   const { rescols } = useLayoutCols()
+  const appStore = useAppStore()
+
+  const originTableHeaders = ORIGIN_TABLE_HEADERS
+  const fetchOriginTypes = params =>
+    fetchOriginTypesFromList(appStore.appCombobox.getCombobox('originTypes'), params)
+
+  const onSelectOrigin = row => {
+    inputData.value.bkg_origin = row?.rl_code ?? null
+    inputData.value.bkg_origin_name = row?.rl_port_name ?? null
+  }
+
+  const onClearOrigin = () => {
+    inputData.value.bkg_origin = null
+    inputData.value.bkg_origin_name = null
+  }
 
   const portItems = (codeKey, nameKey) => {
     const items = [...(props.queryPortList || [])]

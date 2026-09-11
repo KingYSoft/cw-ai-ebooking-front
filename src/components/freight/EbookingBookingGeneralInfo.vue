@@ -354,46 +354,29 @@
               </template>
             </v-select>
 
-            <v-autocomplete
+            <FRemoteTableMenu
               :id="`${fieldIdPrefix}@bkg_origin`"
-              auto-select-first
-              autocomplete="off"
-              clearable
-              color="primary"
-              density="compact"
-              hide-details
-              item-title="rl_code"
+              v-model="inputData.bkg_origin"
+              bind-key="rl_code"
+              :bind-value="inputData.bkg_origin"
+              display-key="rl_code"
+              :fetch-method="fetchOriginTypes"
+              :headers="originTableHeaders"
               item-value="rl_code"
-              :items="originPortItems(inputData.bkg_origin, inputData.bkg_origin_name)"
-              :menu-props="{
-                'max-width': '100%',
+              :text-field-props="{
+                'min-width': '100%',
+                rules: inputDataRules.bkg_origin,
               }"
-              min-width="100%"
-              :model-value="inputData.bkg_origin"
-              return-object
-              :rules="inputDataRules.bkg_origin"
-              variant="outlined"
-              @update:model-value="
-                $event => {
-                  inputData.bkg_origin = $event?.rl_code ?? null
-                  inputData.bkg_origin_name = $event?.rl_port_name ?? null
-                }
-              "
+              virtual
+              @click-clear="onClearOrigin"
+              @row-select="onSelectOrigin"
             >
-              <template #item="scope">
-                <v-list-item
-                  v-bind="scope.props"
-                  :subtitle="scope.item.raw.rl_port_name"
-                  :title="scope.item.raw.rl_code"
-                />
-              </template>
-
               <template #prepend>
                 <div class="text-caption text-end w-label-100">
                   {{ detailField('origin') }}<span class="text-red">*</span>:
                 </div>
               </template>
-            </v-autocomplete>
+            </FRemoteTableMenu>
 
             <v-autocomplete
               :id="`${fieldIdPrefix}@bkg_destination`"
@@ -1324,7 +1307,7 @@
     fetchPackageTypes,
     packageTypeTableHeaders,
   } from '@/composables/usePackageTypeRemoteMenu'
-  import { originPortItems } from '@/constants/bookingOriginPorts'
+  import { fetchOriginTypesFromList, ORIGIN_TABLE_HEADERS } from '@/constants/bookingOriginPorts'
   import { BOOKING_CUT_OFF_FIELDS } from '@/constants/bookingPartyFields'
   import { useAppStore } from '@/stores/app'
 
@@ -1384,6 +1367,20 @@
   }
   const queryPort = value => {
     emit('query-port', value)
+  }
+
+  const originTableHeaders = ORIGIN_TABLE_HEADERS
+  const fetchOriginTypes = params =>
+    fetchOriginTypesFromList(appStore.appCombobox.getCombobox('originTypes'), params)
+
+  const onSelectOrigin = row => {
+    inputData.value.bkg_origin = row?.rl_code ?? null
+    inputData.value.bkg_origin_name = row?.rl_port_name ?? null
+  }
+
+  const onClearOrigin = () => {
+    inputData.value.bkg_origin = null
+    inputData.value.bkg_origin_name = null
   }
   // const partyBlocks = BOOKING_PARTY_BLOCKS
   const CUT_OFF_I18N_KEYS = {
