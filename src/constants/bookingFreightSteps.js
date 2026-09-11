@@ -9,17 +9,8 @@ export const BOOKING_FREIGHT_STEPS = [
   { value: 'booking_completed', title: 'Booking Completed', icon: 'mdi-checkbox-marked-circle-outline' },
 ]
 
-const ACTIVE_STATUS_TO_STEP = {
-  Draft: 'saved',
-  Submit: 'request_approve',
-  Accept: 'approved',
-  Release: 'booking_released',
-  SI_Submit: 'si_submitted',
-}
-
 export function getFreightStepIndex(status) {
   const raw = String(status ?? '').trim()
-  const stepValue = raw ? ACTIVE_STATUS_TO_STEP[raw] : 'draft'
-  const idx = BOOKING_FREIGHT_STEPS.findIndex(s => s.value === stepValue)
+  const idx = BOOKING_FREIGHT_STEPS.findIndex(s => s.title === raw)
   return Math.max(idx, 0)
 }

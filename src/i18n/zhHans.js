@@ -72,7 +72,7 @@ export default {
       },
     },
     app: {
-      title: 'SJ Clemenger EBooking',
+      title: 'SJ Clemenger Booking Portal',
       search: '搜索',
       searchPlaceholder: '输入搜索关键词',
       action: '操作',

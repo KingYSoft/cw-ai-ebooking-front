@@ -88,12 +88,12 @@ const WOI_UI_FIELD_PAIRS = [
 ]
 
 function resolveItemField(row, woiKey, uiKey) {
-  // 表格行以 UI 字段为准（含清空为 ''）；仅无 UI 字段时回退 woi_*
+  // Order Line 表格绑定 woi_*；保存优先用表格当前值，没有再回退 UI 别名
+  if (Object.prototype.hasOwnProperty.call(row, woiKey)) {
+    return row[woiKey]
+  }
   if (Object.prototype.hasOwnProperty.call(row, uiKey)) {
     return row[uiKey]
-  }
-  if (hasFieldValue(row[woiKey])) {
-    return row[woiKey]
   }
   return undefined
 }
@@ -713,10 +713,10 @@ export function mapWhsOrderFormToSave(form, options = {}) {
     payload.wso_insurance_currency = form.bkg_insurance_value_currency
   }
 
-  const pacList = Array.isArray(form.pac_list)
-    ? form.pac_list
-    : (Array.isArray(form.item_list)
-        ? form.item_list
+  const pacList = Array.isArray(form.item_list)
+    ? form.item_list
+    : (Array.isArray(form.pac_list)
+        ? form.pac_list
         : [])
   payload.item_list = pacList
     .map((row, index) => mapFormItemToWoi(row, payload.pk, index))
