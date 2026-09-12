@@ -268,3 +268,26 @@
     }
   }
 }
+
+.booking-lock-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.booking-lock-fieldset.is-locked {
+  pointer-events: none;
+  user-select: none;
+
+  .v-field,
+  .v-btn,
+  .v-selection-control,
+  .v-data-table {
+    opacity: 0.45;
+  }
+
+  .v-input {
+    pointer-events: none;
+  }
+}

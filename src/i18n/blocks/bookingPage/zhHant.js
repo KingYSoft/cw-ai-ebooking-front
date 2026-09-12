@@ -104,6 +104,9 @@ export default {
     pac_container_type: {
       err: 'Container Type 不能為空。',
     },
+    pac_list: {
+      err: 'Container 必須至少有一筆資料。',
+    },
     pac_container_count: {
       err: 'Container Count 必須大於 0。',
     },

@@ -9,8 +9,16 @@ export const BOOKING_FREIGHT_STEPS = [
   { value: 'booking_completed', title: 'Booking Completed', icon: 'mdi-checkbox-marked-circle-outline' },
 ]
 
+const BOOKING_RELEASED_STEP_INDEX = BOOKING_FREIGHT_STEPS.findIndex(s => s.value === 'booking_released')
+
 export function getFreightStepIndex(status) {
   const raw = String(status ?? '').trim()
   const idx = BOOKING_FREIGHT_STEPS.findIndex(s => s.title === raw)
   return Math.max(idx, 0)
+}
+
+export function isBookingReleasedOrLater(status) {
+  const raw = String(status ?? '').trim()
+  const idx = BOOKING_FREIGHT_STEPS.findIndex(s => s.title === raw)
+  return idx >= BOOKING_RELEASED_STEP_INDEX
 }

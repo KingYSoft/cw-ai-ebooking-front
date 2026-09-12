@@ -1,31 +1,56 @@
 <template>
   <v-sheet color="transparent">
     <div v-if="activedTab !== 4" v-show="activedTab === 1">
-      <EbookingBookingGeneralInfo
-        v-model:input-data="inputData"
-        :addr-table-headers="addrTableHeaders"
-        :input-data-rules="inputDataRules"
-        :query-port-list="queryPortList"
-        @add-container="emit('add-container')"
-        @on-clear-addr="onClearAddr"
-        @on-select-addr="onSelectAddr"
-        @query-port="queryPort"
-        @remove-container="emit('remove-container')"
-      />
+      <fieldset
+        class="booking-lock-fieldset"
+        :class="{ 'is-locked': lockNonSiFields }"
+        :disabled="lockNonSiFields"
+        :inert="lockNonSiFields"
+      >
+        <EbookingBookingGeneralInfo
+          v-model:input-data="inputData"
+          :addr-table-headers="addrTableHeaders"
+          :input-data-rules="inputDataRules"
+          :query-port-list="queryPortList"
+          @add-container="emit('add-container')"
+          @on-clear-addr="onClearAddr"
+          @on-select-addr="onSelectAddr"
+          @query-port="queryPort"
+          @remove-container="emit('remove-container')"
+        />
+      </fieldset>
     </div>
 
     <div v-show="activedTab === 2">
-      <BookingAdditionalDetails
-        v-model:input-data="inputData"
-        :addr-table-headers="addrTableHeaders"
-        :input-data-rules="inputDataRules"
-        @on-clear-addr="onClearAddr"
-        @on-select-addr="onSelectAddr"
-      />
+      <fieldset
+        class="booking-lock-fieldset"
+        :class="{ 'is-locked': lockNonSiFields }"
+        :disabled="lockNonSiFields"
+        :inert="lockNonSiFields"
+      >
+        <BookingAdditionalDetails
+          v-model:input-data="inputData"
+          :addr-table-headers="addrTableHeaders"
+          :input-data-rules="inputDataRules"
+          @on-clear-addr="onClearAddr"
+          @on-select-addr="onSelectAddr"
+        />
+      </fieldset>
     </div>
 
     <div v-show="activedTab === 3">
-      <v-card-text class="text-medium-emphasis">Docs (coming soon)</v-card-text>
+      <fieldset
+        class="booking-lock-fieldset"
+        :class="{ 'is-locked': lockNonSiFields }"
+        :disabled="lockNonSiFields"
+        :inert="lockNonSiFields"
+      >
+        <BookingEDocs
+          v-model:input-data="inputData"
+          :actived-tab="activedTab"
+          :readonly="lockNonSiFields"
+        />
+      </fieldset>
     </div>
 
     <div v-if="activedTab === 4">
@@ -34,6 +59,7 @@
         :addr-table-headers="addrTableHeaders"
         field-id-prefix="4"
         :input-data-rules="inputDataRules"
+        :lock-si-route-fields="lockNonSiFields"
         :query-port-list="queryPortList"
         :show-cargo-fields="false"
         show-si-route-fields
@@ -63,6 +89,7 @@
 
   defineProps({
     activedTab: { type: Number, default: 1 },
+    lockNonSiFields: { type: Boolean, default: false },
   })
 
   const emit = defineEmits(['add-container', 'remove-container'])
@@ -641,3 +668,4 @@
     ],
   }
 </script>
+

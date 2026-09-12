@@ -390,6 +390,9 @@ export default {
         pac_container_type: {
           err: 'Container Type not null.',
         },
+        pac_list: {
+          err: 'Container must have at least one row.',
+        },
         pac_container_count: {
           err: 'Container Count must be greater than 0.',
         },
