@@ -59,7 +59,6 @@
         :addr-table-headers="addrTableHeaders"
         field-id-prefix="4"
         :input-data-rules="inputDataRules"
-        :lock-si-route-fields="lockNonSiFields"
         :query-port-list="queryPortList"
         :show-cargo-fields="false"
         show-si-route-fields

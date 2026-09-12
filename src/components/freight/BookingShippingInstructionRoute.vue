@@ -1,258 +1,450 @@
 <template>
-  <v-row class="mt-2" dense>
-    <v-col :cols="rescols('c12l3s6')">
-      <div class="d-flex align-start flex-column flex-wrap ga-1">
-        <FRemoteTableMenu
-          id="4@si_bkg_origin"
-          v-model="inputData.bkg_origin"
-          bind-key="rl_code"
-          :bind-value="inputData.bkg_origin"
-          display-key="rl_code"
-          :fetch-method="fetchOriginTypes"
-          :headers="originTableHeaders"
-          item-value="rl_code"
-          :text-field-props="{
-            'min-width': '100%',
-            rules: inputDataRules.bkg_origin,
-          }"
-          virtual
-          @click-clear="onClearOrigin"
-          @row-select="onSelectOrigin"
-        >
-          <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('origin') }}<span class="text-red">*</span>:
-            </div>
-          </template>
-        </FRemoteTableMenu>
+  <div class="ref-form-pre mt-2">
+    <v-row dense>
+      <v-col class="d-flex flex-column" cols="12" md="6">
+        <v-row dense>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              :model-value="inputData.bkg_house_bill"
+              density="compact"
+              hide-details
+              min-width="100%"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">{{ detailField('hblNo') }}:</div>
+              </template>
+            </v-text-field>
+          </v-col>
 
-        <v-autocomplete
-          id="4@si_bkg_destination"
-          auto-select-first
-          autocomplete="off"
-          clearable
-          color="primary"
-          density="compact"
-          hide-details
-          item-title="rl_code"
-          item-value="rl_code"
-          :items="portItems('bkg_destination', 'bkg_destination_name')"
-          :menu-props="{
-            'max-width': '100%',
-          }"
-          min-width="100%"
-          :model-value="inputData.bkg_destination"
-          no-data-text="$vuetify.custom.app.searchMore"
-          no-filter
-          return-object
-          :rules="inputDataRules.bkg_destination"
-          variant="outlined"
-          @update:focused="
-            $event => {
-              if ($event) {
-                queryPort(inputData.bkg_destination)
-              }
-            }
-          "
-          @update:model-value="onSelectPort($event, 'bkg_destination', 'bkg_destination_name')"
-          @update:search="queryPort"
-        >
-          <template #item="scope">
-            <v-list-item
-              v-bind="scope.props"
-              :subtitle="scope.item.raw.rl_port_name"
-              :title="scope.item.raw.rl_code"
+          <v-col class="d-flex align-center" cols="12" sm="6">
+            <v-checkbox
+              color="primary"
+              density="compact"
+              false-value="N"
+              hide-details
+              :model-value="shipperLoadAndCount"
+              true-value="Y"
+            >
+              <template #label>
+                <div class="text-caption">{{ detailField('shipperLoadAndCount') }}</div>
+              </template>
+            </v-checkbox>
+          </v-col>
+        </v-row>
+
+        <v-row v-for="(row, rowIndex) in portRows" :key="rowIndex" dense>
+          <v-col v-for="port in row" :key="port.codeKey" cols="12" sm="6">
+            <div class="d-flex align-center ga-1 w-100">
+              <div class="text-caption text-end w-label-100">
+                {{ detailField(port.labelKey) }}<span class="text-red">*</span>:
+              </div>
+
+              <v-text-field
+                density="compact"
+                hide-details
+                max-width="90px"
+                :model-value="inputData[port.codeKey]"
+                variant="outlined"
+              />
+
+              <v-text-field
+                class="flex-1-1"
+                density="compact"
+                hide-details
+                min-width="auto"
+                :model-value="inputData[port.nameKey]"
+                variant="outlined"
+              />
+            </div>
+          </v-col>
+        </v-row>
+
+        <div class="d-flex align-center ga-1 w-100 mt-1">
+          <div class="text-caption text-end w-label-100">{{ detailField('freightTerms') }}:</div>
+
+          <v-select
+            density="compact"
+            hide-details
+            :items="freightTermItems"
+            max-width="54px"
+            :model-value="inputData.bkg_freight_terms"
+            variant="outlined"
+          />
+
+          <div class="text-caption text-end">{{ detailField('deliveryMode') }}:</div>
+
+          <v-select
+            class="flex-1-1"
+            density="compact"
+            hide-details
+            :items="deliveryModeItems"
+            min-width="auto"
+            :model-value="inputData.bkg_delivery_mode"
+            variant="outlined"
+          />
+
+          <div class="text-caption text-end">{{ detailField('payAt') }}:</div>
+
+          <v-select
+            class="flex-1-1"
+            density="compact"
+            hide-details
+            :items="payAtItems"
+            min-width="auto"
+            :model-value="payAt"
+            variant="outlined"
+          />
+        </div>
+
+        <v-row class="si-hbl-textarea-row mt-1" dense>
+          <v-col cols="12" sm="6">
+            <v-textarea
+              class="si-hbl-textarea"
+              :auto-grow="false"
+              density="compact"
+              hide-details
+              :model-value="inputData.bkg_marks_nos"
+              no-resize
+              rows="9"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">{{ detailField('marksNos') }}:</div>
+              </template>
+            </v-textarea>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-textarea
+              class="si-hbl-textarea"
+              :auto-grow="false"
+              density="compact"
+              hide-details
+              :model-value="inputData.bkg_goods_description"
+              no-resize
+              rows="9"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">{{ detailField('goodDesc') }}:</div>
+              </template>
+            </v-textarea>
+          </v-col>
+        </v-row>
+      </v-col>
+
+      <v-col cols="12" md="6">
+        <v-row dense>
+          <v-col cols="12" sm="6">
+            <v-select
+              density="compact"
+              hide-details
+              :items="asAgentOptionItems"
+              min-width="100%"
+              :model-value="asAgentOption"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-110">
+                  {{ detailField('asAgentOption') }}:
+                </div>
+              </template>
+            </v-select>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-text-field
+              density="compact"
+              hide-details
+              min-width="100%"
+              :model-value="asAgentDetail"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-110">
+                  {{ detailField('asAgentDetail') }}:
+                </div>
+              </template>
+            </v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row dense>
+          <v-col cols="12" sm="6">
+            <div class="d-flex align-start flex-column flex-wrap ga-1">
+              <v-text-field
+                density="compact"
+                hide-details
+                min-width="100%"
+                :model-value="inputData.bkg_intended_vessel"
+                variant="outlined"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('vessel') }}<span class="text-red">*</span>:
+                  </div>
+                </template>
+              </v-text-field>
+
+              <v-text-field
+                density="compact"
+                hide-details
+                min-width="100%"
+                :model-value="inputData.bkg_voyage"
+                variant="outlined"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('voyage') }}<span class="text-red">*</span>:
+                  </div>
+                </template>
+              </v-text-field>
+            </div>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <div class="d-flex align-start flex-column flex-wrap ga-1">
+              <FDatePicker
+                :date-value="inputData.bkg_etd"
+                max="2099-12-31"
+                min="2000-01-01"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('etd') }}<span class="text-red">*</span>:
+                  </div>
+                </template>
+              </FDatePicker>
+
+              <FDatePicker
+                :date-value="inputData.bkg_eta"
+                max="2099-12-31"
+                min="2000-01-01"
+              >
+                <template #prepend>
+                  <div class="text-caption text-end w-label-110">
+                    {{ detailField('eta') }}<span class="text-red">*</span>:
+                  </div>
+                </template>
+              </FDatePicker>
+            </div>
+          </v-col>
+        </v-row>
+
+        <v-row dense>
+          <v-col cols="12" sm="4">
+            <v-text-field
+              density="compact"
+              hide-details
+              :label="detailField('noOfPackage')"
+              :model-value="packageDesc"
+              variant="outlined"
             />
-          </template>
+          </v-col>
 
-          <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('destination') }}<span class="text-red">*</span>:
-            </div>
-          </template>
-        </v-autocomplete>
-      </div>
-    </v-col>
-
-    <v-col :cols="rescols('c12l3s6')">
-      <div class="d-flex align-start flex-column flex-wrap ga-1">
-        <v-autocomplete
-          id="4@bkg_load_port"
-          auto-select-first
-          autocomplete="off"
-          clearable
-          color="primary"
-          density="compact"
-          hide-details
-          item-title="rl_code"
-          item-value="rl_code"
-          :items="portItems('bkg_load_port', 'bkg_load_port_name')"
-          :menu-props="{
-            'max-width': '100%',
-          }"
-          min-width="100%"
-          :model-value="inputData.bkg_load_port"
-          no-data-text="$vuetify.custom.app.searchMore"
-          no-filter
-          return-object
-          :rules="inputDataRules.bkg_load_port"
-          variant="outlined"
-          @update:focused="
-            $event => {
-              if ($event) {
-                queryPort(inputData.bkg_load_port)
-              }
-            }
-          "
-          @update:model-value="onSelectPort($event, 'bkg_load_port', 'bkg_load_port_name')"
-          @update:search="queryPort"
-        >
-          <template #item="scope">
-            <v-list-item
-              v-bind="scope.props"
-              :subtitle="scope.item.raw.rl_port_name"
-              :title="scope.item.raw.rl_code"
+          <v-col cols="12" sm="4">
+            <v-text-field
+              density="compact"
+              hide-details
+              :label="detailField('grossWeight')"
+              :model-value="weightDesc"
+              variant="outlined"
             />
-          </template>
+          </v-col>
 
-          <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('polLoad') }}<span class="text-red">*</span>:
-            </div>
-          </template>
-        </v-autocomplete>
-
-        <v-autocomplete
-          id="4@bkg_discharge_port"
-          auto-select-first
-          autocomplete="off"
-          clearable
-          color="primary"
-          density="compact"
-          hide-details
-          item-title="rl_code"
-          item-value="rl_code"
-          :items="portItems('bkg_discharge_port', 'bkg_discharge_port_name')"
-          :menu-props="{
-            'max-width': '100%',
-          }"
-          min-width="100%"
-          :model-value="inputData.bkg_discharge_port"
-          no-data-text="$vuetify.custom.app.searchMore"
-          no-filter
-          return-object
-          :rules="inputDataRules.bkg_discharge_port"
-          variant="outlined"
-          @update:focused="
-            $event => {
-              if ($event) {
-                queryPort(inputData.bkg_discharge_port)
-              }
-            }
-          "
-          @update:model-value="onSelectPort($event, 'bkg_discharge_port', 'bkg_discharge_port_name')"
-          @update:search="queryPort"
-        >
-          <template #item="scope">
-            <v-list-item
-              v-bind="scope.props"
-              :subtitle="scope.item.raw.rl_port_name"
-              :title="scope.item.raw.rl_code"
+          <v-col cols="12" sm="4">
+            <v-text-field
+              density="compact"
+              hide-details
+              :label="detailField('cbm')"
+              :model-value="cbmDesc"
+              variant="outlined"
             />
-          </template>
+          </v-col>
+        </v-row>
 
-          <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('podDischarge') }}<span class="text-red">*</span>:
-            </div>
-          </template>
-        </v-autocomplete>
-      </div>
-    </v-col>
-
-    <v-col :cols="rescols('c12l3s6')">
-      <div class="d-flex align-start flex-column flex-wrap ga-1">
         <v-text-field
-          id="4@bkg_intended_vessel"
-          v-model="inputData.bkg_intended_vessel"
-          color="primary"
+          class="mt-1"
           density="compact"
           hide-details
-          min-width="100%"
-          :rules="inputDataRules.bkg_intended_vessel"
+          :model-value="sayTotal"
           variant="outlined"
         >
           <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('vessel') }}<span class="text-red">*</span>:
-            </div>
+            <div class="text-caption text-end w-label-110">{{ detailField('sayTotal') }}:</div>
           </template>
         </v-text-field>
 
-        <v-text-field
-          id="4@bkg_voyage"
-          v-model="inputData.bkg_voyage"
-          color="primary"
-          density="compact"
-          hide-details
-          min-width="100%"
-          :rules="inputDataRules.bkg_voyage"
-          variant="outlined"
-        >
-          <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('voyage') }}<span class="text-red">*</span>:
-            </div>
-          </template>
-        </v-text-field>
-      </div>
-    </v-col>
+        <v-row class="mt-1" dense>
+          <v-col cols="12" sm="8">
+            <div class="d-flex align-center ga-1 w-100">
+              <v-checkbox
+                color="primary"
+                density="compact"
+                false-value="N"
+                hide-details
+                model-value="N"
+                true-value="Y"
+              >
+                <template #label>
+                  <div class="text-caption">{{ detailField('wooden') }}:</div>
+                </template>
+              </v-checkbox>
 
-    <v-col :cols="rescols('c12l3s6')">
-      <div class="d-flex align-start flex-column flex-wrap ga-1">
-        <FDatePicker
-          id="4@si_bkg_etd"
-          v-model:date-value="inputData.bkg_etd"
-          max="2099-12-31"
-          min="2000-01-01"
-          :rules="inputDataRules.bkg_etd"
-        >
-          <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('etd') }}<span class="text-red">*</span>:
+              <v-text-field
+                class="flex-1-1"
+                density="compact"
+                hide-details
+                model-value="NO WOODEN PRODUCE HAS BEEN USED IN PACKING"
+                variant="outlined"
+              />
             </div>
-          </template>
-        </FDatePicker>
+          </v-col>
 
-        <FDatePicker
-          id="4@si_bkg_eta"
-          v-model:date-value="inputData.bkg_eta"
-          max="2099-12-31"
-          min="2000-01-01"
-          :rules="inputDataRules.bkg_eta"
-        >
-          <template #prepend>
-            <div class="text-caption text-end w-label-110">
-              {{ detailField('eta') }}<span class="text-red">*</span>:
+          <v-col cols="12" sm="4">
+            <FDatePicker
+              :date-value="inputData.bkg_shipped_on_board_date"
+              max="2099-12-31"
+              min="2000-01-01"
+            >
+              <template #prepend>
+                <div class="text-caption text-end">{{ detailField('onBoard') }}:</div>
+              </template>
+            </FDatePicker>
+          </v-col>
+        </v-row>
+
+        <v-row dense>
+          <v-col cols="12" sm="4">
+            <div class="d-flex align-center ga-1 w-100">
+              <div class="text-caption text-end w-label-110">{{ detailField('cargoValue') }}:</div>
+
+              <v-select
+                auto-select-first
+                autocomplete="off"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="currencyItems"
+                :list-props="{ density: 'compact' }"
+                max-width="60px"
+                :model-value="inputData.bkg_goods_value_currency"
+                no-filter
+                variant="underlined"
+              />
+
+              <v-text-field
+                class="flex-1-1"
+                density="compact"
+                hide-details
+                :model-value="inputData.bkg_goods_value"
+                variant="outlined"
+              />
             </div>
-          </template>
-        </FDatePicker>
-      </div>
-    </v-col>
-  </v-row>
+          </v-col>
+
+          <v-col class="d-flex align-center" cols="12" sm="8">
+            <div class="d-flex align-center ga-1 w-100">
+              <div class="text-caption text-end">{{ detailField('additionalCharges') }}:</div>
+
+              <v-select
+                auto-select-first
+                autocomplete="off"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="currencyItems"
+                :list-props="{ density: 'compact' }"
+                max-width="60px"
+                no-filter
+                variant="underlined"
+              />
+
+              <v-text-field
+                class="flex-1-1"
+                density="compact"
+                hide-details
+                variant="outlined"
+              />
+
+              <v-checkbox
+                color="primary"
+                density="compact"
+                false-value="N"
+                hide-details
+                model-value="N"
+                true-value="Y"
+              >
+                <template #label>
+                  <div class="text-caption">{{ detailField('asArgd') }}</div>
+                </template>
+              </v-checkbox>
+            </div>
+          </v-col>
+        </v-row>
+
+        <v-row dense>
+          <v-col cols="12" sm="4">
+            <FDatePicker max="2099-12-31" min="2000-01-01">
+              <template #prepend>
+                <div class="text-caption text-end w-label-110">{{ detailField('issueDate') }}:</div>
+              </template>
+            </FDatePicker>
+          </v-col>
+
+          <v-col cols="12" sm="5">
+            <div class="d-flex align-center ga-1 w-100">
+              <div class="text-caption text-end">{{ detailField('issuedPlace') }}:</div>
+
+              <v-text-field
+                density="compact"
+                hide-details
+                max-width="90px"
+                variant="outlined"
+              />
+
+              <v-text-field
+                class="flex-1-1"
+                density="compact"
+                hide-details
+                min-width="auto"
+                variant="outlined"
+              />
+            </div>
+          </v-col>
+
+          <v-col cols="12" sm="3">
+            <v-text-field
+              density="compact"
+              hide-details
+              min-width="100%"
+              model-value="1"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end">{{ detailField('noOfBl') }}:</div>
+              </template>
+            </v-text-field>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script setup>
+  import { computed } from 'vue'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
-  import { useLayoutCols } from '@/composables/useLayoutCols'
-  import { fetchOriginTypesFromList, ORIGIN_TABLE_HEADERS } from '@/constants/bookingOriginPorts'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
     name: 'BookingShippingInstructionRoute',
   })
 
-  const props = defineProps({
+  defineProps({
     inputDataRules: {
       type: Object,
       default: () => ({}),
@@ -264,43 +456,119 @@
   })
 
   const inputData = defineModel('input-data', { type: Object, required: true })
-  const emit = defineEmits(['query-port'])
   const { detailField } = useBookingPageI18n()
-  const { rescols } = useLayoutCols()
   const appStore = useAppStore()
 
-  const originTableHeaders = ORIGIN_TABLE_HEADERS
-  const fetchOriginTypes = params =>
-    fetchOriginTypesFromList(appStore.appCombobox.getCombobox('originTypes'), params)
+  const portRows = [
+    [
+      { labelKey: 'origin', codeKey: 'bkg_origin', nameKey: 'bkg_origin_name' },
+      { labelKey: 'polLoad', codeKey: 'bkg_load_port', nameKey: 'bkg_load_port_name' },
+    ],
+    [
+      { labelKey: 'destination', codeKey: 'bkg_destination', nameKey: 'bkg_destination_name' },
+      { labelKey: 'podDischarge', codeKey: 'bkg_discharge_port', nameKey: 'bkg_discharge_port_name' },
+    ],
+  ]
 
-  const onSelectOrigin = row => {
-    inputData.value.bkg_origin = row?.rl_code ?? null
-    inputData.value.bkg_origin_name = row?.rl_port_name ?? null
-  }
+  const deliveryModeItems = ['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']
+  const payAtItems = ['ORIGIN', 'DESTINATION']
+  const asAgentOptionItems = ['AS CARRIER', 'AS AGENT', 'AS AGENT FOR CARRIER', 'AS AGENT FOR']
+  const asAgentOption = ''
+  const asAgentDetail = ''
 
-  const onClearOrigin = () => {
-    inputData.value.bkg_origin = null
-    inputData.value.bkg_origin_name = null
-  }
+  const freightTermItems = ['PP', 'CC']
+  const currencyItems = computed(() => appStore.appCombobox.getCombobox('currency') || [])
 
-  const portItems = (codeKey, nameKey) => {
-    const items = [...(props.queryPortList || [])]
-    const code = inputData.value[codeKey]
-    if (code && !items.some(item => item.rl_code === code)) {
-      items.unshift({
-        rl_code: code,
-        rl_port_name: inputData.value[nameKey],
-      })
+  const shipperLoadAndCount = computed(() =>
+    String(inputData.value.bkg_packing_mode ?? '').toUpperCase() === 'FCL' ? 'Y' : 'N',
+  )
+
+  const payAt = computed(() => {
+    const terms = String(inputData.value.bkg_freight_terms ?? '').toUpperCase()
+    if (terms === 'PP') {
+      return 'ORIGIN'
     }
-    return items
+    if (terms === 'CC') {
+      return 'DESTINATION'
+    }
+    return ''
+  })
+
+  const joinValueUnit = (value, unit) => {
+    if (value === undefined || value === null || value === '') {
+      return ''
+    }
+    return [value, unit].filter(item => item !== undefined && item !== null && item !== '').join(' ')
   }
 
-  const onSelectPort = (event, codeKey, nameKey) => {
-    inputData.value[codeKey] = event?.rl_code ?? null
-    inputData.value[nameKey] = event?.rl_port_name ?? null
-  }
+  const packageDesc = computed(() =>
+    joinValueUnit(inputData.value.bkg_total_package_count, inputData.value.bkg_pack_type),
+  )
+  const weightDesc = computed(() =>
+    joinValueUnit(inputData.value.bkg_actual_weight, inputData.value.bkg_unit_of_weight),
+  )
+  const cbmDesc = computed(() =>
+    joinValueUnit(inputData.value.bkg_actual_volume, inputData.value.bkg_unit_of_volume),
+  )
 
-  const queryPort = value => {
-    emit('query-port', value)
-  }
+  const containerCount = computed(() =>
+    (inputData.value.pac_list || []).reduce(
+      (sum, row) => sum + Number(row.pac_container_count || 0),
+      0,
+    ),
+  )
+
+  const sayTotal = computed(() => {
+    const count = containerCount.value
+    if (!count) {
+      return ''
+    }
+    const words = [
+      'ZERO',
+      'ONE',
+      'TWO',
+      'THREE',
+      'FOUR',
+      'FIVE',
+      'SIX',
+      'SEVEN',
+      'EIGHT',
+      'NINE',
+      'TEN',
+    ]
+    const word = words[count] ?? String(count)
+    return `${word} CONTAINER(S) ONLY.`
+  })
 </script>
+
+<style scoped lang="scss">
+  .si-hbl-textarea-row {
+    flex: 1 1 auto;
+    min-height: 146px;
+
+    :deep(> .v-col) {
+      display: flex;
+    }
+  }
+
+  .si-hbl-textarea {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 146px;
+
+    :deep(.v-input__prepend) {
+      align-self: flex-start;
+      margin-top: 6px;
+    }
+
+    :deep(.v-input__control),
+    :deep(.v-field),
+    :deep(.v-field__field) {
+      height: 100%;
+    }
+
+    :deep(textarea) {
+      min-height: 176px;
+    }
+  }
+</style>
