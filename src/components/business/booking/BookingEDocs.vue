@@ -92,19 +92,49 @@
       </template>
     </FPdfPreview>
   </v-dialog>
+
+  <v-dialog v-model="deleteDialogVisible" max-width="400" persistent>
+    <v-card>
+      <v-card-title class="d-flex align-center">
+        <v-icon color="error" start>mdi-alert-circle</v-icon>
+        {{ eDocs('deleteConfirmTitle') }}
+      </v-card-title>
+
+      <v-card-text>
+        {{ eDocs('deleteConfirmMessage') }}
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+
+        <v-btn size="small" variant="text" @click="deleteDialogVisible = false">
+          {{ editButton('cancel') }}
+        </v-btn>
+
+        <v-btn
+          color="error"
+          :loading="deleting"
+          size="small"
+          variant="flat"
+          @click="confirmDelete"
+        >
+          {{ eDocs('delete') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
   import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from 'vue'
-  import { edocSave, edocSearch } from '@/api/edoc'
-  import { downloadFile, FILE_DOCUMENT_SOURCE, previewFile } from '@/api/files'
+  import { edocDelete, edocDownloadFiles, edocSave, edocSearch } from '@/api/edoc'
   import FPdfPreview from '@/components/FPdfPreview.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import FUpload from '@/components/FUpload.vue'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useAppStore } from '@/stores/app'
 
-  const { t, eDocs } = useBookingPageI18n()
+  const { t, eDocs, editButton } = useBookingPageI18n()
 
   const inputData = defineModel('input-data', {
     type: Object,
@@ -132,6 +162,9 @@
   const pdfTemplateName = ref('eDoc')
   const currentPage = ref(1)
   const itemsPerPage = ref(100)
+  const deleteDialogVisible = ref(false)
+  const deleteTarget = ref(null)
+  const deleting = ref(false)
   let downloadController = null
   let previewObjectUrl = null
 
@@ -175,10 +208,27 @@
     revokePreviewUrl()
   }
 
-  const getRowMenuItems = () => [
-    { title: eDocs('download'), prependIcon: 'mdi-download', code: 'download' },
-    { title: eDocs('preview'), prependIcon: 'mdi-eye', code: 'preview' },
-  ]
+  const toEdocPayload = item => ({
+    id: item.id,
+    pk: item.pk,
+    parent_table: item.parent_table || 'BKG',
+    related_key: item.related_key || inputData.value.pk,
+    file_name: item.file_name,
+    file_type: item.file_type,
+    file_path: item.file_path,
+    ref_no: item.ref_no,
+  })
+
+  const getRowMenuItems = () => {
+    const items = [
+      { title: eDocs('download'), prependIcon: 'mdi-download', code: 'download' },
+      { title: eDocs('preview'), prependIcon: 'mdi-eye', code: 'preview' },
+    ]
+    if (!props.readonly) {
+      items.push({ title: eDocs('delete'), prependIcon: 'mdi-delete', code: 'delete' })
+    }
+    return items
+  }
 
   const handleRowMenuSelect = (e, item) => {
     switch (e.id) {
@@ -187,6 +237,9 @@
       }
       case 'preview': {
         return handlePreview(item)
+      }
+      case 'delete': {
+        return openDeleteConfirm(item)
       }
     }
   }
@@ -211,7 +264,7 @@
   }
 
   const handlePreview = async item => {
-    if (!item?.pk) {
+    if (!item?.id && !item?.pk) {
       appStore.openMessage({
         content: 'No document reference available for preview.',
         color: 'warning',
@@ -221,10 +274,7 @@
 
     try {
       appStore.openGlobalLoadingWithIcon('Loading preview...', 'mdi-eye', 'info')
-      const blob = await previewFile({
-        document_source: FILE_DOCUMENT_SOURCE.job,
-        document_pk: item.pk,
-      })
+      const blob = await edocDownloadFiles(toEdocPayload(item))
       revokePreviewUrl()
       previewObjectUrl = URL.createObjectURL(blob)
       pdfUrl.value = previewObjectUrl
@@ -244,7 +294,7 @@
   const handleClear = () => undefined
 
   const handleUpload = async uploadData => {
-    const { files, docType, jobNumber: relatedKey, is_ebooking_visible } = uploadData
+    const { files, docType, jobNumber, is_ebooking_visible } = uploadData
 
     if (!files?.length) {
       appStore.openMessage({
@@ -266,9 +316,10 @@
       const formData = new FormData()
       formData.append('file', files[0].file)
       formData.append('parent_table', 'BKG')
+      formData.append('related_key', inputData.value.pk)
       formData.append('file_type', docType)
-      formData.append('ref_no', relatedKey || inputData.value.pk)
-      formData.append('is_ebooking_visible', String(Boolean(is_ebooking_visible)))
+      formData.append('ref_no', jobNumber || inputData.value.bkg_consign_no || inputData.value.pk)
+      formData.append('is_ebooking_visible', is_ebooking_visible ? '1' : '0')
 
       const result = await edocSave(formData)
       if (result?.success) {
@@ -289,7 +340,7 @@
   }
 
   const onDownloadFile = async item => {
-    if (!item?.pk) {
+    if (!item?.id && !item?.pk) {
       return
     }
 
@@ -298,13 +349,7 @@
     downloadController = controller
     try {
       appStore.openGlobalLoadingWithIcon('Downloading file...', 'mdi-cloud-download', 'info')
-      const blob = await downloadFile(
-        {
-          document_source: FILE_DOCUMENT_SOURCE.job,
-          document_pk: item.pk,
-        },
-        controller.signal,
-      )
+      const blob = await edocDownloadFiles(toEdocPayload(item), controller.signal)
       if (controller.signal.aborted) {
         return
       }
@@ -330,6 +375,40 @@
         downloadController = null
         appStore.closeGlobalLoading()
       }
+    }
+  }
+
+  const openDeleteConfirm = item => {
+    if (props.readonly || checkBookingLocked() || !item?.id) {
+      return
+    }
+    deleteTarget.value = item
+    deleteDialogVisible.value = true
+  }
+
+  const confirmDelete = async () => {
+    const item = deleteTarget.value
+    if (!item?.id || deleting.value) {
+      return
+    }
+
+    deleting.value = true
+    try {
+      const result = await edocDelete(item.id)
+      if (result?.success !== false) {
+        appStore.openMessage({
+          content: eDocs('deleted'),
+          color: 'success',
+        })
+        deleteDialogVisible.value = false
+        deleteTarget.value = null
+        tblSelectedEDoc.value = tblSelectedEDoc.value.filter(row => row.id !== item.id)
+        await edocFetchData()
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      deleting.value = false
     }
   }
 

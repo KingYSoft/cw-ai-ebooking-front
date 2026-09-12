@@ -131,6 +131,10 @@ export default {
       receivedTime: 'Thời gian nhận',
       download: 'tải xuống',
       preview: 'xem trước',
+      delete: 'xóa',
+      deleteConfirmTitle: 'Xóa tài liệu',
+      deleteConfirmMessage: 'Bạn có chắc muốn xóa tài liệu này?',
+      deleted: 'Đã xóa tài liệu.',
     },
     logs: {
       title: 'Nhật ký',

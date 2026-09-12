@@ -131,6 +131,10 @@ export default {
       receivedTime: 'Received Time',
       download: 'download',
       preview: 'preview',
+      delete: 'delete',
+      deleteConfirmTitle: 'Delete document',
+      deleteConfirmMessage: 'Are you sure you want to delete this document?',
+      deleted: 'Document deleted.',
     },
     logs: {
       title: 'Logs',

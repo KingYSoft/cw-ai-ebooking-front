@@ -131,6 +131,10 @@ export default {
       receivedTime: '接收時間',
       download: '下載',
       preview: '預覽',
+      delete: '刪除',
+      deleteConfirmTitle: '刪除文件',
+      deleteConfirmMessage: '確定要刪除該文件嗎？',
+      deleted: '文件已刪除。',
     },
     logs: {
       title: '日誌',

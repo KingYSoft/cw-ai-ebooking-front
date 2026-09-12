@@ -45,3 +45,11 @@ export const edocDownloadFiles = (params, signal) =>
     responseType: 'blob',
     signal,
   })
+
+/** 删除 eBooking / Booking / Shipment 下同一文件的全部关联 */
+export const edocDelete = id =>
+  service({
+    url: '/edoc/delete',
+    method: 'delete',
+    params: { id },
+  })
