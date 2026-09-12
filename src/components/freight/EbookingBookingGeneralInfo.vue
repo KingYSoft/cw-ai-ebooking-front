@@ -1014,10 +1014,9 @@
 
       <fieldset
         v-if="showSiRouteFields"
-        class="booking-lock-fieldset"
-        :class="{ 'is-locked': lockSiRouteFields }"
-        :disabled="lockSiRouteFields"
-        :inert="lockSiRouteFields"
+        class="booking-lock-fieldset is-locked"
+        disabled
+        inert
       >
         <BookingShippingInstructionRoute
           v-model:input-data="inputData"
@@ -1351,10 +1350,6 @@
     showCargoFields: {
       type: Boolean,
       default: true,
-    },
-    lockSiRouteFields: {
-      type: Boolean,
-      default: false,
     },
   })
   const { inputDataRules, queryPortList } = toRefs(props)
