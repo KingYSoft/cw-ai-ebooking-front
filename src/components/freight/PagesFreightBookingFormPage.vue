@@ -92,6 +92,7 @@
         <PagesFreightBookingEdit
           v-model:input-data="inputData"
           :actived-tab="activedTab"
+          :lock-non-si-fields="isBookingReleasedLocked"
           @add-container="addNewContainer"
           @remove-container="removeNewContainer"
         />
@@ -237,6 +238,7 @@
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
   import { useFreightBookingForm } from '@/composables/useFreightBookingForm'
+  import { isBookingReleasedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
@@ -291,15 +293,22 @@
   const isBookingCancelled = computed(
     () => freightStatus.value === 'cancelled' || Boolean(inputData.value?.bkg_is_cancelled),
   )
-  const showSaveButton = computed(
-    () => activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4,
-  )
+  const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
+  const isBookingReleasedLocked = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
+  const showSaveButton = computed(() => {
+    if (isBookingReleasedLocked.value) {
+      return activedTab.value === 4
+    }
+    return activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4
+  })
   const showBookingActionButtons = computed(
     () => isEditMode.value && Boolean(String(inputData.value?.pk || route.params.pk || '').trim()),
   )
-  const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
   const showSubmitButton = computed(
-    () => showBookingActionButtons.value && Boolean(activeStatusTitle.value),
+    () =>
+      showBookingActionButtons.value &&
+      Boolean(activeStatusTitle.value) &&
+      !isBookingReleasedLocked.value,
   )
   const showSiSubmitButton = computed(
     () => showBookingActionButtons.value && activeStatusTitle.value === 'Booking Released',
@@ -512,7 +521,10 @@
   }
 
   const saveThenRun = async run => {
-    const saved = await persistBooking({ showMessage: false })
+    if (!ensureContainerRows()) {
+      return false
+    }
+    const saved = await bookingSaveHandle({ showMessage: false })
     if (!saved) {
       return false
     }

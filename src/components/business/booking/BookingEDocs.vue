@@ -19,6 +19,7 @@
         <v-btn
           color="primary"
           density="default"
+          :disabled="readonly"
           prepend-icon="mdi-upload"
           size="small"
           variant="flat"
@@ -114,6 +115,10 @@
       type: Number,
       default: 1,
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   })
   const { activedTab } = toRefs(props)
   const appStore = useAppStore()
@@ -151,7 +156,7 @@
   }
 
   const openShowUpload = () => {
-    if (checkBookingLocked()) {
+    if (props.readonly || checkBookingLocked()) {
       return
     }
     showUpload.value = true

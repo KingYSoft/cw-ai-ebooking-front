@@ -1012,13 +1012,20 @@
         </v-col>
       </v-row>
 
-      <BookingShippingInstructionRoute
+      <fieldset
         v-if="showSiRouteFields"
-        v-model:input-data="inputData"
-        :input-data-rules="inputDataRules"
-        :query-port-list="queryPortList"
-        @query-port="queryPort"
-      />
+        class="booking-lock-fieldset"
+        :class="{ 'is-locked': lockSiRouteFields }"
+        :disabled="lockSiRouteFields"
+        :inert="lockSiRouteFields"
+      >
+        <BookingShippingInstructionRoute
+          v-model:input-data="inputData"
+          :input-data-rules="inputDataRules"
+          :query-port-list="queryPortList"
+          @query-port="queryPort"
+        />
+      </fieldset>
     </v-card-text>
 
     <template v-if="showContainerTable">
@@ -1345,6 +1352,10 @@
       type: Boolean,
       default: true,
     },
+    lockSiRouteFields: {
+      type: Boolean,
+      default: false,
+    },
   })
   const { inputDataRules, queryPortList } = toRefs(props)
 
@@ -1504,19 +1515,3 @@
   fetchServiceLevelOptions()
 </script>
 
-<style lang="scss" scoped>
-  // .booking-cutoff-panel {
-  //   padding-left: 12px;
-  //   border-left: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
-
-  //   @media (max-width: 1279px) {
-  //     margin-top: 12px;
-  //     padding-left: 0;
-  //     border-left: none;
-  //   }
-  // }
-
-  // .booking-cutoff-row + .booking-cutoff-row {
-  //   margin-top: 8px;
-  // }
-</style>
