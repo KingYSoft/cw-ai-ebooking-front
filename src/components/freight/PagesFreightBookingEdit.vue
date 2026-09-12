@@ -25,7 +25,7 @@
     </div>
 
     <div v-show="activedTab === 3">
-      <v-card-text class="text-medium-emphasis">Docs (coming soon)</v-card-text>
+      <BookingEDocs v-model:input-data="inputData" :actived-tab="activedTab" />
     </div>
 
     <div v-if="activedTab === 4">

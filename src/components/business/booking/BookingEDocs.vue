@@ -45,7 +45,7 @@
           density="compact"
           item-props
           item-value="code"
-          :items="getRowMenuItems(item)"
+          :items="getRowMenuItems()"
           slim
           @click:select="handleRowMenuSelect($event, item)"
         />
@@ -57,7 +57,6 @@
     </template>
   </FTableLayout>
 
-  <!-- Upload Dialog -->
   <v-dialog v-model="showUpload" max-width="800" persistent>
     <v-card>
       <v-card-title class="d-flex align-center justify-space-between">
@@ -73,9 +72,10 @@
           v-if="showUpload"
           cols="c12m6"
           :job-number="inputData.bkg_consign_no"
-          :job-type="'BKG'"
+          job-type="BKG"
           :max-files="1"
           :readonly="true"
+          show-ebooking-visible
           :upload-button-text="eDocs('uploadButtonText')"
           @clear="handleClear"
           @upload="handleUpload"
@@ -87,15 +87,17 @@
   <v-dialog v-model="pdfDiaVis" height="800" max-width="800" persistent>
     <FPdfPreview :pdf-url="pdfUrl || ''" :template-name="pdfTemplateName">
       <template #tools-btn>
-        <v-btn color="red" density="comfortable" icon="$close" @click="pdfDiaVis = false" />
+        <v-btn color="red" density="comfortable" icon="$close" @click="closePreview" />
       </template>
     </FPdfPreview>
   </v-dialog>
 </template>
 
 <script setup>
-  import { computed, onMounted, ref, watch } from 'vue'
-  import { edocDownloadFiles, edocSave, edocSearch } from '@/api/edoc'
+  import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from 'vue'
+  import { edocSave, edocSearch } from '@/api/edoc'
+  import { downloadFile, FILE_DOCUMENT_SOURCE, previewFile } from '@/api/files'
+  import FPdfPreview from '@/components/FPdfPreview.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import FUpload from '@/components/FUpload.vue'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
@@ -114,13 +116,29 @@
     },
   })
   const { activedTab } = toRefs(props)
-
   const appStore = useAppStore()
+
   const refTblDataEDoc = ref(null)
   const tblSelectedEDoc = ref([])
-  const edocTableLoading = ref(false)
   const edocList = ref([])
   const showUpload = ref(false)
+  const pdfUrl = ref('')
+  const pdfDiaVis = ref(false)
+  const pdfTemplateName = ref('eDoc')
+  const currentPage = ref(1)
+  const itemsPerPage = ref(100)
+  let downloadController = null
+  let previewObjectUrl = null
+
+  const maxHeight = computed(() => document.documentElement.clientHeight - 272)
+  const tblEDocHeaders = computed(() => [
+    { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
+    { title: eDocs('fileName'), key: 'file_name', align: 'start', minWidth: '140' },
+    { title: eDocs('filePath'), key: 'file_path', align: 'start', minWidth: '200' },
+    { title: eDocs('refNo'), key: 'ref_no', align: 'start', minWidth: '140' },
+    { title: eDocs('receivedTime'), key: 'received_time', align: 'start', minWidth: '140' },
+  ])
+
   const checkBookingLocked = () => {
     if (inputData.value.bkg_is_forward_registered === 1) {
       appStore.openMessage({
@@ -128,10 +146,10 @@
         color: 'error',
       })
       return true
-    } else {
-      return false
     }
+    return false
   }
+
   const openShowUpload = () => {
     if (checkBookingLocked()) {
       return
@@ -139,118 +157,91 @@
     showUpload.value = true
   }
 
-  const pdfUrl = ref(null)
-  const pdfDiaVis = ref(false)
-  const pdfTemplateName = ref('eDoc')
-
-  const currentPage = ref(1)
-  const itemsPerPage = ref(100)
-  const maxHeight = computed(() => {
-    const clientHeight = document.documentElement.clientHeight
-    return clientHeight - 272
-  })
-
-  const initTable = () => {
-    if (refTblDataEDoc.value) {
-      refTblDataEDoc.value.initHeaders()
-      refTblDataEDoc.value.initScrollListener()
+  const revokePreviewUrl = () => {
+    if (previewObjectUrl) {
+      URL.revokeObjectURL(previewObjectUrl)
+      previewObjectUrl = null
     }
+    pdfUrl.value = ''
   }
 
-  onMounted(() => {
-    initTable()
-  })
+  const closePreview = () => {
+    pdfDiaVis.value = false
+    revokePreviewUrl()
+  }
 
-  const tblEDocHeaders = computed(() => [
-    { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
-    {
-      title: eDocs('fileName'),
-      key: 'file_name',
-      align: 'start',
-      minWidth: '140',
-    },
-    {
-      title: eDocs('filePath'),
-      key: 'file_path',
-      align: 'start',
-      minWidth: '200',
-    },
-    {
-      title: eDocs('refNo'),
-      key: 'ref_no',
-      align: 'start',
-      minWidth: '140',
-    },
-    {
-      title: eDocs('receivedTime'),
-      key: 'received_time',
-      align: 'start',
-      minWidth: '140',
-    },
-  ])
-
-  // #region Row Actions Menu
   const getRowMenuItems = () => [
     { title: eDocs('download'), prependIcon: 'mdi-download', code: 'download' },
     { title: eDocs('preview'), prependIcon: 'mdi-eye', code: 'preview' },
   ]
+
   const handleRowMenuSelect = (e, item) => {
     switch (e.id) {
       case 'download': {
-        console.log('download', item)
         return onDownloadFile(item)
       }
       case 'preview': {
-        console.log('preview', item)
-        return openInNewTab(item.file_path)
+        return handlePreview(item)
       }
     }
   }
 
   const edocFetchData = async () => {
-    if (!inputData.value.pk) return
-
-    const edocSearchInput = {
-      parent_table: 'BKG',
-      related_key: inputData.value.pk,
+    if (!inputData.value.pk) {
+      edocList.value = []
+      return
     }
 
-    edocTableLoading.value = true
     try {
-      const response = await edocSearch(edocSearchInput)
-      if (response && response.success) {
-        edocList.value = response.data.list ?? []
+      const response = await edocSearch({
+        parent_table: 'BKG',
+        related_key: inputData.value.pk,
+      })
+      if (response?.success) {
+        edocList.value = response.data?.list ?? []
       }
     } catch (error) {
       console.log(error)
-    } finally {
-      edocTableLoading.value = false
     }
   }
 
-  const handlePageChange = page => {
-    currentPage.value = page
-  }
-
-  const handleItemsPerPageChange = itemsPerPageValue => {
-    itemsPerPage.value = itemsPerPageValue
-    currentPage.value = 1
-  }
-
-  function onRowDblClick(event, { item }) {
-    if (event.target.closest('.v-selection-control, button, a, input, textarea, [role="button"]'))
+  const handlePreview = async item => {
+    if (!item?.pk) {
+      appStore.openMessage({
+        content: 'No document reference available for preview.',
+        color: 'warning',
+      })
       return
-    console.log('EDoc details:', item)
+    }
+
+    try {
+      appStore.openGlobalLoadingWithIcon('Loading preview...', 'mdi-eye', 'info')
+      const blob = await previewFile({
+        document_source: FILE_DOCUMENT_SOURCE.job,
+        document_pk: item.pk,
+      })
+      revokePreviewUrl()
+      previewObjectUrl = URL.createObjectURL(blob)
+      pdfUrl.value = previewObjectUrl
+      pdfTemplateName.value = item.file_name || item.file_type || 'eDoc'
+      pdfDiaVis.value = true
+    } catch (error) {
+      console.log(error)
+      appStore.openMessage({
+        content: 'Failed to preview document.',
+        color: 'error',
+      })
+    } finally {
+      appStore.closeGlobalLoading()
+    }
   }
 
-  const handleClear = () => {
-    console.log('Clearing files')
-  }
+  const handleClear = () => undefined
 
   const handleUpload = async uploadData => {
-    const { files, docType, jobNumber: relatedKey } = uploadData
+    const { files, docType, jobNumber: relatedKey, is_ebooking_visible } = uploadData
 
-    if (!files || files.length === 0) {
+    if (!files?.length) {
       appStore.openMessage({
         content: 'please upload edoc excel.',
         color: 'error',
@@ -267,77 +258,113 @@
     }
 
     try {
-      // 构建 FormData
       const formData = new FormData()
       formData.append('file', files[0].file)
       formData.append('parent_table', 'BKG')
       formData.append('file_type', docType)
       formData.append('ref_no', relatedKey || inputData.value.pk)
+      formData.append('is_ebooking_visible', String(Boolean(is_ebooking_visible)))
 
       const result = await edocSave(formData)
-
-      if (result && result.success) {
+      if (result?.success) {
         appStore.openMessage({
           content: 'Upload successful',
           color: 'success',
         })
-        // 查询数据
         await edocFetchData()
         showUpload.value = false
       }
     } catch (error) {
-      console.error('Upload error:', error)
+      const message = error instanceof Error ? error.message : String(error)
       appStore.openMessage({
-        content: `Upload failed: ${error.message || error}`,
+        content: `Upload failed: ${message}`,
         color: 'error',
       })
     }
   }
 
-  // Watch for inputData.pk changes and fetch data
+  const onDownloadFile = async item => {
+    if (!item?.pk) {
+      return
+    }
+
+    downloadController?.abort()
+    const controller = new AbortController()
+    downloadController = controller
+    try {
+      appStore.openGlobalLoadingWithIcon('Downloading file...', 'mdi-cloud-download', 'info')
+      const blob = await downloadFile(
+        {
+          document_source: FILE_DOCUMENT_SOURCE.job,
+          document_pk: item.pk,
+        },
+        controller.signal,
+      )
+      if (controller.signal.aborted) {
+        return
+      }
+
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = item.file_name || 'edoc'
+      document.body.append(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+      appStore.openMessage({
+        content: t('$vuetify.custom.app.downloadSnackText', link.download),
+        color: 'success',
+      })
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.log(error)
+      }
+    } finally {
+      if (downloadController === controller) {
+        downloadController = null
+        appStore.closeGlobalLoading()
+      }
+    }
+  }
+
+  const handlePageChange = page => {
+    currentPage.value = page
+  }
+
+  const handleItemsPerPageChange = value => {
+    itemsPerPage.value = value
+    currentPage.value = 1
+  }
+
+  const onRowDblClick = (event, { item }) => {
+    const target = event?.target
+    if (
+      target instanceof Element &&
+      target.closest('.v-selection-control, button, a, input, textarea, [role="button"]')
+    ) {
+      return
+    }
+    handlePreview(item)
+  }
+
+  onMounted(() => {
+    refTblDataEDoc.value?.initHeaders()
+    refTblDataEDoc.value?.initScrollListener()
+  })
+
   watch(
-    () => activedTab.value,
-    newVal => {
-      if (newVal === 3) {
+    [activedTab, () => inputData.value.pk],
+    ([tab]) => {
+      if (tab === 3) {
         edocFetchData()
       }
     },
     { immediate: true },
   )
 
-  const onDownloadFile = async item => {
-    try {
-      const blob = await edocDownloadFiles({
-        ...item,
-      })
-      const url = window.URL.createObjectURL(blob) // 创建一个对象 URL
-      const a = document.createElement('a') // 创建一个链接元素
-      a.style.display = 'none' // 隐藏链接
-      a.href = url // 设置链接的 href 属性
-      a.target = '_blank'
-      a.rel = 'noopener noreferrer'
-      a.download = item.file_name
-      document.body.append(a) // 将链接添加到 DOM 中
-      a.click() // 模拟点击链接
-      window.URL.revokeObjectURL(url) // 释放对象 URL
-      a.remove() //
-      appStore.openMessage({
-        content: t('$vuetify.custom.app.downloadSnackText', item.file_name),
-        color: 'success',
-      })
-    } catch (error) {
-      console.log(error)
-    } finally {
-      //
-    }
-  }
-  const openInNewTab = url => {
-    const a = document.createElement('a')
-    a.href = import.meta.env.VITE_APP_BASE_API + url
-    a.target = '_blank'
-    a.rel = 'noopener noreferrer'
-    document.body.append(a)
-    a.click()
-    a.remove()
-  }
+  onBeforeUnmount(() => {
+    downloadController?.abort()
+    revokePreviewUrl()
+  })
 </script>

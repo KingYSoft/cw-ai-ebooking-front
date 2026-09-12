@@ -58,6 +58,18 @@
       </v-col>
     </v-row>
 
+    <v-row v-if="showConfig && showEbookingVisible" dense>
+      <v-col cols="12">
+        <v-checkbox
+          v-model="isEbookingVisible"
+          color="primary"
+          density="compact"
+          hide-details
+          :label="t('$vuetify.custom.upload.fields.ebookingVisible')"
+        />
+      </v-col>
+    </v-row>
+
     <!-- 拖拽上传区域 -->
     <div
       class="upload-dropzone"
@@ -209,6 +221,10 @@
       type: Boolean,
       default: true,
     },
+    showEbookingVisible: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const emit = defineEmits(['upload', 'clear', 'file-added', 'file-removed'])
@@ -217,6 +233,7 @@
   const isDragover = ref(false)
   const files = ref([])
   const docType = ref('')
+  const isEbookingVisible = ref(false)
   const selectedJobType = ref(props.jobType || 'BKG')
   const jobNumber = ref(props.jobNumber || '')
 
@@ -419,6 +436,7 @@
       docType: docType.value,
       jobType: selectedJobType.value,
       jobNumber: jobNumber.value,
+      is_ebooking_visible: Boolean(isEbookingVisible.value),
     })
   }
 

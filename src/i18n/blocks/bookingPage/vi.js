@@ -104,6 +104,9 @@ export default {
     pac_container_type: {
       err: 'Container Type không được để trống.',
     },
+    pac_list: {
+      err: 'Container phải có ít nhất một dòng.',
+    },
     pac_container_count: {
       err: 'Container Count phải lớn hơn 0.',
     },

@@ -390,6 +390,9 @@ export default {
         pac_container_type: {
           err: 'Container Type 不能为空。',
         },
+        pac_list: {
+          err: 'Container 必须至少有一条数据。',
+        },
         pac_container_count: {
           err: 'Container Count 必须大于 0。',
         },

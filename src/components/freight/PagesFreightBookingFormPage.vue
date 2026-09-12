@@ -249,7 +249,7 @@
   })
   const { isEditMode, pageTitle } = toRefs(props)
 
-  const { edit, editButton, editDialog, editMessage, editTab } = useBookingPageI18n()
+  const { t, edit, editButton, editDialog, editMessage, editTab } = useBookingPageI18n()
 
   const router = useRouter()
   const route = useRoute()
@@ -408,16 +408,43 @@
   }
 
   const refDataForm = ref(null)
+
+  const isContainerRequired = () =>
+    inputData.value?.bkg_transport_mode === 'SEA' && inputData.value?.bkg_packing_mode === 'FCL'
+
+  const ensureContainerRows = () => {
+    if (!isContainerRequired()) {
+      return true
+    }
+    const rows = Array.isArray(inputData.value?.pac_list) ? inputData.value.pac_list : []
+    if (rows.length > 0) {
+      return true
+    }
+    activedTab.value = 1
+    appStore.openMessage({
+      content: t('$vuetify.custom.bookingPage.form.pac_list.err'),
+      color: 'error',
+    })
+    return false
+  }
+
+  const persistBooking = async ({ showMessage = true } = {}) => {
+    if (!ensureContainerRows()) {
+      return false
+    }
+    const { valid, errors } = await refDataForm.value.validate()
+    if (!valid) {
+      handleValidationErrors(errors)
+      return false
+    }
+    return bookingSaveHandle({ showMessage })
+  }
+
   const onSaveHandle = async () => {
     if (!editLockGuard.ensureCanSave()) {
       return
     }
     if (checkBookingLocked()) {
-      return
-    }
-    const { valid, errors } = await refDataForm.value.validate()
-    if (!valid) {
-      handleValidationErrors(errors)
       return
     }
     try {
@@ -426,8 +453,8 @@
         case 1:
         case 2:
         case 4: {
-          await bookingSaveHandle()
-          if (!isEditMode.value) {
+          const saved = await persistBooking()
+          if (saved && !isEditMode.value) {
             router.push({
               name: 'booking_edit-pk',
               params: { pk: inputData.value.pk },
@@ -485,12 +512,7 @@
   }
 
   const saveThenRun = async run => {
-    const { valid, errors } = await refDataForm.value.validate()
-    if (!valid) {
-      handleValidationErrors(errors)
-      return false
-    }
-    const saved = await bookingSaveHandle({ showMessage: false })
+    const saved = await persistBooking({ showMessage: false })
     if (!saved) {
       return false
     }
