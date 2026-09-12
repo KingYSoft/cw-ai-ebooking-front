@@ -3,7 +3,7 @@
     <v-progress-linear :active="loading" color="primary" height="2" indeterminate />
 
     <v-row class="dashboard-page__stats">
-      <v-col v-for="card in statCards" :key="card.key" cols="12" sm="6" lg="3">
+      <v-col v-for="card in statCards" :key="card.key" cols="12" lg="3" sm="6">
         <DashboardStatCard :title="card.title" :value="card.value" @click="goBookingList" />
       </v-col>
     </v-row>

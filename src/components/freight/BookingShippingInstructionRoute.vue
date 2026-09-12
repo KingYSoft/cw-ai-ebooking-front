@@ -5,10 +5,10 @@
         <v-row dense>
           <v-col cols="12" sm="6">
             <v-text-field
-              :model-value="inputData.bkg_house_bill"
               density="compact"
               hide-details
               min-width="100%"
+              :model-value="inputData.bkg_house_bill"
               variant="outlined"
             >
               <template #prepend>
@@ -100,8 +100,8 @@
         <v-row class="si-hbl-textarea-row mt-1" dense>
           <v-col cols="12" sm="6">
             <v-textarea
-              class="si-hbl-textarea"
               :auto-grow="false"
+              class="si-hbl-textarea"
               density="compact"
               hide-details
               :model-value="inputData.bkg_marks_nos"
@@ -117,8 +117,8 @@
 
           <v-col cols="12" sm="6">
             <v-textarea
-              class="si-hbl-textarea"
               :auto-grow="false"
+              class="si-hbl-textarea"
               density="compact"
               hide-details
               :model-value="inputData.bkg_goods_description"

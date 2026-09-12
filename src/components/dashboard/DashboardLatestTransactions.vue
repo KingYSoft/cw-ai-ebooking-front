@@ -5,7 +5,7 @@
     </div>
 
     <v-card-text class="dashboard-panel__body pt-2 pb-4 px-4">
-      <div v-if="!items.length" class="text-medium-emphasis text-center py-10">
+      <div v-if="items.length === 0" class="text-medium-emphasis text-center py-10">
         {{ emptyText }}
       </div>
 

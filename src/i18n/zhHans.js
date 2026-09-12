@@ -1,5 +1,6 @@
 import bookingPageEdit from './blocks/bookingPage/editZhHans'
 import dashboardPage from './blocks/dashboardPage/zhHans'
+import partyRole from './blocks/partyRole/zhHans'
 import systemPage from './blocks/systemPage/zhHans'
 import warehouseOrder from './blocks/warehouseOrder/zhHans'
 
@@ -188,6 +189,7 @@ export default {
       system: '系统',
       system_user: '用户',
       system_group: '组',
+      system_party_role: '参与方角色',
       system_security: '权限',
       system_logs: '日志',
     },
@@ -539,6 +541,7 @@ export default {
         uploadError: 'Upload error: {0}',
       },
     },
+    partyRole,
     systemPage,
     warehouseOrder,
   },
