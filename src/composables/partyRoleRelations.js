@@ -48,7 +48,7 @@ export function addRelationBatch(existing, candidates) {
       continue
     }
     keys.add(key)
-    added.push({ ...candidate, client_key: candidate.client_key || crypto.randomUUID() })
+    added.push({ ...candidate, client_key: candidate.client_key || '-' })
   }
   const retained = existing.filter(row => !added.some(child => isEmptyParent(row, child)))
   return {

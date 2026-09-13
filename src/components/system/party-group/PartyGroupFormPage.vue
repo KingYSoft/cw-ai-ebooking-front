@@ -56,37 +56,6 @@
         </v-scroll-x-transition>
       </v-sheet>
     </v-form>
-
-    <v-dialog v-model="linkDialog" max-width="820" persistent>
-      <v-card :title="t('links')">
-        <v-card-text>
-          <div v-for="role in roles" :key="role" class="d-flex align-center ga-3 mb-4">
-            <strong class="w-label-120">{{ t(role) }}</strong>
-
-            <div class="flex-grow-1">
-              {{ linkSelections[role]?.[0]?.code || t('unconfigured') }}
-            </div>
-
-            <v-btn
-              :disabled="role === group.role_type"
-              size="small"
-              variant="text"
-              @click="linkSelections[role] = []"
-            >
-              {{ t('remove') }}
-            </v-btn>
-          </div>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer />
-
-          <v-btn @click="linkDialog = false">{{ t('cancel') }}</v-btn>
-
-          <v-btn color="primary" @click="applyLink">{{ t('apply') }}</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </FPageLayout>
 </template>
 <script setup>
@@ -133,7 +102,7 @@
   const state = ref({
     group: {
       id: 0,
-      pk: crypto.randomUUID(),
+      pk: '',
       role_type: roleType,
       code: '',
       description: '',
@@ -190,50 +159,6 @@
 
   const maxHeight = computed(() => display.height.value - 320)
 
-  const linkDialog = ref(false)
-  const editingKey = ref(null)
-  const linkSelections = ref({ AGENT: [], CONSIGNEE: [], SHIPPER: [] })
-  const linkError = ref('')
-  function editLink(row) {
-    editingKey.value = row?._key ?? null
-    linkError.value = ''
-    linkSelections.value = Object.fromEntries(
-      roles.map(role => {
-        const prefix = role.toLowerCase()
-        return [
-          role,
-          role === group.value.role_type
-            ? [{ ...group.value }]
-            : row?.[`${prefix}_group_pk`]
-              ? [
-                  {
-                    pk: row[`${prefix}_group_pk`],
-                    code: row[`${prefix}_group_code`],
-                    description: row[`${prefix}_group_description`],
-                  },
-                ]
-              : [],
-        ]
-      }),
-    )
-    linkDialog.value = true
-  }
-  function applyLink() {
-    const old = links.value.find(x => x._key === editingKey.value)
-    const row = { pk: old?.pk ?? null, _key: old?._key ?? crypto.randomUUID() }
-    for (const role of roles) {
-      const selected = linkSelections.value[role]?.[0]
-      const prefix = role.toLowerCase()
-      row[`${prefix}_group_pk`] = selected?.pk ?? null
-      row[`${prefix}_group_code`] = selected?.code ?? null
-      row[`${prefix}_group_description`] = selected?.description ?? null
-    }
-    const next = old ? links.value.map(x => (x._key === old._key ? row : x)) : [...links.value, row]
-    linkError.value = validateGroupLinks(next, group.value.pk) || ''
-    if (linkError.value) return
-    links.value = next
-    linkDialog.value = false
-  }
   async function load() {
     if (!props.pk) {
       skeletonLoading.value = false
