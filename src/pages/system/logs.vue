@@ -263,7 +263,7 @@
     name: 'system_logs',
     icon: 'mdi-text-box-search-outline',
     menu: true,
-    order: 7,
+    order: 99,
     meta: {
       keepAlive: false,
       requiresAuth: true,

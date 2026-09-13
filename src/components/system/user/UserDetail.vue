@@ -423,7 +423,7 @@
   const { addrTable } = useWarehouseOrderPageI18n()
   const { rescols } = useLayoutCols()
 
-  defineProps({
+  const props = defineProps({
     inputDataRules: {
       type: Object,
       default: () => ({}),
@@ -440,7 +440,7 @@
     default: () => ({}),
   })
 
-  if (!inputData.value.role_type) {
+  if (!props.isEdit && !inputData.value.role_type) {
     inputData.value.role_type = 'SHIPPER'
   }
   /**

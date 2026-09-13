@@ -1,4 +1,5 @@
 const emptyParty = () => ({
+  add_address: null,
   add_address_name: '',
   add_address_code: '',
   add_address1: '',
@@ -108,6 +109,9 @@ const BOOKING_SAVE_BKG_KEYS = [
   'bkg_po_number',
   'bkg_dagent_fee',
   'bkg_org_header_pk',
+  'bkg_agent_org_header_pk',
+  'bkg_consignee_org_header_pk',
+  'bkg_shipper_org_header_pk',
 ]
 
 export function createDefaultBookingForm(appStore) {

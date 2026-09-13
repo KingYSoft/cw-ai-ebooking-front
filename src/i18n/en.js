@@ -1,5 +1,6 @@
 import bookingPageEdit from './blocks/bookingPage/editEn'
 import dashboardPage from './blocks/dashboardPage/en'
+import partyGroup from './blocks/partyGroup/en'
 import partyRole from './blocks/partyRole/en'
 import systemPage from './blocks/systemPage/en'
 import warehouseOrder from './blocks/warehouseOrder/en'
@@ -189,6 +190,9 @@ export default {
       system: 'System',
       system_user: 'User',
       system_group: 'Group',
+      system_agent_group: 'Agent Groups',
+      system_consignee_group: 'Consignee Groups',
+      system_shipper_group: 'Shipper Groups',
       system_party_role: 'Party Roles',
       system_security: 'Security',
       system_logs: 'Logs',
@@ -542,6 +546,7 @@ export default {
       },
     },
     partyRole,
+    partyGroup,
     systemPage,
     warehouseOrder,
   },
