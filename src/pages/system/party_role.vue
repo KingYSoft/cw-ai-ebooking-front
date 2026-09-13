@@ -146,7 +146,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      permissions: 'PERMISSION_SYSTEM_PARTY_ROLE',
+      permissions: 'PERMISSION_SYSTEM_PARTY_ROLE11',
     },
   })
 

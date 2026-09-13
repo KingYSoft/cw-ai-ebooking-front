@@ -17,11 +17,19 @@
     <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
       <v-tab :value="1">{{ userEditTab('detail') }}</v-tab>
       <v-tab :value="2">{{ userEditTab('warehouse') }}</v-tab>
+      <v-tab :value="3">{{ groupText('linkedAgent') }}</v-tab>
+      <v-tab :value="4">{{ groupText('linkedConsignee') }}</v-tab>
+      <v-tab :value="5">{{ groupText('linkedShipper') }}</v-tab>
     </v-tabs>
 
     <v-divider />
 
-    <v-form ref="formRef" class="ref-form-pre" color="background">
+    <v-form
+      ref="formRef"
+      class="ref-form-pre"
+      color="background"
+      :disabled="cardLoading || skeletonLoading"
+    >
       <PagesSystemUserEdit
         v-model:input-data="inputData"
         :actived-tab="activedTab"
@@ -66,8 +74,11 @@
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
   import PagesSystemUserEdit from '@/components/system/PagesSystemUserEdit.vue'
+  import { usePartyGroupI18n } from '@/composables/usePartyGroupI18n'
   import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import { useAppStore } from '@/stores/app'
+
+  const { t: groupText } = usePartyGroupI18n()
 
   const { common, userDialog, userEditTab } = useSystemPageI18n()
 
@@ -105,6 +116,10 @@
     is_warehouse: 0,
     warehouse_list: [],
     group_list: [],
+    agent_group_pks: [],
+    consignee_group_pks: [],
+    shipper_group_pks: [],
+    party_groups: [],
   })
 
   const cardLoading = ref(false)
