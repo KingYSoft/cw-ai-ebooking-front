@@ -49,6 +49,7 @@
               v-model:input-data="inputData"
               :actived-tab="activedTab"
               :group-pk="groupPk"
+              :max-height="maxHeight"
               :role-type="roleType"
             />
           </div>
@@ -65,12 +66,6 @@
             <div class="flex-grow-1">
               {{ linkSelections[role]?.[0]?.code || t('unconfigured') }}
             </div>
-
-            <PartyGroupPicker
-              v-model="linkSelections[role]"
-              :disabled="role === group.role_type"
-              :role="role"
-            />
 
             <v-btn
               :disabled="role === group.role_type"
@@ -97,6 +92,7 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useDisplay } from 'vuetify'
   import { getPartyGroup, savePartyGroup } from '@/api/party-group'
   import FPageLayout from '@/components/FPageLayout.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
@@ -118,6 +114,7 @@
   const route = useRoute()
   const router = useRouter()
   const app = useAppStore()
+  const display = useDisplay()
   const roles = PARTY_GROUP_ROLES
   const roleType = roles.includes(String(route.query.role_type))
     ? String(route.query.role_type)
@@ -190,6 +187,9 @@
       members.value = rows.map(x => ({ ...x, org_header_pk: x.pk }))
     },
   })
+
+  const maxHeight = computed(() => display.height.value - 320)
+
   const linkDialog = ref(false)
   const editingKey = ref(null)
   const linkSelections = ref({ AGENT: [], CONSIGNEE: [], SHIPPER: [] })
