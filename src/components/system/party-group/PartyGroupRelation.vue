@@ -7,7 +7,7 @@
       hide-default-footer
       item-value="id"
       :items="inputData.link_list"
-      :max-height="maxHeight"
+      :max-height="props.maxHeight"
       setting-name="system-party-role"
       striped="even"
       title="Group Relations"
@@ -173,6 +173,10 @@
     roleType: {
       type: String,
       default: null,
+    },
+    maxHeight: {
+      type: Number,
+      default: 400,
     },
   })
 
