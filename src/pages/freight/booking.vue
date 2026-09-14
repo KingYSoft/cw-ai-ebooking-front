@@ -185,6 +185,7 @@
     defaultBookingListStatusSelection,
     getBookingListStatusChipProps,
   } from '@/constants/bookingListStatus'
+  import { isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'Booking' })
@@ -336,11 +337,17 @@
     { title: tableHeader('inco'), key: 'bkg_inco', align: 'start', minWidth: '80px' },
   ])
 
-  const getRowMenuItems = () => [
-    { title: menu('copy'), prependIcon: 'mdi-content-copy', code: 'copy' },
-    { type: 'divider' },
-    { title: menu('deactivate'), prependIcon: 'mdi-delete', code: 'deactivate', color: 'red' },
-  ]
+  const getRowMenuItems = item => {
+    const items = [{ title: menu('copy'), prependIcon: 'mdi-content-copy', code: 'copy' }]
+    const status = item?.active_status || item?.booking_status || item?.bkg_status
+    if (!isSiSubmittedOrLater(status)) {
+      items.push(
+        { type: 'divider' },
+        { title: menu('deactivate'), prependIcon: 'mdi-delete', code: 'deactivate', color: 'red' },
+      )
+    }
+    return items
+  }
 
   const handleRowMenuSelect = (e, item) => {
     switch (e.id) {

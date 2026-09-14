@@ -500,7 +500,7 @@ export default {
         },
         menu: {
           copy: 'Copy',
-          deactivate: 'Deactivate',
+          deactivate: 'Deactive',
         },
         listStatus: {
           submitted: 'Submitted',

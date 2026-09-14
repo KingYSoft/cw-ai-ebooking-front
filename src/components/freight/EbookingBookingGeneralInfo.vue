@@ -1,7 +1,17 @@
 <template>
   <div>
     <v-card-text class="py-2">
-      <v-row>
+      <BookingSiPartyFields
+        v-if="showSiRouteFields"
+        v-model:input-data="inputData"
+        :addr-table-headers="addrTableHeaders"
+        :field-id-prefix="fieldIdPrefix"
+        :input-data-rules="inputDataRules"
+        @on-clear-addr="onClearAddr"
+        @on-select-addr="onSelectAddr"
+      />
+
+      <v-row v-else>
         <v-col :cols="rescols('c12l4s6')">
           <v-divider>
             <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
