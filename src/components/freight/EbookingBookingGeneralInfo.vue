@@ -344,10 +344,11 @@
               auto-select-first
               autocomplete="off"
               density="compact"
+              :disabled="isAirTransport"
               hide-details
               item-title="code"
               item-value="code"
-              :items="appStore.appCombobox.getCombobox('containerMode')"
+              :items="packingModeItems"
               :menu-props="{
                 'max-width': '100%',
               }"
@@ -664,6 +665,7 @@
               v-model:date-value="inputData.bkg_etd"
               max="2099-12-31"
               min="2000-01-01"
+              :rules="inputDataRules.bkg_etd"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">{{ detailField('etd') }}:</div>
@@ -675,6 +677,7 @@
               v-model:date-value="inputData.bkg_eta"
               max="2099-12-31"
               min="2000-01-01"
+              :rules="inputDataRules.bkg_eta"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">{{ detailField('eta') }}:</div>
@@ -686,6 +689,7 @@
               v-model:date-value="inputData.bkg_cargo_ready"
               max="2099-12-31"
               min="2000-01-01"
+              :rules="inputDataRules.bkg_cargo_ready"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">{{ detailField('cargoReadyDate') }}:</div>
@@ -1047,9 +1051,11 @@
       </v-card-text>
 
       <v-data-table
-        class="table-filter"
+        class="table-filter booking-container-table"
         disable-sort
+        fixed-header
         :headers="containerHeaders"
+        :height="150"
         hide-default-footer
         item-value="id"
         :items="inputData.pac_list"
@@ -1308,7 +1314,7 @@
 
 <script setup>
   import Decimal from 'decimal.js'
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { queryServiceLevelOptions } from '@/api/service_level'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
@@ -1422,20 +1428,41 @@
   // const releaseTypes = ['OBL', 'SWB', 'Telex']
   // const deliveryModes = ['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']
 
-  const showContainerTable = computed(
-    () =>
-      props.showCargoFields &&
-      inputData.value.bkg_transport_mode === 'SEA' &&
-      inputData.value.bkg_packing_mode === 'FCL',
+  const showContainerTable = computed(() => props.showCargoFields)
+
+  const isAirTransport = computed(
+    () => String(inputData.value.bkg_transport_mode ?? '').toUpperCase() === 'AIR',
   )
 
+  const packingModeItems = computed(() => {
+    const items = [...(appStore.appCombobox.getCombobox('containerMode') ?? [])]
+    if (isAirTransport.value) {
+      const lseItems = items.filter(item => item.code === 'LSE')
+      return lseItems.length ? lseItems : [{ code: 'LSE', title: 'LSE' }]
+    }
+    if (!items.some(item => item.code === 'BCN')) {
+      items.push({ code: 'BCN', title: 'BCN', id: 4 })
+    }
+    return items
+  })
+
   const onTransportChange = mode => {
-    if (mode === 'AIR') {
+    if (String(mode ?? '').toUpperCase() === 'AIR') {
       inputData.value.bkg_packing_mode = 'LSE'
-    } else if (!inputData.value.bkg_packing_mode) {
+    } else {
       inputData.value.bkg_packing_mode = 'FCL'
     }
   }
+
+  watch(
+    isAirTransport,
+    isAir => {
+      if (isAir && inputData.value.bkg_packing_mode !== 'LSE') {
+        inputData.value.bkg_packing_mode = 'LSE'
+      }
+    },
+    { immediate: true },
+  )
 
   const containerHeaders = computed(() => [
     { title: '', key: 'actions', width: '40px', align: 'center', sortable: false },
@@ -1460,7 +1487,7 @@
     const cbm = cbm_d.isNaN() ? new Decimal(0) : cbm_d
     const vol_weight = cbm.times(new Decimal(166)).times(new Decimal(1000)).div(new Decimal(1000))
     const vw = vol_weight.toNumber()
-    const newVolumeWeight = vw === 0 ? null : vw
+    const newVolumeWeight = vw === 0 ? 0 : vw
 
     // 只在值真正改变时才更新，避免触发不必要的响应式更新
     if (inputData.value.bkg_volume_weight !== newVolumeWeight) {
@@ -1470,7 +1497,7 @@
     const gw_d = new Decimal(inputData.value.bkg_actual_weight ?? 0)
     const gw = gw_d.isNaN() ? new Decimal(0) : gw_d
     const cg = gw.lessThan(vol_weight) ? vol_weight.toNumber() : gw.toNumber()
-    const newChargeableWeight = cg === 0 ? null : cg
+    const newChargeableWeight = cg === 0 ? 0 : cg
 
     // 只在值真正改变时才更新，避免触发不必要的响应式更新
     if (inputData.value.bkg_actual_chargeable !== newChargeableWeight) {
@@ -1486,7 +1513,7 @@
     const cbm = cbm_d.isNaN() ? new Decimal(0) : cbm_d
     const vol_weight = cbm.times(new Decimal(166)).times(new Decimal(1000)).div(new Decimal(1000))
     const vw = vol_weight.toNumber()
-    const newVolumeWeight = vw === 0 ? null : vw
+    const newVolumeWeight = vw === 0 ? 0 : vw
 
     // 只在值真正改变时才更新，避免触发不必要的响应式更新
     if (item.pac_volume_weight !== newVolumeWeight) {
@@ -1496,7 +1523,7 @@
     const gw_d = new Decimal(item.pac_gross_weight ?? 0)
     const gw = gw_d.isNaN() ? new Decimal(0) : gw_d
     const cg = gw.lessThan(vol_weight) ? vol_weight.toNumber() : gw.toNumber()
-    const newChargeableWeight = cg === 0 ? null : cg
+    const newChargeableWeight = cg === 0 ? 0 : cg
 
     // 只在值真正改变时才更新，避免触发不必要的响应式更新
     if (item.pac_chargeable_weight !== newChargeableWeight) {
@@ -1519,3 +1546,9 @@
   // Fetch service level options on component mount
   fetchServiceLevelOptions()
 </script>
+
+<style scoped>
+  .booking-container-table :deep(.v-table__wrapper) {
+    overflow-y: auto;
+  }
+</style>

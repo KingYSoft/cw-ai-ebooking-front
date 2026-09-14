@@ -292,6 +292,32 @@
     }
   }
 
+  /** ETD 须严格晚于 Cargo Ready（yyyy-MM-dd：es > cs，不可同日） */
+  const validateBookingEtdNotBeforeCargoReady = () => {
+    const es = String(inputData.value.bkg_etd ?? '').trim()
+    const cs = String(inputData.value.bkg_cargo_ready ?? '').trim()
+    if (!es || !cs) return true
+    if (es > cs) return true
+    return t('$vuetify.custom.bookingPage.form.etd_must_be_before_cargo_ready.err')
+  }
+
+  /** SEA: ETA > ETD；AIR: ETA >= ETD */
+  const validateBookingEtaVsEtd = () => {
+    const mode = String(inputData.value.bkg_transport_mode ?? '').toUpperCase()
+    const etd = String(inputData.value.bkg_etd ?? '').trim()
+    const eta = String(inputData.value.bkg_eta ?? '').trim()
+    if (!etd || !eta) return true
+    if (mode === 'SEA') {
+      if (eta > etd) return true
+      return t('$vuetify.custom.bookingPage.form.eta_vs_etd_sea.err')
+    }
+    if (mode === 'AIR') {
+      if (eta >= etd) return true
+      return t('$vuetify.custom.bookingPage.form.eta_vs_etd_air.err')
+    }
+    return true
+  }
+
   const inputDataRules = {
     shipper_name: [
       value => {
@@ -391,6 +417,8 @@
           return t('$vuetify.custom.bookingPage.form.bkg_etd.err')
         }
       },
+      validateBookingEtdNotBeforeCargoReady,
+      validateBookingEtaVsEtd,
     ],
     bkg_eta: [
       value => {
@@ -400,6 +428,7 @@
           return t('$vuetify.custom.bookingPage.form.bkg_eta.err')
         }
       },
+      validateBookingEtaVsEtd,
     ],
     bkg_cargo_ready: [
       value => {
@@ -409,6 +438,7 @@
           return t('$vuetify.custom.bookingPage.form.bkg_cargo_ready.err')
         }
       },
+      validateBookingEtdNotBeforeCargoReady,
     ],
     bkg_actual_weight: [
       value => {
