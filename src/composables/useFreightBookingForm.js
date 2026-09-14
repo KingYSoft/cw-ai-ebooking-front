@@ -1,8 +1,40 @@
+import Decimal from 'decimal.js'
 import { ref } from 'vue'
 import { useLocale } from 'vuetify'
 import { bookingSave } from '@/api/booking'
 import { useUnsavedInputDataGuard } from '@/composables/useUnsavedInputDataGuard'
 import { useAppStore } from '@/stores/app'
+
+const toDecimal = value => {
+  const text = String(value ?? '')
+    .trim()
+    .replace(/,/g, '')
+  if (text === '') {
+    return new Decimal(0)
+  }
+  try {
+    return new Decimal(text)
+  } catch {
+    return new Decimal(0)
+  }
+}
+
+const BOOKING_PAC_REMAINDER_FIELDS = [
+  { header: 'bkg_total_package_count', row: 'pac_package_count', digits: 0 },
+  { header: 'bkg_actual_weight', row: 'pac_gross_weight', digits: 5 },
+  { header: 'bkg_actual_volume', row: 'pac_actual_volume', digits: 5 },
+]
+
+const getBookingPacRowRemainderFields = inputData => {
+  const rows = inputData?.pac_list ?? []
+  return BOOKING_PAC_REMAINDER_FIELDS.reduce((fields, { header, row, digits }) => {
+    const total = rows.reduce((sum, item) => sum.plus(toDecimal(item?.[row])), new Decimal(0))
+    const remainder = toDecimal(inputData?.[header]).minus(total)
+    const safeRemainder = remainder.isNegative() ? new Decimal(0) : remainder
+    fields[row] = safeRemainder.toDecimalPlaces(digits, Decimal.ROUND_HALF_UP).toNumber()
+    return fields
+  }, {})
+}
 
 /**
  * 编辑 和 新增，公共部分写在这里。
@@ -116,23 +148,25 @@ export function useFreightBookingForm() {
   }
 
   const addNewContainer = () => {
+    if (!inputData.value) {
+      return
+    }
+    if (!Array.isArray(inputData.value.pac_list)) {
+      inputData.value.pac_list = []
+    }
+    const remainderFields = getBookingPacRowRemainderFields(inputData.value)
     inputData.value.pac_list.push({
       id: Date.now(),
-      pac_container_type: '20GP',
       pac_container_count: 1,
-      pac_container_num: '',
-      pac_seal_num: '',
-      pac_is_soc: 0,
-      pac_commodity: '',
-      pac_gross_weight: null,
-      pac_weight_unit: 'KG',
-      pac_actual_volume: null,
-      pac_actual_volume_uom: 'M3',
-      pac_package_count: null,
-      pac_pack_type: 'PKG',
-      pac_pack_type_desc: 'Package',
-      pac_harmonised_code: '',
-      pac_goods_description: '',
+      pac_pack_type: inputData.value.bkg_pack_type,
+      pac_weight_unit: inputData.value.bkg_unit_of_weight,
+      pac_actual_volume_uom: inputData.value.bkg_unit_of_volume,
+      pac_volume_weight: inputData.value.bkg_volume_weight,
+      pac_volume_weight_unit: inputData.value.bkg_volume_weight_unit,
+      pac_chargeable_weight: inputData.value.bkg_actual_chargeable,
+      pac_chargeable_weight_unit: inputData.value.bkg_actual_chargeable_unit,
+      pac_pack_type_desc: inputData.value.bkg_pack_type_desc,
+      ...remainderFields,
     })
   }
 

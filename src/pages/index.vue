@@ -122,17 +122,13 @@
   }
 
   const transactionItems = computed(() =>
-    latestTransactions.value.map(item => {
-      const consignee = item.consignee_name || item.consignee?.add_address_name || ''
-      return {
-        ...item,
-        dateLabel: formatTxnDate(itemTimestamp(item)),
-        title: formatBookingNo(item),
-        subtitle: consignee || '—',
-        container: item.container_summary || '—',
-        cbm: formatCbm(item),
-      }
-    }),
+    latestTransactions.value.map(item => ({
+      ...item,
+      dateLabel: formatTxnDate(itemTimestamp(item)),
+      title: formatBookingNo(item),
+      container: item.container_summary || '—',
+      cbm: formatCbm(item),
+    })),
   )
 
   const goBookingList = () => {

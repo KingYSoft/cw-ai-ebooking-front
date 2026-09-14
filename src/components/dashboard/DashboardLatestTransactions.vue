@@ -21,8 +21,6 @@
 
           <span class="dashboard-txn-list__main">
             <span class="dashboard-txn-list__name text-primary">{{ item.title }}</span>
-
-            <span class="dashboard-txn-list__sub text-medium-emphasis">{{ item.subtitle }}</span>
           </span>
 
           <span class="dashboard-txn-list__container font-weight-medium">{{ item.container }}</span>
@@ -117,20 +115,12 @@
 
   .dashboard-txn-list__main {
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
   }
 
-  .dashboard-txn-list__name,
-  .dashboard-txn-list__sub {
+  .dashboard-txn-list__name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .dashboard-txn-list__sub {
-    font-size: 0.75rem;
   }
 
   .dashboard-txn-list__container,

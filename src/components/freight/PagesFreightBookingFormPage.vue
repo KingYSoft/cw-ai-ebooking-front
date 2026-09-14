@@ -82,7 +82,7 @@
       <v-tab :value="1">{{ editTab('booking') }}</v-tab>
       <v-tab :value="2">{{ editTab('additionalDetails') }}</v-tab>
       <v-tab :value="3">{{ editTab('docs') }}</v-tab>
-      <v-tab :value="4">{{ editTab('shippingInstruction') }}</v-tab>
+      <v-tab v-if="showShippingInstructionTab" :value="4">{{ editTab('shippingInstruction') }}</v-tab>
     </v-tabs>
 
     <v-divider />
@@ -228,7 +228,7 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { bookingCancel, bookingDetail, bookingSiSubmit, bookingSubmit } from '@/api/booking'
   import { organizationQueryOrgAddress } from '@/api/organization'
@@ -296,6 +296,12 @@
   )
   const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
   const isBookingReleasedLocked = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
+  const showShippingInstructionTab = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
+  watch(showShippingInstructionTab, show => {
+    if (!show && activedTab.value === 4) {
+      activedTab.value = 1
+    }
+  })
   const showSaveButton = computed(() => {
     if (isBookingReleasedLocked.value) {
       return activedTab.value === 4
@@ -450,8 +456,7 @@
 
   const refDataForm = ref(null)
 
-  const isContainerRequired = () =>
-    inputData.value?.bkg_transport_mode === 'SEA' && inputData.value?.bkg_packing_mode === 'FCL'
+  const isContainerRequired = () => true
 
   const ensureContainerRows = () => {
     if (!isContainerRequired()) {

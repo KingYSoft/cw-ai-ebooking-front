@@ -123,6 +123,11 @@ export default {
       noOfPackage: 'Số kiện',
       hsCode: 'Mã HS',
       description: 'Mô tả',
+      volumeWeight: 'Trọng lượng thể tích',
+      chargeableWeight: 'Trọng lượng tính cước',
+      length: 'Chiều dài',
+      width: 'Chiều rộng',
+      height: 'Chiều cao',
     },
   },
   addrTable: {

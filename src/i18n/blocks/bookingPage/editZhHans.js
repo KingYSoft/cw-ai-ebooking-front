@@ -123,6 +123,11 @@ export default {
       noOfPackage: '件数',
       hsCode: 'HS编码',
       description: '描述',
+      volumeWeight: '体积重',
+      chargeableWeight: '计费重',
+      length: '长度',
+      width: '宽度',
+      height: '高度',
     },
   },
   addrTable: {
