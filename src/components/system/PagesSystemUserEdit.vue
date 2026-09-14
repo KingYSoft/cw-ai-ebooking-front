@@ -16,6 +16,14 @@
         <UserWarehouse v-model:input-data="inputData" :actived-tab="activedTab" />
       </div>
     </v-scroll-x-transition>
+
+    <div
+      v-for="(role, index) in ['AGENT', 'CONSIGNEE', 'SHIPPER']"
+      v-show="activedTab === index + 3"
+      :key="role"
+    >
+      <UserPartyGroups v-model:input-data="inputData" :actived-tab="activedTab" :role="role" />
+    </div>
   </v-sheet>
 </template>
 
@@ -23,6 +31,7 @@
   import { ref, toRefs } from 'vue'
   import { useSystemPageI18n } from '@/composables/useSystemPageI18n'
   import UserDetail from './user/UserDetail.vue'
+  import UserPartyGroups from './user/UserPartyGroups.vue'
   import UserWarehouse from './user/UserWarehouse.vue'
 
   const { userEdit } = useSystemPageI18n()

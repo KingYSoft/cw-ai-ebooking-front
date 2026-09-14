@@ -2,12 +2,6 @@
   <v-row dense>
     <v-col :cols="rescols('c12m6')">
       <v-card-text class="py-2">
-        <v-divider>
-          <div class="text-center text-caption text-uppercase text-on-surface opacity-70 mb-8">
-            {{ groupEdit('detail.section.groupDetail') }}
-          </div>
-        </v-divider>
-
         <v-row dense>
           <v-col :cols="rescols('c12m6')">
             <v-text-field
@@ -41,7 +35,9 @@
               :true-value="1"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120 mr-2">{{ groupField('isActive') }}:</div>
+                <div class="text-caption text-end w-label-120 mr-2">
+                  {{ groupField('isActive') }}:
+                </div>
               </template>
             </v-switch>
           </v-col>
@@ -58,7 +54,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-120">{{ groupField('description') }}:</div>
+                <div class="text-caption text-end w-label-120">
+                  {{ groupField('description') }}:
+                </div>
               </template>
             </v-textarea>
           </v-col>

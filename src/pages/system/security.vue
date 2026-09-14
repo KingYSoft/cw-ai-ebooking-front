@@ -58,7 +58,7 @@
     name: 'system_security',
     icon: 'mdi-shield-lock-outline',
     menu: true,
-    order: 6,
+    order: 98,
     meta: {
       keepAlive: false,
       requiresAuth: true,

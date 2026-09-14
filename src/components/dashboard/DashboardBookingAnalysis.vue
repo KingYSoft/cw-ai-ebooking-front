@@ -15,19 +15,19 @@
 
       <div class="d-flex justify-end mb-2">
         <v-select
-          :model-value="period"
           density="compact"
           hide-details
           item-title="title"
           item-value="value"
           :items="periodItems"
           max-width="160"
+          :model-value="period"
           variant="plain"
           @update:model-value="$emit('update:period', $event)"
         />
       </div>
 
-      <div v-if="!segments.length" class="text-medium-emphasis text-center py-10">
+      <div v-if="segments.length === 0" class="text-medium-emphasis text-center py-10">
         {{ emptyText }}
       </div>
 

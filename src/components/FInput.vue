@@ -5,22 +5,24 @@
         <slot name="prepend" />
 
         <v-select
+          v-if="componentType !== 'v-checkbox'"
           v-model="modelOp"
           auto-select-first
           autocomplete="off"
           density="compact"
           hide-details
-          :items="['=', '>=', '<=', 'Contain', 'Not Contain']"
+          :items="opItems ?? ['=', '>=', '<=', 'Contain', 'Not Contain']"
           :list-props="{
             density: 'compact',
           }"
           :menu-props="{
             'max-width': 'auto',
           }"
+          min-width="60"
           no-data-text="$vuetify.custom.app.searchMore"
           no-filter
           variant="outlined"
-          width="60"
+          width="auto"
         >
           <template #item="scope">
             <v-list-item v-bind="scope.props">
@@ -36,7 +38,7 @@
 </template>
 
 <script setup>
-  import { VSelect, VTextField } from 'vuetify/components'
+  import { VCheckbox, VSelect, VTextField } from 'vuetify/components'
   import FDatePicker from './FDatePicker.vue'
 
   defineOptions({
@@ -62,9 +64,15 @@
         return {}
       },
     },
+    opItems: {
+      type: Array,
+      defalut: () => {
+        return []
+      },
+    },
   })
 
-  const { componentType, componentProps } = toRefs(props)
+  const { componentType, componentProps, opItems } = toRefs(props)
   const getComponent = computed(() => {
     switch (componentType.value) {
       case 'v-select': {
@@ -72,6 +80,9 @@
       }
       case 'f-date-picker': {
         return FDatePicker
+      }
+      case 'v-checkbox': {
+        return VCheckbox
       }
       case 'v-text-field': {
         return VTextField
@@ -90,6 +101,10 @@
     variant: 'outlined',
   }
   const getProps = computed(() => {
-    return Object.assign(defaultProps, componentProps.value)
+    const merged = Object.assign({}, defaultProps, componentProps.value)
+    if (String(merged.type ?? '').toLowerCase() === 'number') {
+      merged.class = [merged.class, 'input-numeric'].filter(Boolean).join(' ')
+    }
+    return merged
   })
 </script>

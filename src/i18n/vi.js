@@ -1,5 +1,7 @@
 import bookingPage from './blocks/bookingPage/vi'
 import dashboardPage from './blocks/dashboardPage/vi'
+import partyGroup from './blocks/partyGroup/vi'
+import partyRole from './blocks/partyRole/vi'
 import systemPage from './blocks/systemPage/vi'
 import warehouseOrder from './blocks/warehouseOrder/vi'
 
@@ -188,6 +190,10 @@ export default {
       system: 'Hệ thống',
       system_user: 'Người dùng',
       system_group: 'Nhóm',
+      system_agent_group: 'Agent Groups',
+      system_consignee_group: 'Consignee Groups',
+      system_shipper_group: 'Shipper Groups',
+      system_party_role: 'Vai trò các bên',
       system_security: 'Bảo mật',
       system_logs: 'Nhật ký',
     },
@@ -321,6 +327,8 @@ export default {
         uploadError: 'Lỗi tải lên: {0}',
       },
     },
+    partyRole,
+    partyGroup,
     systemPage,
     warehouseOrder,
   },

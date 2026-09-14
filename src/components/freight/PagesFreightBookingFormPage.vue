@@ -204,8 +204,8 @@
           auto-grow
           density="compact"
           :label="editDialog('cancelReason', 'reason')"
-          :rules="cancelReasonRules"
           rows="3"
+          :rules="cancelReasonRules"
           variant="outlined"
         />
       </v-card-text>
