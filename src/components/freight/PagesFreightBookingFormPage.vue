@@ -238,7 +238,7 @@
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
   import { useFreightBookingForm } from '@/composables/useFreightBookingForm'
-  import { isBookingReleasedOrLater } from '@/constants/bookingFreightSteps'
+  import { isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
@@ -256,6 +256,7 @@
   const router = useRouter()
   const route = useRoute()
   const appStore = useAppStore()
+  const isCopyAsNew = computed(() => String(route.query.copy ?? '') === '1')
 
   const {
     inputData,
@@ -274,7 +275,7 @@
 
   const editLockGuard = useEditLockGuard({
     businessType: 'ebooking_booking',
-    pk: route.params.pk?.toString() || '',
+    pk: computed(() => (isCopyAsNew.value ? '' : String(route.params.pk || ''))),
   })
   const isEditLockedByOther = computed(() => editLockGuard.isSaveBlocked.value)
   const editLockWarningText = computed(() => editLockGuard.lockWarningText.value)
@@ -302,7 +303,10 @@
     return activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4
   })
   const showBookingActionButtons = computed(
-    () => isEditMode.value && Boolean(String(inputData.value?.pk || route.params.pk || '').trim()),
+    () =>
+      isEditMode.value &&
+      !isCopyAsNew.value &&
+      Boolean(String(inputData.value?.pk || route.params.pk || '').trim()),
   )
   const showSubmitButton = computed(
     () =>
@@ -314,7 +318,11 @@
     () => showBookingActionButtons.value && activeStatusTitle.value === 'Booking Released',
   )
   const showCancelButton = computed(
-    () => showBookingActionButtons.value && Boolean(activeStatusTitle.value),
+    () =>
+      showBookingActionButtons.value &&
+      Boolean(activeStatusTitle.value) &&
+      !isBookingCancelled.value &&
+      !isSiSubmittedOrLater(activeStatusTitle.value),
   )
   const showToolbarActions = computed(
     () => showSaveButton.value || showBookingActionButtons.value,
@@ -351,6 +359,30 @@
     }
   }
 
+  const stripCopiedIdentity = data => {
+    const pacList = Array.isArray(data.pac_list) ? data.pac_list : []
+    return {
+      ...data,
+      id: 0,
+      pk: '',
+      bkg_consign_no: '',
+      bkg_house_bill: '',
+      active_status: '',
+      freight_status: 'draft',
+      bkg_status: '',
+      bkg_shipment_status: '',
+      bkg_phase: '',
+      bkg_is_cancelled: 0,
+      bkg_is_forward_registered: 0,
+      e_docs_list: [],
+      pac_list: pacList.map((row, index) => ({
+        ...row,
+        id: index + 1,
+        pk: '',
+      })),
+    }
+  }
+
   const loadData = async () => {
     if (isEditMode.value) {
       // 编辑
@@ -359,7 +391,7 @@
         const { success, data } = await bookingDetail(route.params.pk)
         skeletonLoading.value = false
         if (success && data) {
-          applyBookingInput(data)
+          applyBookingInput(isCopyAsNew.value ? stripCopiedIdentity(data) : data)
         } else {
           bookingEmptyVis.value = true
         }
@@ -463,7 +495,7 @@
         case 2:
         case 4: {
           const saved = await persistBooking()
-          if (saved && !isEditMode.value) {
+          if (saved && (!isEditMode.value || isCopyAsNew.value)) {
             router.push({
               name: 'booking_edit-pk',
               params: { pk: inputData.value.pk },
