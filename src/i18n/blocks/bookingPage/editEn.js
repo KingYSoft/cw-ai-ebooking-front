@@ -123,6 +123,11 @@ export default {
       noOfPackage: 'No. of Package',
       hsCode: 'HS Code',
       description: 'Description',
+      volumeWeight: 'Volume Weight',
+      chargeableWeight: 'Chargeable Weight',
+      length: 'Length',
+      width: 'Width',
+      height: 'Height',
     },
   },
   addrTable: {

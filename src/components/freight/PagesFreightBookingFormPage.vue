@@ -456,8 +456,7 @@
 
   const refDataForm = ref(null)
 
-  const isContainerRequired = () =>
-    inputData.value?.bkg_transport_mode === 'SEA' && inputData.value?.bkg_packing_mode === 'FCL'
+  const isContainerRequired = () => true
 
   const ensureContainerRows = () => {
     if (!isContainerRequired()) {

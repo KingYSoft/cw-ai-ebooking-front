@@ -1309,6 +1309,308 @@
         </template>
       </v-data-table>
     </template>
+
+    <template v-else-if="showLooseTable">
+      <v-divider />
+
+      <v-card-text class="py-2">
+        <v-btn color="warning" size="small" variant="flat">Loose</v-btn>
+      </v-card-text>
+
+      <v-data-table
+        class="table-filter booking-container-table"
+        disable-sort
+        fixed-header
+        :headers="looseHeaders"
+        :height="150"
+        hide-default-footer
+        item-value="id"
+        :items="inputData.pac_list"
+        :items-per-page="-1"
+      >
+        <template #header.actions>
+          <v-btn
+            color="primary"
+            density="comfortable"
+            icon="mdi-plus-circle"
+            size="small"
+            variant="text"
+            @click="emit('add-container')"
+          />
+        </template>
+
+        <template #item.actions="{ index }">
+          <v-btn
+            color="red"
+            density="comfortable"
+            icon="mdi-minus-circle"
+            size="small"
+            variant="text"
+            @click="emit('remove-container', index)"
+          />
+        </template>
+
+        <template #item.pac_package_count="{ item }">
+          <div class="d-flex align-center ga-1 w-100">
+            <v-number-input
+              :id="`${fieldIdPrefix}@pac_package${item.id}`"
+              v-model="item.pac_package_count"
+              class="flex-1-1"
+              color="primary"
+              control-variant="hidden"
+              density="compact"
+              hide-details
+              :max="999999999"
+              :min="0"
+              :min-fraction-digits="0"
+              min-width="0"
+              :precision="0"
+              :rules="inputDataRules.pac_package_count"
+              type="input"
+              variant="outlined"
+            />
+
+            <FRemoteTableMenu
+              v-model="item.pac_pack_type"
+              display-key="code"
+              :fetch-method="fetchPackageTypes"
+              :headers="packageTypeTableHeaders"
+              item-value="code"
+              query-key="query"
+              :text-field-props="{
+                color: 'primary',
+                minWidth: '78',
+                maxWidth: '78',
+                variant: 'underlined',
+                clearable: true,
+                rules: inputDataRules.pac_pack_type,
+              }"
+              virtual
+              @row-select="
+                row => assignPackageTypeFromRow(row, item, 'pac_pack_type', 'pac_pack_type_desc')
+              "
+            />
+          </div>
+        </template>
+
+        <template #item.pac_gross_weight="{ item }">
+          <v-number-input
+            :id="`${fieldIdPrefix}@pac_gross_weight${item.id}`"
+            v-model="item.pac_gross_weight"
+            class="has-append"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :max="999999999.99999"
+            :min="0"
+            :min-fraction-digits="0"
+            min-width="100%"
+            :precision="5"
+            :rules="inputDataRules.pac_gross_weight"
+            type="input"
+            variant="outlined"
+            @update:model-value="jsPackingW(item)"
+          >
+            <template #append>
+              <v-select
+                v-model="item.pac_weight_unit"
+                auto-select-first
+                autocomplete="off"
+                color="primary"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="appStore.appCombobox.getCombobox('weightUnit')"
+                :list-props="{
+                  density: 'compact',
+                }"
+                no-filter
+                variant="underlined"
+                width="50px"
+              />
+            </template>
+          </v-number-input>
+        </template>
+
+        <template #item.pac_actual_volume="{ item }">
+          <v-number-input
+            :id="`${fieldIdPrefix}@pac_actual_volume${item.id}`"
+            v-model="item.pac_actual_volume"
+            class="has-append"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :max="999999999.99999"
+            :min="0"
+            :min-fraction-digits="0"
+            min-width="100%"
+            :precision="5"
+            :rules="inputDataRules.pac_actual_volume"
+            type="input"
+            variant="outlined"
+            @update:model-value="jsPackingW(item)"
+          >
+            <template #append>
+              <v-select
+                v-model="item.pac_actual_volume_uom"
+                auto-select-first
+                autocomplete="off"
+                color="primary"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="appStore.appCombobox.getCombobox('cbmUnit')"
+                :list-props="{
+                  density: 'compact',
+                }"
+                no-filter
+                variant="underlined"
+                width="50px"
+              />
+            </template>
+          </v-number-input>
+        </template>
+
+        <template #item.pac_volume_weight="{ item }">
+          <v-number-input
+            v-model="item.pac_volume_weight"
+            class="has-append"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :max="999999999.99999"
+            :min="0"
+            :min-fraction-digits="0"
+            min-width="100%"
+            :precision="5"
+            type="input"
+            variant="outlined"
+          >
+            <template #append>
+              <v-select
+                v-model="item.pac_volume_weight_unit"
+                auto-select-first
+                autocomplete="off"
+                color="primary"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="appStore.appCombobox.getCombobox('weightUnit')"
+                :list-props="{
+                  density: 'compact',
+                }"
+                no-filter
+                variant="underlined"
+                width="50px"
+              />
+            </template>
+          </v-number-input>
+        </template>
+
+        <template #item.pac_chargeable_weight="{ item }">
+          <v-number-input
+            v-model="item.pac_chargeable_weight"
+            class="has-append"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :max="999999999.99999"
+            :min="0"
+            :min-fraction-digits="0"
+            min-width="100%"
+            :precision="5"
+            type="input"
+            variant="outlined"
+          >
+            <template #append>
+              <v-select
+                v-model="item.pac_chargeable_weight_unit"
+                auto-select-first
+                autocomplete="off"
+                color="primary"
+                density="compact"
+                hide-details
+                item-title="code"
+                item-value="code"
+                :items="appStore.appCombobox.getCombobox('weightUnit')"
+                :list-props="{
+                  density: 'compact',
+                }"
+                no-filter
+                variant="underlined"
+                width="50px"
+              />
+            </template>
+          </v-number-input>
+        </template>
+
+        <template #item.pac_length="{ item }">
+          <v-number-input
+            v-model="item.pac_length"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :max="999999999.99999"
+            :min="0"
+            :min-fraction-digits="0"
+            min-width="100%"
+            :precision="5"
+            type="input"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.pac_width="{ item }">
+          <v-number-input
+            v-model="item.pac_width"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :max="999999999.99999"
+            :min="0"
+            :min-fraction-digits="0"
+            min-width="100%"
+            :precision="5"
+            type="input"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.pac_height="{ item }">
+          <v-number-input
+            v-model="item.pac_height"
+            color="primary"
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :max="999999999.99999"
+            :min="0"
+            :min-fraction-digits="0"
+            min-width="100%"
+            :precision="5"
+            type="input"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.pac_description="{ item }">
+          <FTextInput
+            v-model:text-value="item.pac_description"
+            min-width="100%"
+            :textarea-props="{ label: containerHeader('description') }"
+          />
+        </template>
+      </v-data-table>
+    </template>
   </div>
 </template>
 
@@ -1428,7 +1730,14 @@
   // const releaseTypes = ['OBL', 'SWB', 'Telex']
   // const deliveryModes = ['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']
 
-  const showContainerTable = computed(() => props.showCargoFields)
+  const showContainerTable = computed(
+    () =>
+      props.showCargoFields &&
+      inputData.value.bkg_transport_mode === 'SEA' &&
+      inputData.value.bkg_packing_mode === 'FCL',
+  )
+
+  const showLooseTable = computed(() => props.showCargoFields && !showContainerTable.value)
 
   const isAirTransport = computed(
     () => String(inputData.value.bkg_transport_mode ?? '').toUpperCase() === 'AIR',
@@ -1477,6 +1786,72 @@
     { title: containerHeader('noOfPackage'), key: 'pac_package_count', minWidth: '120px' },
     { title: containerHeader('hsCode'), key: 'pac_harmonised_code', minWidth: '100px' },
     { title: containerHeader('description'), key: 'pac_description', minWidth: '140px' },
+  ])
+
+  const looseHeaders = computed(() => [
+    { title: '', key: 'actions', align: 'center', sortable: false, width: '40' },
+    {
+      title: containerHeader('noOfPackage'),
+      key: 'pac_package_count',
+      align: 'start',
+      minWidth: '160px',
+      width: '160px',
+    },
+    {
+      title: containerHeader('grossWeight'),
+      key: 'pac_gross_weight',
+      align: 'start',
+      minWidth: '150px',
+      width: '150px',
+    },
+    {
+      title: containerHeader('volume'),
+      key: 'pac_actual_volume',
+      align: 'start',
+      minWidth: '150px',
+      width: '150px',
+    },
+    {
+      title: containerHeader('volumeWeight'),
+      key: 'pac_volume_weight',
+      align: 'start',
+      minWidth: '150px',
+      width: '150px',
+    },
+    {
+      title: containerHeader('chargeableWeight'),
+      key: 'pac_chargeable_weight',
+      align: 'start',
+      minWidth: '150px',
+      width: '150px',
+    },
+    {
+      title: containerHeader('length'),
+      key: 'pac_length',
+      align: 'start',
+      minWidth: '100px',
+      width: '100px',
+    },
+    {
+      title: containerHeader('width'),
+      key: 'pac_width',
+      align: 'start',
+      minWidth: '100px',
+      width: '100px',
+    },
+    {
+      title: containerHeader('height'),
+      key: 'pac_height',
+      align: 'start',
+      minWidth: '100px',
+      width: '100px',
+    },
+    {
+      title: containerHeader('description'),
+      key: 'pac_description',
+      align: 'start',
+      minWidth: '100',
+    },
   ])
 
   const js_w = () => {
