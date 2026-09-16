@@ -92,7 +92,7 @@
 
   .dashboard-txn-list__item {
     display: grid;
-    grid-template-columns: 72px minmax(0, 1fr) 88px 80px;
+    grid-template-columns: 72px minmax(0, 1fr) minmax(88px, 120px) 72px;
     align-items: center;
     column-gap: 16px;
     width: 100%;
@@ -125,7 +125,10 @@
 
   .dashboard-txn-list__container,
   .dashboard-txn-list__cbm {
+    min-width: 0;
+    overflow: hidden;
     text-align: right;
+    text-overflow: ellipsis;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
