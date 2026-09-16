@@ -79,6 +79,7 @@ export function useFreightBookingForm() {
     bkg_discharge_port_name: '',
     bkg_intended_vessel: '',
     bkg_voyage: '',
+    doc_data: {},
   })
   // 初始化 表单
   const inputData = ref(defaultData())

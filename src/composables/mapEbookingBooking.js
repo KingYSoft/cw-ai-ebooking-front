@@ -206,6 +206,7 @@ export function mapBookingDetailToForm(data, appStore) {
       ? data.pac_list.map((row, i) => ({ ...row, id: row.id ?? i + 1 }))
       : [],
     job: data.job || { job_status: data.job_status || defaults.job.job_status },
+    doc_data: data.doc_data && typeof data.doc_data === 'object' ? data.doc_data : {},
   }
 }
 

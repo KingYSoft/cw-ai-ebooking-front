@@ -5,10 +5,10 @@
         <v-row dense>
           <v-col cols="12" sm="6">
             <v-text-field
+              v-model="doc.housebill_number"
               density="compact"
               hide-details
               min-width="100%"
-              :model-value="inputData.bkg_house_bill"
               variant="outlined"
             >
               <template #prepend>
@@ -19,11 +19,11 @@
 
           <v-col class="d-flex align-center" cols="12" sm="6">
             <v-checkbox
+              v-model="doc.shipper_load_and_count"
               color="primary"
               density="compact"
               false-value="N"
               hide-details
-              :model-value="shipperLoadAndCount"
               true-value="Y"
             >
               <template #label>
@@ -41,19 +41,19 @@
               </div>
 
               <v-text-field
+                v-model="doc[port.codeKey]"
                 density="compact"
                 hide-details
                 max-width="90px"
-                :model-value="inputData[port.codeKey]"
                 variant="outlined"
               />
 
               <v-text-field
+                v-model="doc[port.nameKey]"
                 class="flex-1-1"
                 density="compact"
                 hide-details
                 min-width="auto"
-                :model-value="inputData[port.nameKey]"
                 variant="outlined"
               />
             </div>
@@ -64,35 +64,35 @@
           <div class="text-caption text-end w-label-100">{{ detailField('freightTerms') }}:</div>
 
           <v-select
+            v-model="doc.freight_terms"
             density="compact"
             hide-details
             :items="freightTermItems"
             max-width="54px"
-            :model-value="inputData.bkg_freight_terms"
             variant="outlined"
           />
 
           <div class="text-caption text-end">{{ detailField('deliveryMode') }}:</div>
 
           <v-select
+            v-model="doc.delivery_mode"
             class="flex-1-1"
             density="compact"
             hide-details
             :items="deliveryModeItems"
             min-width="auto"
-            :model-value="inputData.bkg_delivery_mode"
             variant="outlined"
           />
 
           <div class="text-caption text-end">{{ detailField('payAt') }}:</div>
 
           <v-select
+            v-model="doc.pay_at"
             class="flex-1-1"
             density="compact"
             hide-details
             :items="payAtItems"
             min-width="auto"
-            :model-value="payAt"
             variant="outlined"
           />
         </div>
@@ -100,11 +100,11 @@
         <v-row class="si-hbl-textarea-row mt-1" dense>
           <v-col cols="12" sm="6">
             <v-textarea
+              v-model="doc.marks_nos"
               :auto-grow="false"
               class="si-hbl-textarea"
               density="compact"
               hide-details
-              :model-value="inputData.bkg_marks_nos"
               no-resize
               rows="9"
               variant="outlined"
@@ -117,11 +117,11 @@
 
           <v-col cols="12" sm="6">
             <v-textarea
+              v-model="doc.goods_description"
               :auto-grow="false"
               class="si-hbl-textarea"
               density="compact"
               hide-details
-              :model-value="inputData.bkg_goods_description"
               no-resize
               rows="9"
               variant="outlined"
@@ -138,11 +138,11 @@
         <v-row dense>
           <v-col cols="12" sm="6">
             <v-select
+              v-model="doc.as_agent_option"
               density="compact"
               hide-details
               :items="asAgentOptionItems"
               min-width="100%"
-              :model-value="asAgentOption"
               variant="outlined"
             >
               <template #prepend>
@@ -155,10 +155,10 @@
 
           <v-col cols="12" sm="6">
             <v-text-field
+              v-model="doc.as_agent_detail"
               density="compact"
               hide-details
               min-width="100%"
-              :model-value="asAgentDetail"
               variant="outlined"
             >
               <template #prepend>
@@ -174,10 +174,10 @@
           <v-col cols="12" sm="6">
             <div class="d-flex align-start flex-column flex-wrap ga-1">
               <v-text-field
+                v-model="doc.vessel_name"
                 density="compact"
                 hide-details
                 min-width="100%"
-                :model-value="inputData.bkg_intended_vessel"
                 variant="outlined"
               >
                 <template #prepend>
@@ -188,10 +188,10 @@
               </v-text-field>
 
               <v-text-field
+                v-model="doc.voyage_number"
                 density="compact"
                 hide-details
                 min-width="100%"
-                :model-value="inputData.bkg_voyage"
                 variant="outlined"
               >
                 <template #prepend>
@@ -205,11 +205,7 @@
 
           <v-col cols="12" sm="6">
             <div class="d-flex align-start flex-column flex-wrap ga-1">
-              <FDatePicker
-                :date-value="inputData.bkg_etd"
-                max="2099-12-31"
-                min="2000-01-01"
-              >
+              <FDatePicker v-model:date-value="doc.etd" max="2099-12-31" min="2000-01-01">
                 <template #prepend>
                   <div class="text-caption text-end w-label-110">
                     {{ detailField('etd') }}<span class="text-red">*</span>:
@@ -217,11 +213,7 @@
                 </template>
               </FDatePicker>
 
-              <FDatePicker
-                :date-value="inputData.bkg_eta"
-                max="2099-12-31"
-                min="2000-01-01"
-              >
+              <FDatePicker v-model:date-value="doc.eta" max="2099-12-31" min="2000-01-01">
                 <template #prepend>
                   <div class="text-caption text-end w-label-110">
                     {{ detailField('eta') }}<span class="text-red">*</span>:
@@ -235,40 +227,40 @@
         <v-row dense>
           <v-col cols="12" sm="4">
             <v-text-field
+              v-model="doc.no_of_package_desc"
               density="compact"
               hide-details
               :label="detailField('noOfPackage')"
-              :model-value="packageDesc"
               variant="outlined"
             />
           </v-col>
 
           <v-col cols="12" sm="4">
             <v-text-field
+              v-model="doc.gross_weight_desc"
               density="compact"
               hide-details
               :label="detailField('grossWeight')"
-              :model-value="weightDesc"
               variant="outlined"
             />
           </v-col>
 
           <v-col cols="12" sm="4">
             <v-text-field
+              v-model="doc.cbm_desc"
               density="compact"
               hide-details
               :label="detailField('cbm')"
-              :model-value="cbmDesc"
               variant="outlined"
             />
           </v-col>
         </v-row>
 
         <v-text-field
+          v-model="doc.say_total"
           class="mt-1"
           density="compact"
           hide-details
-          :model-value="sayTotal"
           variant="outlined"
         >
           <template #prepend>
@@ -280,11 +272,11 @@
           <v-col cols="12" sm="8">
             <div class="d-flex align-center ga-1 w-100">
               <v-checkbox
+                v-model="doc.wooden"
                 color="primary"
                 density="compact"
                 false-value="N"
                 hide-details
-                model-value="N"
                 true-value="Y"
               >
                 <template #label>
@@ -293,21 +285,17 @@
               </v-checkbox>
 
               <v-text-field
+                v-model="doc.wooden_desc"
                 class="flex-1-1"
                 density="compact"
                 hide-details
-                model-value="NO WOODEN PRODUCE HAS BEEN USED IN PACKING"
                 variant="outlined"
               />
             </div>
           </v-col>
 
           <v-col cols="12" sm="4">
-            <FDatePicker
-              :date-value="inputData.bkg_shipped_on_board_date"
-              max="2099-12-31"
-              min="2000-01-01"
-            >
+            <FDatePicker v-model:date-value="doc.on_board_date" max="2099-12-31" min="2000-01-01">
               <template #prepend>
                 <div class="text-caption text-end">{{ detailField('onBoard') }}:</div>
               </template>
@@ -321,6 +309,7 @@
               <div class="text-caption text-end w-label-110">{{ detailField('cargoValue') }}:</div>
 
               <v-select
+                v-model="doc.cargo_value_currency"
                 auto-select-first
                 autocomplete="off"
                 density="compact"
@@ -330,16 +319,15 @@
                 :items="currencyItems"
                 :list-props="{ density: 'compact' }"
                 max-width="60px"
-                :model-value="inputData.bkg_goods_value_currency"
                 no-filter
                 variant="underlined"
               />
 
               <v-text-field
+                v-model="doc.cargo_value"
                 class="flex-1-1"
                 density="compact"
                 hide-details
-                :model-value="inputData.bkg_goods_value"
                 variant="outlined"
               />
             </div>
@@ -350,6 +338,7 @@
               <div class="text-caption text-end">{{ detailField('additionalCharges') }}:</div>
 
               <v-select
+                v-model="doc.additional_value_currency"
                 auto-select-first
                 autocomplete="off"
                 density="compact"
@@ -364,6 +353,7 @@
               />
 
               <v-text-field
+                v-model="doc.additional_value"
                 class="flex-1-1"
                 density="compact"
                 hide-details
@@ -371,11 +361,11 @@
               />
 
               <v-checkbox
+                v-model="doc.is_agreed"
                 color="primary"
                 density="compact"
                 false-value="N"
                 hide-details
-                model-value="N"
                 true-value="Y"
               >
                 <template #label>
@@ -388,7 +378,7 @@
 
         <v-row dense>
           <v-col cols="12" sm="4">
-            <FDatePicker max="2099-12-31" min="2000-01-01">
+            <FDatePicker v-model:date-value="doc.issue_date" max="2099-12-31" min="2000-01-01">
               <template #prepend>
                 <div class="text-caption text-end w-label-110">{{ detailField('issueDate') }}:</div>
               </template>
@@ -400,6 +390,7 @@
               <div class="text-caption text-end">{{ detailField('issuedPlace') }}:</div>
 
               <v-text-field
+                v-model="doc.place_of_issue"
                 density="compact"
                 hide-details
                 max-width="90px"
@@ -407,6 +398,7 @@
               />
 
               <v-text-field
+                v-model="doc.place_of_issue_name"
                 class="flex-1-1"
                 density="compact"
                 hide-details
@@ -418,10 +410,10 @@
 
           <v-col cols="12" sm="3">
             <v-text-field
+              v-model="doc.number_of_original"
               density="compact"
               hide-details
               min-width="100%"
-              model-value="1"
               variant="outlined"
             >
               <template #prepend>
@@ -458,87 +450,29 @@
   const inputData = defineModel('input-data', { type: Object, required: true })
   const { detailField } = useBookingPageI18n()
   const appStore = useAppStore()
+  const doc = computed(() => {
+    if (!inputData.value.doc_data) {
+      inputData.value.doc_data = {}
+    }
+    return inputData.value.doc_data
+  })
 
   const portRows = [
     [
-      { labelKey: 'origin', codeKey: 'bkg_origin', nameKey: 'bkg_origin_name' },
-      { labelKey: 'polLoad', codeKey: 'bkg_load_port', nameKey: 'bkg_load_port_name' },
+      { labelKey: 'origin', codeKey: 'origin_code', nameKey: 'origin_name' },
+      { labelKey: 'polLoad', codeKey: 'port_of_loading', nameKey: 'port_of_loading_name' },
     ],
     [
-      { labelKey: 'destination', codeKey: 'bkg_destination', nameKey: 'bkg_destination_name' },
-      { labelKey: 'podDischarge', codeKey: 'bkg_discharge_port', nameKey: 'bkg_discharge_port_name' },
+      { labelKey: 'destination', codeKey: 'destination_code', nameKey: 'destination_name' },
+      { labelKey: 'podDischarge', codeKey: 'port_of_discharge', nameKey: 'port_of_discharge_name' },
     ],
   ]
 
   const deliveryModeItems = ['CFS/CFS', 'CY/CY', 'CFS/CY', 'CY/CFS']
   const payAtItems = ['ORIGIN', 'DESTINATION']
   const asAgentOptionItems = ['AS CARRIER', 'AS AGENT', 'AS AGENT FOR CARRIER', 'AS AGENT FOR']
-  const asAgentOption = ''
-  const asAgentDetail = ''
-
   const freightTermItems = ['PP', 'CC']
   const currencyItems = computed(() => appStore.appCombobox.getCombobox('currency') || [])
-
-  const shipperLoadAndCount = computed(() =>
-    String(inputData.value.bkg_packing_mode ?? '').toUpperCase() === 'FCL' ? 'Y' : 'N',
-  )
-
-  const payAt = computed(() => {
-    const terms = String(inputData.value.bkg_freight_terms ?? '').toUpperCase()
-    if (terms === 'PP') {
-      return 'ORIGIN'
-    }
-    if (terms === 'CC') {
-      return 'DESTINATION'
-    }
-    return ''
-  })
-
-  const joinValueUnit = (value, unit) => {
-    if (value === undefined || value === null || value === '') {
-      return ''
-    }
-    return [value, unit].filter(item => item !== undefined && item !== null && item !== '').join(' ')
-  }
-
-  const packageDesc = computed(() =>
-    joinValueUnit(inputData.value.bkg_total_package_count, inputData.value.bkg_pack_type),
-  )
-  const weightDesc = computed(() =>
-    joinValueUnit(inputData.value.bkg_actual_weight, inputData.value.bkg_unit_of_weight),
-  )
-  const cbmDesc = computed(() =>
-    joinValueUnit(inputData.value.bkg_actual_volume, inputData.value.bkg_unit_of_volume),
-  )
-
-  const containerCount = computed(() =>
-    (inputData.value.pac_list || []).reduce(
-      (sum, row) => sum + Number(row.pac_container_count || 0),
-      0,
-    ),
-  )
-
-  const sayTotal = computed(() => {
-    const count = containerCount.value
-    if (!count) {
-      return ''
-    }
-    const words = [
-      'ZERO',
-      'ONE',
-      'TWO',
-      'THREE',
-      'FOUR',
-      'FIVE',
-      'SIX',
-      'SEVEN',
-      'EIGHT',
-      'NINE',
-      'TEN',
-    ]
-    const word = words[count] ?? String(count)
-    return `${word} CONTAINER(S) ONLY.`
-  })
 </script>
 
 <style scoped lang="scss">
