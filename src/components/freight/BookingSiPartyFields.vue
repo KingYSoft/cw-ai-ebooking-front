@@ -1,144 +1,70 @@
 <template>
-  <v-row class="ref-form-pre" dense>
-    <v-col class="d-flex flex-column ga-1" :cols="rescols('c12l4s6')">
-      <FRemoteTableMenu
-        :id="`${fieldIdPrefix}@si_shipper_name`"
-        v-model="inputData.shipper.add_address_name"
-        bind-key="code"
-        :bind-value="inputData.shipper.add_address_code"
-        display-key="company_name"
-        :fetch-method="organizationQueryOrgAddress"
-        :headers="addrTableHeaders"
-        :query-extra="{ address_type: 'SHIPPER' }"
-        :text-field-props="{
-          'min-width': '100%',
-          rules: inputDataRules.shipper_name,
-        }"
-        virtual
-        @click-clear="onClearAddr('SHIPPER')"
-        @row-select="onSelectAddr($event, 'SHIPPER')"
-      >
-        <template #prepend>
-          <div class="text-caption text-end w-label-100">{{ detailSection('shipper') }}:</div>
-        </template>
-      </FRemoteTableMenu>
+  <v-row class="si-party-row ref-form-pre" dense>
+    <v-col
+      v-for="col in partyCols"
+      :key="col.prefix"
+      class="si-party-col d-flex flex-column ga-1"
+      :cols="rescols('c12l3s6')"
+    >
+      <v-divider>
+        <div class="text-center text-caption text-uppercase text-on-surface opacity-70">
+          {{ col.title }}
+        </div>
+      </v-divider>
 
-      <div class="d-flex align-start ga-1 w-100">
-        <div class="w-label-100 flex-grow-0" />
-
-        <v-textarea
-          class="si-party-textarea flex-1-1"
-          :auto-grow="false"
-          density="compact"
-          hide-details
-          :model-value="formatPartyAddressDesc(inputData.shipper)"
-          no-resize
-          rows="5"
-          variant="outlined"
-          @update:model-value="applyPartyAddressDesc('shipper', $event)"
+      <div class="si-party-head">
+        <FRemoteTableMenu
+          :id="`${fieldIdPrefix}@si_${col.prefix}_name`"
+          v-model="doc[`${col.prefix}_name`]"
+          display-key="company_name"
+          :fetch-method="organizationQueryOrgAddress"
+          :headers="addrTableHeaders"
+          :query-extra="{ address_type: col.addressType }"
+          :text-field-props="{
+            readonly: isSameAsConsignee(col.prefix),
+          }"
+          virtual
+          @click-clear="clearParty(col.prefix)"
+          @row-select="onSelectParty($event, col.prefix)"
         />
-      </div>
-    </v-col>
 
-    <v-col class="d-flex flex-column ga-1" :cols="rescols('c12l4s6')">
-      <FRemoteTableMenu
-        :id="`${fieldIdPrefix}@si_consignee_name`"
-        v-model="inputData.consignee.add_address_name"
-        bind-key="code"
-        :bind-value="inputData.consignee.add_address_code"
-        display-key="company_name"
-        :fetch-method="organizationQueryOrgAddress"
-        :headers="addrTableHeaders"
-        :query-extra="{ address_type: 'CONSIGNEE' }"
-        :text-field-props="{
-          'min-width': '100%',
-          rules: inputDataRules.consignee_name,
-        }"
-        virtual
-        @click-clear="onClearAddr('CONSIGNEE')"
-        @row-select="onSelectAddr($event, 'CONSIGNEE')"
-      >
-        <template #prepend>
-          <div class="text-caption text-end w-label-100">{{ detailSection('consignee') }}:</div>
-        </template>
-      </FRemoteTableMenu>
-
-      <div class="d-flex align-start ga-1 w-100">
-        <div class="w-label-100 flex-grow-0" />
-
-        <v-textarea
-          class="si-party-textarea flex-1-1"
-          :auto-grow="false"
-          density="compact"
-          hide-details
-          :model-value="formatPartyAddressDesc(inputData.consignee)"
-          no-resize
-          rows="5"
-          variant="outlined"
-          @update:model-value="applyPartyAddressDesc('consignee', $event)"
-        />
-      </div>
-    </v-col>
-
-    <v-col class="d-flex flex-column ga-1" :cols="rescols('c12l4s6')">
-      <div class="d-flex align-center ga-1 w-100">
-        <div class="text-caption text-end w-label-100">{{ detailField('notifyParty') }}:</div>
-
-        <v-tabs
-          v-model="notifierTab"
-          class="flex-1-1"
-          color="primary"
-          density="compact"
-          grow
-        >
-          <v-tab class="text-uppercase" size="small" value="np1">
-            {{ detailField('notifyParty1') }}
-          </v-tab>
-
-          <v-tab class="text-uppercase" size="small" value="np2">
-            {{ detailField('notifyParty2') }}
-          </v-tab>
-        </v-tabs>
-      </div>
-
-      <div class="d-flex align-start ga-1 w-100">
-        <div class="w-label-100 flex-grow-0" />
-
-        <v-tabs-window v-model="notifierTab" class="flex-1-1">
-          <v-tabs-window-item value="np1">
-            <v-textarea
-              class="si-party-textarea"
-              :auto-grow="false"
+        <v-tooltip v-if="col.sameAsConsignee" location="bottom">
+          <template #activator="ssss">
+            <v-checkbox-btn
+              v-bind="ssss.props"
+              class="si-np-same-btn"
+              color="primary"
               density="compact"
+              false-value="N"
               hide-details
-              :model-value="notifyParty1Desc"
-              no-resize
-              rows="5"
-              variant="outlined"
-              @update:model-value="onNotifyParty1Input"
+              :model-value="isSameAsConsignee(col.prefix) ? 'Y' : 'N'"
+              true-value="Y"
+              @update:model-value="setSameAsConsignee(col.prefix, $event)"
             />
-          </v-tabs-window-item>
+          </template>
 
-          <v-tabs-window-item value="np2">
-            <v-textarea
-              v-model="notifyParty2Desc"
-              class="si-party-textarea"
-              :auto-grow="false"
-              density="compact"
-              hide-details
-              no-resize
-              rows="5"
-              variant="outlined"
-            />
-          </v-tabs-window-item>
-        </v-tabs-window>
+          <span>{{ detailField('sameAsConsignee') }}</span>
+        </v-tooltip>
       </div>
+
+      <v-textarea
+        class="si-party-addr"
+        :auto-grow="false"
+        density="compact"
+        hide-details
+        :model-value="formatPartyAddr(col.prefix)"
+        no-resize
+        :readonly="isSameAsConsignee(col.prefix)"
+        rows="5"
+        variant="outlined"
+        @update:model-value="applyPartyAddr(col.prefix, $event)"
+      />
     </v-col>
   </v-row>
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
@@ -163,58 +89,141 @@
   })
 
   const inputData = defineModel('input-data', { type: Object, required: true })
-  const emit = defineEmits(['on-select-addr', 'on-clear-addr'])
   const { detailSection, detailField } = useBookingPageI18n()
   const { rescols } = useLayoutCols()
-  const notifierTab = ref('np1')
-  const notifyParty2Desc = ref('')
 
-  const formatPartyAddressDesc = party => {
-    if (!party || typeof party !== 'object') {
-      return ''
+  const doc = computed(() => {
+    if (!inputData.value.doc_data) {
+      inputData.value.doc_data = {}
     }
-    return [party.add_address_name, party.add_address1, party.add_address2, party.add_address3]
-      .map(value => String(value ?? '').trim())
-      .filter(Boolean)
-      .join('\n')
-  }
-
-  const applyPartyAddressDesc = (partyKey, text) => {
-    if (!inputData.value[partyKey] || typeof inputData.value[partyKey] !== 'object') {
-      inputData.value[partyKey] = {}
-    }
-    const lines = String(text ?? '').split('\n')
-    const target = inputData.value[partyKey]
-    target.add_address_name = (lines[0] ?? '').trim()
-    target.add_address1 = (lines[1] ?? '').trim()
-    target.add_address2 = (lines[2] ?? '').trim()
-    target.add_address3 = lines.slice(3).join('\n').trim()
-  }
-
-  const notifyParty1Desc = computed(() => {
-    if (inputData.value.notify_party_same_as_consignee === 'Y') {
-      return formatPartyAddressDesc(inputData.value.consignee)
-    }
-    return formatPartyAddressDesc(inputData.value.notify_party)
+    return inputData.value.doc_data
   })
 
-  const onNotifyParty1Input = text => {
-    inputData.value.notify_party_same_as_consignee = 'N'
-    applyPartyAddressDesc('notify_party', text)
+  const partyCols = computed(() => [
+    {
+      prefix: 'shipper',
+      title: detailSection('shipper'),
+      addressType: 'SHIPPER',
+    },
+    {
+      prefix: 'consignee',
+      title: detailSection('consignee'),
+      addressType: 'CONSIGNEE',
+    },
+    {
+      prefix: 'np1',
+      title: detailField('notifyParty1'),
+      addressType: 'NOTIFY_PARTY',
+      sameAsConsignee: true,
+    },
+    {
+      prefix: 'np2',
+      title: detailField('notifyParty2'),
+      addressType: 'NOTIFY_PARTY',
+      sameAsConsignee: true,
+    },
+  ])
+
+  const formatPartyAddr = prefix =>
+    [
+      doc.value[`${prefix}_address1`],
+      doc.value[`${prefix}_address2`],
+      doc.value[`${prefix}_address3`],
+    ]
+      .map(value => String(value ?? ''))
+      .join('\n')
+      .replace(/\n+$/, '')
+
+  const SAME_AS_CONSIGNEE = 'SAME AS CONSIGNEE'
+
+  const isSameAsConsignee = prefix =>
+    String(doc.value[`${prefix}_name`] ?? '') === SAME_AS_CONSIGNEE
+
+  const setSameAsConsignee = (prefix, checked) => {
+    if (checked === 'Y') {
+      doc.value[`${prefix}_name`] = SAME_AS_CONSIGNEE
+      doc.value[`${prefix}_address1`] = ''
+      doc.value[`${prefix}_address2`] = ''
+      doc.value[`${prefix}_address3`] = ''
+      return
+    }
+    if (doc.value[`${prefix}_name`] === SAME_AS_CONSIGNEE) {
+      doc.value[`${prefix}_name`] = ''
+    }
   }
 
-  const onSelectAddr = (event, type) => {
-    emit('on-select-addr', event, type)
+  const applyPartyAddr = (prefix, text) => {
+    if (isSameAsConsignee(prefix)) {
+      return
+    }
+    const lines = String(text ?? '').split('\n')
+    doc.value[`${prefix}_address1`] = (lines[0] ?? '').trim()
+    doc.value[`${prefix}_address2`] = (lines[1] ?? '').trim()
+    doc.value[`${prefix}_address3`] = lines.slice(2).join('\n').trim()
   }
 
-  const onClearAddr = type => {
-    emit('on-clear-addr', type)
+  const onSelectParty = (row, prefix) => {
+    if (isSameAsConsignee(prefix)) {
+      return
+    }
+    doc.value[`${prefix}_name`] = row.company_name ?? ''
+    doc.value[`${prefix}_address1`] = row.address1 ?? ''
+    doc.value[`${prefix}_address2`] = row.address2 ?? ''
+    doc.value[`${prefix}_address3`] = row.address3 ?? ''
+  }
+
+  const clearParty = prefix => {
+    if (isSameAsConsignee(prefix)) {
+      return
+    }
+    doc.value[`${prefix}_name`] = ''
+    doc.value[`${prefix}_address1`] = ''
+    doc.value[`${prefix}_address2`] = ''
+    doc.value[`${prefix}_address3`] = ''
   }
 </script>
 
 <style scoped lang="scss">
-  .si-party-textarea {
-    flex: 1 1 auto;
+  .si-party-col {
+    min-width: 0;
+  }
+
+  .si-party-head {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    overflow: hidden;
+
+    :deep(.v-input) {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  }
+
+  .si-np-same-btn {
+    flex: 0 0 28px;
+    height: 28px;
+    width: 28px;
+    margin-inline-start: 4px;
+
+    :deep(.v-selection-control) {
+      --v-selection-control-size: 24px;
+      min-height: 24px;
+    }
+  }
+
+  .si-party-addr {
+    flex: none;
+
+    :deep(.v-input__control),
+    :deep(.v-field),
+    :deep(.v-field__field),
+    :deep(.v-field__input) {
+      height: 100%;
+    }
 
     :deep(textarea) {
       min-height: 96px;

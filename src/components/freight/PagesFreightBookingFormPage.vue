@@ -357,6 +357,7 @@
       bkg_volume_weight_unit: el.bkg_volume_weight_unit || 'KG',
       bkg_pack_type: el.bkg_pack_type || 'CTN',
       bkg_pack_type_desc: el.bkg_pack_type_desc || 'Carton',
+      doc_data: el.doc_data && typeof el.doc_data === 'object' ? el.doc_data : {},
     })
     if (inputData.value.notify_party.add_address_name === 'SAME AS CONSIGNEE') {
       inputData.value.notify_party_same_as_consignee = 'Y'

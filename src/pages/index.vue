@@ -2,33 +2,47 @@
   <v-sheet class="dashboard-page pa-3" color="transparent">
     <v-progress-linear :active="loading" color="primary" height="2" indeterminate />
 
-    <v-row class="dashboard-page__stats">
-      <v-col v-for="card in statCards" :key="card.key" cols="12" lg="3" sm="6">
-        <DashboardStatCard :title="card.title" :value="card.value" @click="goBookingList" />
-      </v-col>
-    </v-row>
+    <v-row class="dashboard-page__layout">
+      <v-col class="dashboard-page__col" cols="12" md="6">
+        <v-row class="dashboard-page__stats">
+          <v-col v-for="card in leftCards" :key="card.key" cols="6">
+            <DashboardStatCard :title="card.title" :value="card.value" @click="goBookingList" />
+          </v-col>
+        </v-row>
 
-    <v-row class="dashboard-page__bottom">
-      <v-col class="dashboard-page__bottom-col d-flex flex-column" cols="12" md="6">
-        <DashboardLatestTransactions
-          :empty-text="d('emptyTransactions')"
-          :items="transactionItems"
-          :title="d('latestTransactions')"
-          @select="openBooking"
-        />
+        <v-row class="dashboard-page__panel-row">
+          <v-col cols="12">
+            <DashboardLatestTransactions
+              :empty-text="d('emptyTransactions')"
+              :items="transactionItems"
+              :title="d('latestTransactions')"
+              @select="openBooking"
+            />
+          </v-col>
+        </v-row>
       </v-col>
 
-      <v-col class="dashboard-page__bottom-col d-flex flex-column" cols="12" md="6">
-        <DashboardBookingAnalysis
-          v-model:period="analysisPeriod"
-          :empty-text="d('emptyAnalysis')"
-          :period-items="periodItems"
-          :segments="analysis.segments"
-          :summaries="analysisSummaries"
-          :title="d('bookingAnalysis')"
-          :total="analysis.total"
-          :total-label="d('total')"
-        />
+      <v-col class="dashboard-page__col" cols="12" md="6">
+        <v-row class="dashboard-page__stats">
+          <v-col v-for="card in rightCards" :key="card.key" cols="6">
+            <DashboardStatCard :title="card.title" :value="card.value" @click="goBookingList" />
+          </v-col>
+        </v-row>
+
+        <v-row class="dashboard-page__panel-row">
+          <v-col cols="12">
+            <DashboardBookingAnalysis
+              v-model:period="analysisPeriod"
+              :empty-text="d('emptyAnalysis')"
+              :period-items="periodItems"
+              :segments="analysis.segments"
+              :summaries="analysisSummaries"
+              :title="d('bookingAnalysis')"
+              :total="analysis.total"
+              :total-label="d('total')"
+            />
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-sheet>
@@ -81,6 +95,8 @@
       value: cardCounts.value[key] ?? 0,
     })),
   )
+  const leftCards = computed(() => statCards.value.slice(0, 2))
+  const rightCards = computed(() => statCards.value.slice(2, 4))
 
   const periodItems = computed(() => [
     { value: 'lastMonth', title: d('lastMonth') },
@@ -161,21 +177,32 @@
     overflow: hidden;
   }
 
+  .dashboard-page__layout {
+    flex: 1 1 0%;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+
+  .dashboard-page__col {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
   .dashboard-page__stats {
     flex: 0 0 auto;
   }
 
-  .dashboard-page__bottom {
+  .dashboard-page__panel-row {
     flex: 1 1 0%;
     min-height: 0;
-    width: 100%;
-    overflow: hidden;
+    margin-bottom: 0;
   }
 
-  .dashboard-page__bottom-col {
+  .dashboard-page__panel-row :deep(.v-col) {
+    display: flex;
     height: 100%;
-    max-height: 100%;
     min-height: 0;
-    overflow: hidden;
   }
 </style>

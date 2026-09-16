@@ -26,20 +26,36 @@ function asCount(value) {
 }
 
 function itemTimestamp(item) {
-  const raw =
-    item.last_modify_time ||
-    item.last_modified_time ||
-    item.modify_time ||
-    item.creation_time ||
-    item.create_time ||
-    item.create_gmt ||
-    item.bkg_etd
-  const time = Date.parse(raw)
+  const time = Date.parse(item?.creationTime)
   return Number.isNaN(time) ? 0 : time
 }
 
+function formatContainerSummary(value) {
+  let rows = []
+  if (Array.isArray(value)) {
+    rows = value
+  } else if (typeof value === 'string' && value.startsWith('[')) {
+    try {
+      rows = JSON.parse(value)
+    } catch {
+      rows = []
+    }
+  }
+  const parts = (rows || [])
+    .map(row => {
+      const type = row?.pac_container_type
+      const count = row?.pac_container_count
+      if (!type) {
+        return ''
+      }
+      return count == null || count === '' ? type : `${type} x ${count}`
+    })
+    .filter(Boolean)
+  return parts.length ? parts.join(', ') : '—'
+}
+
 function formatBookingNo(item) {
-  const no = item.bkg_consign_no || item.bkg_booking_reference || ''
+  const no = item.bkg_consign_no
   if (!no) {
     return '—'
   }
@@ -50,8 +66,8 @@ function mapLatestBooking(item, index) {
   const row = mapBookingListRow(item, index)
   return {
     ...row,
-    consignee_name:
-      row.consignee_name || item.bkg_booking_party || item.bkg_delivery_agent_name || '',
+    consignee_name: row.consignee_name || '',
+    container_summary: formatContainerSummary(item.container_summary),
   }
 }
 
