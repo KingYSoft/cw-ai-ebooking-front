@@ -21,7 +21,7 @@
           :headers="addrTableHeaders"
           :query-extra="{ address_type: col.addressType }"
           :text-field-props="{
-            readonly: col.sameAsConsignee && np1SameAsConsignee === 'Y',
+            readonly: isSameAsConsignee(col.prefix),
           }"
           virtual
           @click-clear="clearParty(col.prefix)"
@@ -32,13 +32,14 @@
           <template #activator="ssss">
             <v-checkbox-btn
               v-bind="ssss.props"
-              v-model="np1SameAsConsignee"
               class="si-np-same-btn"
               color="primary"
               density="compact"
               false-value="N"
               hide-details
+              :model-value="isSameAsConsignee(col.prefix) ? 'Y' : 'N'"
               true-value="Y"
+              @update:model-value="setSameAsConsignee(col.prefix, $event)"
             />
           </template>
 
@@ -53,7 +54,7 @@
         hide-details
         :model-value="formatPartyAddr(col.prefix)"
         no-resize
-        :readonly="col.sameAsConsignee && np1SameAsConsignee === 'Y'"
+        :readonly="isSameAsConsignee(col.prefix)"
         rows="5"
         variant="outlined"
         @update:model-value="applyPartyAddr(col.prefix, $event)"
@@ -119,6 +120,7 @@
       prefix: 'np2',
       title: detailField('notifyParty2'),
       addressType: 'NOTIFY_PARTY',
+      sameAsConsignee: true,
     },
   ])
 
@@ -132,24 +134,26 @@
       .join('\n')
       .replace(/\n+$/, '')
 
-  const np1SameAsConsignee = computed({
-    get: () => (String(doc.value.np1_name ?? '') === 'SAME AS CONSIGNEE' ? 'Y' : 'N'),
-    set: checked => {
-      if (checked === 'Y') {
-        doc.value.np1_name = 'SAME AS CONSIGNEE'
-        doc.value.np1_address1 = ''
-        doc.value.np1_address2 = ''
-        doc.value.np1_address3 = ''
-        return
-      }
-      if (doc.value.np1_name === 'SAME AS CONSIGNEE') {
-        doc.value.np1_name = ''
-      }
-    },
-  })
+  const SAME_AS_CONSIGNEE = 'SAME AS CONSIGNEE'
+
+  const isSameAsConsignee = prefix =>
+    String(doc.value[`${prefix}_name`] ?? '') === SAME_AS_CONSIGNEE
+
+  const setSameAsConsignee = (prefix, checked) => {
+    if (checked === 'Y') {
+      doc.value[`${prefix}_name`] = SAME_AS_CONSIGNEE
+      doc.value[`${prefix}_address1`] = ''
+      doc.value[`${prefix}_address2`] = ''
+      doc.value[`${prefix}_address3`] = ''
+      return
+    }
+    if (doc.value[`${prefix}_name`] === SAME_AS_CONSIGNEE) {
+      doc.value[`${prefix}_name`] = ''
+    }
+  }
 
   const applyPartyAddr = (prefix, text) => {
-    if (prefix === 'np1' && np1SameAsConsignee.value === 'Y') {
+    if (isSameAsConsignee(prefix)) {
       return
     }
     const lines = String(text ?? '').split('\n')
@@ -159,7 +163,7 @@
   }
 
   const onSelectParty = (row, prefix) => {
-    if (prefix === 'np1' && np1SameAsConsignee.value === 'Y') {
+    if (isSameAsConsignee(prefix)) {
       return
     }
     doc.value[`${prefix}_name`] = row.company_name ?? ''
@@ -169,7 +173,7 @@
   }
 
   const clearParty = prefix => {
-    if (prefix === 'np1' && np1SameAsConsignee.value === 'Y') {
+    if (isSameAsConsignee(prefix)) {
       return
     }
     doc.value[`${prefix}_name`] = ''
