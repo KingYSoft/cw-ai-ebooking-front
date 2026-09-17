@@ -92,7 +92,7 @@
         <PagesFreightBookingEdit
           v-model:input-data="inputData"
           :actived-tab="activedTab"
-          :lock-non-si-fields="isBookingReleasedLocked"
+          :lock-non-si-fields="isApprovedLocked"
           @add-container="addNewContainer"
           @remove-container="removeNewContainer"
         />
@@ -238,7 +238,7 @@
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
   import { useFreightBookingForm } from '@/composables/useFreightBookingForm'
-  import { isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
+  import { isApprovedOrLater, isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
@@ -295,7 +295,7 @@
     () => freightStatus.value === 'cancelled' || Boolean(inputData.value?.bkg_is_cancelled),
   )
   const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
-  const isBookingReleasedLocked = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
+  const isApprovedLocked = computed(() => isApprovedOrLater(activeStatusTitle.value))
   const showShippingInstructionTab = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
   watch(showShippingInstructionTab, show => {
     if (!show && activedTab.value === 4) {
@@ -303,7 +303,7 @@
     }
   })
   const showSaveButton = computed(() => {
-    if (isBookingReleasedLocked.value) {
+    if (isApprovedLocked.value) {
       return activedTab.value === 4
     }
     return activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4
@@ -318,7 +318,7 @@
     () =>
       showBookingActionButtons.value &&
       Boolean(activeStatusTitle.value) &&
-      !isBookingReleasedLocked.value,
+      !isApprovedLocked.value,
   )
   const showSiSubmitButton = computed(
     () => showBookingActionButtons.value && activeStatusTitle.value === 'Booking Released',
