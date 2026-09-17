@@ -387,6 +387,7 @@
         id: index + 1,
         pk: '',
       })),
+      shipper: {},
     }
   }
 
@@ -399,6 +400,9 @@
         skeletonLoading.value = false
         if (success && data) {
           applyBookingInput(isCopyAsNew.value ? stripCopiedIdentity(data) : data)
+          if (isCopyAsNew.value) {
+            await fillShipperFromSession()
+          }
         } else {
           bookingEmptyVis.value = true
         }
@@ -411,19 +415,7 @@
     } else {
       try {
         cardLoading.value = true
-        const orgCode = appStore.userSession.session()?.org_header_code
-        if (orgCode) {
-          const { success, data } = await organizationQueryOrgAddress({
-            query: orgCode,
-            address_type: 'SHIPPER',
-          })
-          if (success) {
-            const items = data?.items ?? []
-            if (items.length > 0) {
-              applyOrgRowToShipper(inputData.value.shipper, items[0])
-            }
-          }
-        }
+        await fillShipperFromSession()
         skeletonLoading.value = false
         markInputDataSaved()
       } catch (error) {
@@ -453,6 +445,28 @@
     shipper.add_fax = row.fax
     shipper.add_email = row.email
     shipper.add_port_code = row.port_code
+  }
+
+  const fillShipperFromSession = async () => {
+    const orgCode = appStore.userSession.session()?.org_header_code
+    if (!orgCode) {
+      return
+    }
+    const { success, data } = await organizationQueryOrgAddress({
+      query: orgCode,
+      address_type: 'SHIPPER',
+    })
+    if (!success) {
+      return
+    }
+    const items = data?.items ?? []
+    if (items.length === 0) {
+      return
+    }
+    if (!inputData.value.shipper || typeof inputData.value.shipper !== 'object') {
+      inputData.value.shipper = {}
+    }
+    applyOrgRowToShipper(inputData.value.shipper, items[0])
   }
 
   const refDataForm = ref(null)
