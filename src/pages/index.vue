@@ -6,7 +6,11 @@
       <v-col class="dashboard-page__col" cols="12" md="6">
         <v-row class="dashboard-page__stats">
           <v-col v-for="card in leftCards" :key="card.key" cols="6">
-            <DashboardStatCard :title="card.title" :value="card.value" @click="goBookingList" />
+            <DashboardStatCard
+              :title="card.title"
+              :value="card.value"
+              @click="goBookingList(card.key)"
+            />
           </v-col>
         </v-row>
 
@@ -25,7 +29,11 @@
       <v-col class="dashboard-page__col" cols="12" md="6">
         <v-row class="dashboard-page__stats">
           <v-col v-for="card in rightCards" :key="card.key" cols="6">
-            <DashboardStatCard :title="card.title" :value="card.value" @click="goBookingList" />
+            <DashboardStatCard
+              :title="card.title"
+              :value="card.value"
+              @click="goBookingList(card.key)"
+            />
           </v-col>
         </v-row>
 
@@ -53,6 +61,7 @@
   import { useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
   import { useDashboardData } from '@/composables/useDashboardData'
+  import { DASHBOARD_CARD_STATUS_MAP } from '@/constants/bookingListStatus'
 
   defineOptions({
     name: 'Dashboard',
@@ -147,8 +156,12 @@
     })),
   )
 
-  const goBookingList = () => {
-    router.push({ name: 'booking' })
+  const goBookingList = key => {
+    const status = DASHBOARD_CARD_STATUS_MAP[key]
+    router.push({
+      name: 'booking',
+      query: status ? { status } : {},
+    })
   }
 
   const openBooking = item => {

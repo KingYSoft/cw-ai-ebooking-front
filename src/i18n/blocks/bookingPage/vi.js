@@ -211,11 +211,10 @@ export default {
       deactivate: 'Vô hiệu hóa',
     },
     listStatus: {
-      submitted: 'Đã gửi',
-      under_review: 'Đang xem xét',
-      confirmed: 'Đã xác nhận',
-      cancelled: 'Đã hủy',
-      rejected: 'Đã từ chối',
+      saved: 'Saved',
+      waiting_approve: 'Waiting for Approve',
+      pending_si: 'Pending for Submit SI',
+      deactive: 'Deactive',
     },
   },
 }

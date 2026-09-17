@@ -18,7 +18,7 @@
                 item-value="key"
                 :items="inputSearchData.field1.keyItems"
                 variant="underlined"
-                width="60"
+                width="70"
               />
 
               <FDatePicker
@@ -61,7 +61,7 @@
                 v-model="inputSearchData.field2.val"
                 density="compact"
                 hide-details
-                :placeholder="list('jobNumber')"
+                :placeholder="tableHeader('bookingNo')"
                 variant="outlined"
               />
             </div>
@@ -165,7 +165,7 @@
 
 <script setup>
   import { computed, nextTick, ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
 
   import { bookingQueryPage } from '@/api/booking'
@@ -184,6 +184,7 @@
     BOOKING_LIST_STATUS_OPTIONS,
     defaultBookingListStatusSelection,
     getBookingListStatusChipProps,
+    statusesFromQuery,
   } from '@/constants/bookingListStatus'
   import { isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
@@ -203,6 +204,7 @@
   })
 
   const router = useRouter()
+  const route = useRoute()
   const display = useDisplay()
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
@@ -221,11 +223,11 @@
   const tblItems = ref([])
   const totalCount = ref(0)
   const pageObj = ref({ pageSize: 2000, pageIndex: 1 })
-  const selectedStatuses = ref(defaultBookingListStatusSelection())
+  const selectedStatuses = ref(statusesFromQuery(route.query.status))
   const statusOptions = computed(() =>
     BOOKING_LIST_STATUS_OPTIONS.map(item => ({
       ...item,
-      title: listStatus(item.value),
+      title: listStatus(item.labelKey),
     })),
   )
 
@@ -234,21 +236,24 @@
       return ''
     }
     const matched = BOOKING_LIST_STATUS_OPTIONS.find(item => item.value === status)
-    return matched ? listStatus(matched.value) : status
+    return matched ? listStatus(matched.labelKey) : status
   }
 
   const defaultSearchData = () => ({
     field1: {
       key: 'bkg_etd',
-      title: 'ETD',
-      keyItems: [{ key: 'bkg_etd', title: 'ETD' }],
+      title: tableHeader('etd'),
+      keyItems: [
+        { key: 'bkg_etd', title: tableHeader('etd') },
+        { key: 'bkg_cargo_ready', title: tableHeader('crd') },
+      ],
       start: appStore.utils.formatDate(appStore.utils.addDays(new Date(), -20)),
       end: appStore.utils.formatDate(appStore.utils.addDays(new Date(), 20)),
     },
     field2: {
       key: 'bkg_consign_no',
-      title: list('jobNumber'),
-      keyItems: [{ key: 'bkg_consign_no', title: list('jobNumber') }],
+      title: tableHeader('bookingNo'),
+      keyItems: [{ key: 'bkg_consign_no', title: tableHeader('bookingNo') }],
       val: '',
     },
   })

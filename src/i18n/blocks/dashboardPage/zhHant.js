@@ -1,7 +1,7 @@
 export default {
   cards: {
     pendingSubmit: 'Pending for Submit',
-    waitingApproval: 'Waiting for Approval',
+    waitingApproval: 'Waiting for Approve',
     pendingSi: 'Pending for Submit SI',
     rejected: 'Cancel',
   },

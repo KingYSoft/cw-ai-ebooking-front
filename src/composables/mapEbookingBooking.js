@@ -272,5 +272,5 @@ export function buildBookingStatusFilters(statuses, totalCount = 0) {
   if (totalCount > 0 && statuses.length >= totalCount) {
     return []
   }
-  return [{ key: 'bkg_shipment_status', op: 'In', val: statuses.join(',') }]
+  return [{ key: 'active_status', op: 'In', val: statuses.join(',') }]
 }
