@@ -92,7 +92,7 @@
         <PagesFreightBookingEdit
           v-model:input-data="inputData"
           :actived-tab="activedTab"
-          :lock-non-si-fields="isBookingReleasedLocked"
+          :lock-non-si-fields="isApprovedLocked"
           @add-container="addNewContainer"
           @remove-container="removeNewContainer"
         />
@@ -238,7 +238,7 @@
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
   import { useFreightBookingForm } from '@/composables/useFreightBookingForm'
-  import { isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
+  import { isApprovedOrLater, isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
@@ -295,7 +295,7 @@
     () => freightStatus.value === 'cancelled' || Boolean(inputData.value?.bkg_is_cancelled),
   )
   const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
-  const isBookingReleasedLocked = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
+  const isApprovedLocked = computed(() => isApprovedOrLater(activeStatusTitle.value))
   const showShippingInstructionTab = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
   watch(showShippingInstructionTab, show => {
     if (!show && activedTab.value === 4) {
@@ -303,7 +303,7 @@
     }
   })
   const showSaveButton = computed(() => {
-    if (isBookingReleasedLocked.value) {
+    if (isApprovedLocked.value) {
       return activedTab.value === 4
     }
     return activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4
@@ -318,7 +318,7 @@
     () =>
       showBookingActionButtons.value &&
       Boolean(activeStatusTitle.value) &&
-      !isBookingReleasedLocked.value,
+      !isApprovedLocked.value,
   )
   const showSiSubmitButton = computed(
     () => showBookingActionButtons.value && activeStatusTitle.value === 'Booking Released',
@@ -387,6 +387,7 @@
         id: index + 1,
         pk: '',
       })),
+      shipper: {},
     }
   }
 
@@ -399,6 +400,9 @@
         skeletonLoading.value = false
         if (success && data) {
           applyBookingInput(isCopyAsNew.value ? stripCopiedIdentity(data) : data)
+          if (isCopyAsNew.value) {
+            await fillShipperFromSession()
+          }
         } else {
           bookingEmptyVis.value = true
         }
@@ -411,19 +415,7 @@
     } else {
       try {
         cardLoading.value = true
-        const orgCode = appStore.userSession.session()?.org_header_code
-        if (orgCode) {
-          const { success, data } = await organizationQueryOrgAddress({
-            query: orgCode,
-            address_type: 'SHIPPER',
-          })
-          if (success) {
-            const items = data?.items ?? []
-            if (items.length > 0) {
-              applyOrgRowToShipper(inputData.value.shipper, items[0])
-            }
-          }
-        }
+        await fillShipperFromSession()
         skeletonLoading.value = false
         markInputDataSaved()
       } catch (error) {
@@ -453,6 +445,28 @@
     shipper.add_fax = row.fax
     shipper.add_email = row.email
     shipper.add_port_code = row.port_code
+  }
+
+  const fillShipperFromSession = async () => {
+    const orgCode = appStore.userSession.session()?.org_header_code
+    if (!orgCode) {
+      return
+    }
+    const { success, data } = await organizationQueryOrgAddress({
+      query: orgCode,
+      address_type: 'SHIPPER',
+    })
+    if (!success) {
+      return
+    }
+    const items = data?.items ?? []
+    if (items.length === 0) {
+      return
+    }
+    if (!inputData.value.shipper || typeof inputData.value.shipper !== 'object') {
+      inputData.value.shipper = {}
+    }
+    applyOrgRowToShipper(inputData.value.shipper, items[0])
   }
 
   const refDataForm = ref(null)

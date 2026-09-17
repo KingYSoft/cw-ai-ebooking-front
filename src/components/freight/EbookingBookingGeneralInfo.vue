@@ -1860,7 +1860,7 @@
 
     const cbm_d = new Decimal(inputData.value.bkg_actual_volume ?? 0)
     const cbm = cbm_d.isNaN() ? new Decimal(0) : cbm_d
-    const vol_weight = cbm.times(new Decimal(166)).times(new Decimal(1000)).div(new Decimal(1000))
+    const vol_weight = cbm.times(new Decimal('166.67'))
     const vw = vol_weight.toNumber()
     const newVolumeWeight = vw === 0 ? 0 : vw
 
@@ -1886,7 +1886,7 @@
 
     const cbm_d = new Decimal(item.pac_actual_volume ?? 0)
     const cbm = cbm_d.isNaN() ? new Decimal(0) : cbm_d
-    const vol_weight = cbm.times(new Decimal(166)).times(new Decimal(1000)).div(new Decimal(1000))
+    const vol_weight = cbm.times(new Decimal('166.67'))
     const vw = vol_weight.toNumber()
     const newVolumeWeight = vw === 0 ? 0 : vw
 
