@@ -18,7 +18,7 @@
                 item-value="key"
                 :items="inputSearchData.field1.keyItems"
                 variant="underlined"
-                width="60"
+                width="70"
               />
 
               <FDatePicker
@@ -61,7 +61,7 @@
                 v-model="inputSearchData.field2.val"
                 density="compact"
                 hide-details
-                :placeholder="list('jobNumber')"
+                :placeholder="tableHeader('bookingNo')"
                 variant="outlined"
               />
             </div>
@@ -240,15 +240,18 @@
   const defaultSearchData = () => ({
     field1: {
       key: 'bkg_etd',
-      title: 'ETD',
-      keyItems: [{ key: 'bkg_etd', title: 'ETD' }],
+      title: tableHeader('etd'),
+      keyItems: [
+        { key: 'bkg_etd', title: tableHeader('etd') },
+        { key: 'bkg_cargo_ready', title: tableHeader('crd') },
+      ],
       start: appStore.utils.formatDate(appStore.utils.addDays(new Date(), -20)),
       end: appStore.utils.formatDate(appStore.utils.addDays(new Date(), 20)),
     },
     field2: {
       key: 'bkg_consign_no',
-      title: list('jobNumber'),
-      keyItems: [{ key: 'bkg_consign_no', title: list('jobNumber') }],
+      title: tableHeader('bookingNo'),
+      keyItems: [{ key: 'bkg_consign_no', title: tableHeader('bookingNo') }],
       val: '',
     },
   })

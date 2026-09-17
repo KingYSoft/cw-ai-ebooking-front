@@ -3,7 +3,6 @@ export const BOOKING_LIST_STATUS_OPTIONS = [
   { value: 'under_review', title: 'Under review' },
   { value: 'confirmed', title: 'Confirmed' },
   { value: 'cancelled', title: 'Cancelled' },
-  { value: 'rejected', title: 'Rejected' },
 ]
 
 export const BOOKING_LIST_STATUS_VALUES = BOOKING_LIST_STATUS_OPTIONS.map(item => item.value)
@@ -28,7 +27,6 @@ export const BOOKING_LIST_STATUS_CHIP = {
   under_review: { color: 'warning', variant: 'tonal' },
   confirmed: { color: 'success', variant: 'tonal' },
   cancelled: { color: 'grey', variant: 'tonal' },
-  rejected: { color: 'error', variant: 'tonal' },
 }
 
 export function getBookingListStatusChipProps(status) {
