@@ -165,7 +165,7 @@
 
 <script setup>
   import { computed, nextTick, ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
 
   import { bookingQueryPage } from '@/api/booking'
@@ -184,6 +184,7 @@
     BOOKING_LIST_STATUS_OPTIONS,
     defaultBookingListStatusSelection,
     getBookingListStatusChipProps,
+    statusesFromQuery,
   } from '@/constants/bookingListStatus'
   import { isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
@@ -203,6 +204,7 @@
   })
 
   const router = useRouter()
+  const route = useRoute()
   const display = useDisplay()
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
@@ -221,11 +223,11 @@
   const tblItems = ref([])
   const totalCount = ref(0)
   const pageObj = ref({ pageSize: 2000, pageIndex: 1 })
-  const selectedStatuses = ref(defaultBookingListStatusSelection())
+  const selectedStatuses = ref(statusesFromQuery(route.query.status))
   const statusOptions = computed(() =>
     BOOKING_LIST_STATUS_OPTIONS.map(item => ({
       ...item,
-      title: listStatus(item.value),
+      title: listStatus(item.labelKey),
     })),
   )
 
@@ -234,7 +236,7 @@
       return ''
     }
     const matched = BOOKING_LIST_STATUS_OPTIONS.find(item => item.value === status)
-    return matched ? listStatus(matched.value) : status
+    return matched ? listStatus(matched.labelKey) : status
   }
 
   const defaultSearchData = () => ({

@@ -1,14 +1,29 @@
 export const BOOKING_LIST_STATUS_OPTIONS = [
-  { value: 'submitted', title: 'Submitted' },
-  { value: 'under_review', title: 'Under review' },
-  { value: 'confirmed', title: 'Confirmed' },
-  { value: 'cancelled', title: 'Cancelled' },
+  { value: 'Saved', title: 'Saved', labelKey: 'saved' },
+  { value: 'Request for Approve', title: 'Waiting for Approve', labelKey: 'waiting_approve' },
+  { value: 'Booking Released', title: 'Pending for Submit SI', labelKey: 'pending_si' },
+  { value: 'Cancel', title: 'Deactive', labelKey: 'deactive' },
 ]
 
 export const BOOKING_LIST_STATUS_VALUES = BOOKING_LIST_STATUS_OPTIONS.map(item => item.value)
 
+export const DASHBOARD_CARD_STATUS_MAP = {
+  pendingSubmit: 'Saved',
+  waitingApproval: 'Request for Approve',
+  pendingSi: 'Booking Released',
+  rejected: 'Cancel',
+}
+
 export function defaultBookingListStatusSelection() {
   return [...BOOKING_LIST_STATUS_VALUES]
+}
+
+export function statusesFromQuery(statusQuery) {
+  const raw = Array.isArray(statusQuery) ? statusQuery[0] : statusQuery
+  if (typeof raw === 'string' && BOOKING_LIST_STATUS_VALUES.includes(raw)) {
+    return [raw]
+  }
+  return defaultBookingListStatusSelection()
 }
 
 const STATUS_LABEL_MAP = Object.fromEntries(
@@ -23,10 +38,10 @@ export function getBookingListStatusLabel(status) {
 }
 
 export const BOOKING_LIST_STATUS_CHIP = {
-  submitted: { color: 'primary', variant: 'tonal' },
-  under_review: { color: 'warning', variant: 'tonal' },
-  confirmed: { color: 'success', variant: 'tonal' },
-  cancelled: { color: 'grey', variant: 'tonal' },
+  Saved: { color: 'primary', variant: 'tonal' },
+  'Request for Approve': { color: 'warning', variant: 'tonal' },
+  'Booking Released': { color: 'success', variant: 'tonal' },
+  Cancel: { color: 'grey', variant: 'tonal' },
 }
 
 export function getBookingListStatusChipProps(status) {

@@ -211,11 +211,10 @@ export default {
       deactivate: '停用',
     },
     listStatus: {
-      submitted: '已提交',
-      under_review: '審核中',
-      confirmed: '已確認',
-      cancelled: '已取消',
-      rejected: '已拒絕',
+      saved: 'Saved',
+      waiting_approve: 'Waiting for Approve',
+      pending_si: 'Pending for Submit SI',
+      deactive: 'Deactive',
     },
   },
 }
