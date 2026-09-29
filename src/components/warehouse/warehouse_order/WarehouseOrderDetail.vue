@@ -290,7 +290,7 @@
                     color="primary"
                     density="compact"
                     hide-details
-                    :model-value="inputData.consignee.add_address_code"
+                    :model-value="inputData.consignee_code"
                     readonly
                     variant="outlined"
                   />
@@ -443,7 +443,7 @@
                     color="primary"
                     density="compact"
                     hide-details
-                    :model-value="inputData.notify_party.add_address_code"
+                    :model-value="inputData.notify_party_code"
                     readonly
                     variant="outlined"
                   />
@@ -1551,6 +1551,8 @@
     }
     inputData.value.consignee = {}
     inputData.value.notify_party = {}
+    inputData.value.consignee_code = ''
+    inputData.value.notify_party_code = ''
     inputData.value.notify_party_same_as_consignee = 'N'
   }
 
@@ -1576,6 +1578,8 @@
       if (!data) {
         return
       }
+      inputData.value.consignee_code = data.consignee_code ?? ''
+      inputData.value.notify_party_code = data.notify_party_code ?? ''
       inputData.value.consignee = mapWhsMarketPartyToAddress(data.consignee, 'CONSIGNEE')
       const notifyParty = data.notify ?? data.notify_party
       inputData.value.notify_party = mapWhsMarketPartyToAddress(notifyParty, 'NOTIFY_PARTY')
