@@ -1558,7 +1558,11 @@
     if (!inputData.value) {
       return
     }
-    inputData.value.wso_market_pk = String(pk ?? '').trim()
+    const nextPk = String(pk ?? '').trim()
+    inputData.value.wso_market_pk = nextPk
+    if (inputData.value.market && typeof inputData.value.market === 'object') {
+      inputData.value.market.pk = nextPk
+    }
   }
 
   /** 选中 Plant ID 后按 market pk 拉 Market 明细，填充 Consignee / Notify */
@@ -1633,6 +1637,7 @@
       plant_id: '',
     })
     setWhsOrderMarketPk('')
+    plantIdOptionItems.value = []
     clearMarketParties()
   }
 
@@ -1654,12 +1659,13 @@
       return
     }
     const matched = findPlantOption(pid)
+    const nextPk = String(matched?.pk ?? '').trim()
     syncMarketDerivedFields(inputData.value, {
       market: name,
       plant_id: pid,
-      pk: matched?.pk ?? inputData.value?.wso_market_pk ?? '',
+      pk: nextPk,
     })
-    setWhsOrderMarketPk(matched?.pk)
+    setWhsOrderMarketPk(nextPk)
     if (matched?.pk) {
       await loadMarketPartyDetailByPk(matched.pk)
       return

@@ -63,6 +63,22 @@ export const recognizeWhsBookingFile = formData =>
     },
   })
 
+/**
+ * POST /parse-ebooking-whs-order-items-excel
+ * query: ebooking_whs_order_pk（可选）, whs_market_pk, whs_market
+ * formData: file
+ */
+export const parseEbookingWhsOrderItemsExcel = (formData, params = {}) =>
+  service({
+    url: '/whs-order/parse-ebooking-whs-order-items-excel',
+    method: 'post',
+    data: formData,
+    params,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+
 /** @deprecated 使用 whsOrderQueryPage */
 export const pageWhsOrder = whsOrderQueryPage
 

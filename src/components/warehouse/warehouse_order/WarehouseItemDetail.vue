@@ -8,7 +8,7 @@
         prepend-icon="mdi-upload"
         size="small"
         variant="flat"
-        @click="importDialogOpen = true"
+        @click="openOrderLineImport"
       >
         {{ itemDetailLabel('upload') }}
       </v-btn>
@@ -108,6 +108,15 @@
             density="compact"
             hide-details
             :rules="lineTextRules.woi_item"
+            variant="outlined"
+          />
+        </template>
+
+        <template #item.woi_hs_code="{ item }">
+          <v-text-field
+            v-model="item.woi_hs_code"
+            density="compact"
+            hide-details
             variant="outlined"
           />
         </template>
@@ -433,6 +442,7 @@
 
     <WarehouseOrderImportDialog
       v-model="importDialogOpen"
+      accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
       :loading="importLoading"
       @upload="onOrderLineImportUpload"
     />
@@ -443,7 +453,7 @@
   import Decimal from 'decimal.js'
   import { computed, ref, watch } from 'vue'
   import { getWhsMarketPlantOptions } from '@/api/whs-market'
-  import { recognizeWhsBookingFile } from '@/api/whs-order'
+  import { parseEbookingWhsOrderItemsExcel } from '@/api/whs-order'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
   import { hasWhsOrderItemBatteryFile, mapWhsOrderItemListFromRecognize } from '@/composables/mapWhsOrderDetail'
@@ -467,8 +477,67 @@
   const { itemHeader, itemDetailLabel, validation, requiredRule, import: importI18n } =
     useWarehouseOrderPageI18n()
 
+  const inputData = defineModel('input-data', {
+    type: Object,
+    default: () => ({}),
+  })
+
+  const emit = defineEmits(['register-form-refs'])
+
+  const setRef = el => {
+    emit('register-form-refs', el)
+  }
+
+  const itemList = computed(() => inputData.value?.item_list ?? [])
+
   const importDialogOpen = ref(false)
   const importLoading = ref(false)
+
+  const selectedMarketGroup = computed(() =>
+    String(inputData.value?.wso_market || inputData.value?.market?.market || '').trim(),
+  )
+
+  const selectedPlantId = computed(() =>
+    String(inputData.value?.wso_plant_id || inputData.value?.market?.plant_id || '').trim(),
+  )
+
+  const selectedMarketPk = computed(() =>
+    String(inputData.value?.wso_market_pk || inputData.value?.market?.pk || '').trim(),
+  )
+
+  const resolveOrderLineUploadParams = () => {
+    const form = inputData.value ?? {}
+    const whs_market = String(form.wso_market || form.market?.market || '').trim()
+    const plantId = String(form.wso_plant_id || form.market?.plant_id || '').trim()
+    const whs_market_pk = String(form.wso_market_pk || form.market?.pk || '').trim()
+    if (!whs_market) {
+      return { error: validation('marketRequired') }
+    }
+    if (!plantId) {
+      return { error: validation('plantIdRequired') }
+    }
+    if (!whs_market_pk) {
+      return { error: validation('plantIdSelectFromList') }
+    }
+    const params = { whs_market_pk, whs_market }
+    const orderPk = String(inputData.value?.pk ?? '').trim()
+    if (orderPk) {
+      params.ebooking_whs_order_pk = orderPk
+    }
+    return { params }
+  }
+
+  const openOrderLineImport = () => {
+    const { error } = resolveOrderLineUploadParams()
+    if (error) {
+      appStore.openMessage({
+        content: error,
+        color: 'warning',
+      })
+      return
+    }
+    importDialogOpen.value = true
+  }
 
   const onOrderLineImportUpload = async ({ files }) => {
     if (!files?.length) {
@@ -479,39 +548,37 @@
       return
     }
 
+    const { error, params } = resolveOrderLineUploadParams()
+    if (error) {
+      appStore.openMessage({
+        content: error,
+        color: 'warning',
+      })
+      return
+    }
+
     importLoading.value = true
     try {
       appStore.openGlobalLoadingWithIcon(importI18n('uploading'), '$upload', 'info')
       const formData = new FormData()
       formData.append('file', files[0])
-      const { success, data } = await recognizeWhsBookingFile(formData)
-      const order = Array.isArray(data?.orders) ? data.orders[0] : null
-      if (!success || !order || typeof order !== 'object') {
+      const { success, data, msg, errCode } = await parseEbookingWhsOrderItemsExcel(formData, params)
+      if (!success || !data || typeof data !== 'object') {
+        const apiMsg = String(msg ?? '').trim()
+        if (apiMsg) {
+          if (errCode !== -1) {
+            appStore.openMessage({ content: apiMsg, color: 'error' })
+          }
+          return
+        }
         throw new Error(importI18n('missingData'))
       }
 
-      const headerMarket = String(
-        inputData.value?.market?.market ?? inputData.value?.wso_market ?? '',
-      )
-        .trim()
-        .toUpperCase()
-      const recognizedMarket = String(order?.market?.market ?? order?.wso_market ?? '')
-        .trim()
-        .toUpperCase()
-      if (headerMarket && recognizedMarket && headerMarket !== recognizedMarket) {
-        appStore.openMessage({
-          content: itemDetailLabel('uploadMarketMismatch'),
-          color: 'warning',
-        })
-        return
-      }
-
-      const mappedItems = mapWhsOrderItemListFromRecognize(order)
+      const mappedItems = mapWhsOrderItemListFromRecognize(data)
       if (!Array.isArray(mappedItems) || mappedItems.length === 0) {
         throw new Error(itemDetailLabel('uploadEmptyLines'))
       }
 
-      // 只覆盖 Order Line，不改 header / 地址等
       inputData.value.item_list = mappedItems
       inputData.value.pac_list = mappedItems
       importDialogOpen.value = false
@@ -608,24 +675,6 @@
       item.battery_files = []
     }
   }
-
-  const inputData = defineModel('input-data', {
-    type: Object,
-    default: () => ({}),
-  })
-
-  const emit = defineEmits(['register-form-refs'])
-
-  const setRef = el => {
-    emit('register-form-refs', el)
-  }
-
-  const itemList = computed(() => inputData.value?.item_list ?? [])
-
-  /** Order Header 所选 Market Group */
-  const selectedMarketGroup = computed(() =>
-    String(inputData.value?.market?.market ?? inputData.value?.wso_market ?? '').trim(),
-  )
 
   const orderLineMarketItems = ref([])
 
@@ -755,6 +804,7 @@
       woi_packlist_no: '',
       woi_desc: '',
       woi_item: '',
+      woi_hs_code: '',
       woi_gross_wt: null,
       woi_gw_unit: templateRow?.woi_gw_unit ?? 'KG',
       woi_net_wt: null,
@@ -788,6 +838,7 @@
     { title: itemHeader('packingListNo'), key: 'woi_packlist_no', minWidth: '150px' },
     { title: itemHeader('description'), key: 'woi_desc', minWidth: '200px' },
     { title: itemHeader('itemCode'), key: 'woi_item', minWidth: '120px' },
+    { title: itemHeader('hsCode'), key: 'woi_hs_code', minWidth: '120px' },
     { title: itemHeader('grossWeight'), key: 'woi_gross_wt', minWidth: '180px' },
     { title: itemHeader('netWeight'), key: 'woi_net_wt', minWidth: '180px' },
     { title: itemHeader('volume'), key: 'woi_volume', minWidth: '180px' },

@@ -205,6 +205,7 @@ export default {
       packingListNo: 'Packing List No.',
       description: 'Description',
       itemCode: 'Item Code',
+      hsCode: 'Hs Code',
       grossWeight: 'Gross Weight',
       netWeight: 'Net Weight',
       volume: 'Volume',
