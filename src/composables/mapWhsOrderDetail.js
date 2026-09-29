@@ -133,6 +133,7 @@ export function mapPacListItem(row, index = 0) {
     pac_weight_unit: resolveItemField(row, 'woi_gw_unit', 'pac_weight_unit') ?? 'KG',
     pac_actual_volume_uom: resolveItemField(row, 'woi_vol_unit', 'pac_actual_volume_uom') ?? 'CBM',
     pac_pack_type: resolveItemField(row, 'woi_outpack_unit', 'pac_pack_type') ?? '',
+    woi_hs_code: row.woi_hs_code ?? '',
     file_list: fileList,
     // 回显 file_list + 本地待上传 battery_files（仅含 File 的本地项）
     battery_files: [
@@ -615,6 +616,7 @@ function mapFormItemToWoi(row, parentPk = '', index = 0) {
     woi_pieces: toNum(resolveItemField(row, 'woi_pieces', 'pieces')),
     woi_is_palletization: toNum(resolveItemField(row, 'woi_is_palletization', 'is_palletization')),
     woi_is_battery_included: toNum(resolveItemField(row, 'woi_is_battery_included', 'is_battery')),
+    woi_hs_code: row.woi_hs_code ?? '',
     woi_is_dg: toNum(row.woi_is_dg),
     woi_dg_type: row.woi_dg_type ?? '',
     woi_dg_desc: row.woi_dg_desc ?? '',
