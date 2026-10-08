@@ -77,7 +77,7 @@ export default {
     newTabTitle: '新建倉庫',
     printTitle: 'Shipping Order',
     button: {
-      edit: '進入編輯模式',
+      edit: '請求解鎖',
       save: '儲存',
       submit: '提交',
       cancel: '取消',

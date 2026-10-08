@@ -77,7 +77,7 @@ export default {
     newTabTitle: 'Kho mới',
     printTitle: 'Shipping Order',
     button: {
-      edit: 'Vào chế độ chỉnh sửa',
+      edit: 'Yêu cầu mở khóa',
       save: 'Lưu',
       submit: 'Gửi',
       cancel: 'Hủy',
