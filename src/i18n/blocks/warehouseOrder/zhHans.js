@@ -77,7 +77,7 @@ export default {
     newTabTitle: '新建仓库',
     printTitle: '发货订单',
     button: {
-      edit: '进入编辑模式',
+      edit: '请求解锁',
       save: '保存',
       submit: '提交',
       cancel: '取消',

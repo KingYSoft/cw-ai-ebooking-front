@@ -77,7 +77,7 @@ export default {
     newTabTitle: 'New Warehouse',
     printTitle: 'Shipping Order',
     button: {
-      edit: 'Enter Edit Mode',
+      edit: 'Request Unlock',
       save: 'Save',
       submit: 'Submit',
       cancel: 'Cancel',
