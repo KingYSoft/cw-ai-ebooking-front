@@ -77,6 +77,7 @@ export default {
     newTabTitle: 'Kho mới',
     printTitle: 'Shipping Order',
     button: {
+      edit: 'Vào chế độ chỉnh sửa',
       save: 'Lưu',
       submit: 'Gửi',
       cancel: 'Hủy',
@@ -134,6 +135,10 @@ export default {
     },
     itemDetail: {
       upload: 'Tải lên',
+      download: 'Tải xuống',
+      downloadLoading: 'Đang tải mẫu xuống...',
+      downloadSuccess: 'Đã tải xuống mẫu dòng đơn hàng.',
+      downloadFailed: 'Không thể tải xuống mẫu dòng đơn hàng.',
       uploadSuccess: 'Đã cập nhật dòng đơn từ tệp.',
       uploadEmptyLines: 'Kết quả nhận dạng không có dữ liệu dòng đơn.',
       uploadMarketMismatch:

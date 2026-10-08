@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div :inert="readonly">
     <v-card-text class="py-2">
       <v-btn
+        v-if="!readonly"
         color="primary"
-        :disabled="importLoading"
+        :disabled="importLoading || downloadLoading"
         :loading="importLoading"
         prepend-icon="mdi-upload"
         size="small"
@@ -11,6 +12,20 @@
         @click="openOrderLineImport"
       >
         {{ itemDetailLabel('upload') }}
+      </v-btn>
+
+      <v-btn
+        v-if="!readonly"
+        class="ml-2"
+        color="primary"
+        :disabled="importLoading || downloadLoading"
+        :loading="downloadLoading"
+        prepend-icon="mdi-download"
+        size="small"
+        variant="flat"
+        @click="downloadOrderLineTemplate"
+      >
+        {{ itemDetailLabel('download') }}
       </v-btn>
     </v-card-text>
 
@@ -451,9 +466,12 @@
 
 <script setup>
   import Decimal from 'decimal.js'
-  import { computed, ref, watch } from 'vue'
+  import { computed, ref, toRefs, watch } from 'vue'
   import { getWhsMarketPlantOptions } from '@/api/whs-market'
-  import { parseEbookingWhsOrderItemsExcel } from '@/api/whs-order'
+  import {
+    downloadWhsOrderLineTemplate,
+    parseEbookingWhsOrderItemsExcel,
+  } from '@/api/whs-order'
   import FRemoteTableMenu from '@/components/FRemoteTableMenu.vue'
   import WarehouseOrderImportDialog from '@/components/warehouse/WarehouseOrderImportDialog.vue'
   import { hasWhsOrderItemBatteryFile, mapWhsOrderItemListFromRecognize } from '@/composables/mapWhsOrderDetail'
@@ -482,6 +500,14 @@
     default: () => ({}),
   })
 
+  const props = defineProps({
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
+  })
+  const { readonly } = toRefs(props)
+
   const emit = defineEmits(['register-form-refs'])
 
   const setRef = el => {
@@ -492,6 +518,7 @@
 
   const importDialogOpen = ref(false)
   const importLoading = ref(false)
+  const downloadLoading = ref(false)
 
   const selectedMarketGroup = computed(() =>
     String(inputData.value?.wso_market || inputData.value?.market?.market || '').trim(),
@@ -537,6 +564,33 @@
       return
     }
     importDialogOpen.value = true
+  }
+
+  const downloadOrderLineTemplate = async () => {
+    downloadLoading.value = true
+    try {
+      appStore.openGlobalLoadingWithIcon(
+        itemDetailLabel('downloadLoading'),
+        'mdi-cloud-download',
+        'info',
+      )
+      const blob = await downloadWhsOrderLineTemplate()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'Order_Line_Template.xlsx'
+      document.body.append(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+      appStore.openMessage({ content: itemDetailLabel('downloadSuccess'), color: 'success' })
+    } catch (error) {
+      console.error(error)
+      appStore.openMessage({ content: itemDetailLabel('downloadFailed'), color: 'error' })
+    } finally {
+      downloadLoading.value = false
+      appStore.closeGlobalLoading()
+    }
   }
 
   const onOrderLineImportUpload = async ({ files }) => {

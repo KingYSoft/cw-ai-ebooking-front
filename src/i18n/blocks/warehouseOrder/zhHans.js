@@ -77,6 +77,7 @@ export default {
     newTabTitle: '新建仓库',
     printTitle: '发货订单',
     button: {
+      edit: '进入编辑模式',
       save: '保存',
       submit: '提交',
       cancel: '取消',
@@ -134,6 +135,10 @@ export default {
     },
     itemDetail: {
       upload: '上传',
+      download: '下载',
+      downloadLoading: '正在下载模板...',
+      downloadSuccess: '订单明细模板下载成功。',
+      downloadFailed: '订单明细模板下载失败。',
       uploadSuccess: '已根据文件更新订单明细。',
       uploadEmptyLines: '识别结果中没有订单明细数据。',
       uploadMarketMismatch: '识别到的 Market 与 Order Header 所选 Market 不一致，未更新订单明细。',

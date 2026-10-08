@@ -20,6 +20,7 @@
         <WarehouseItemDetail
           v-model:input-data="inputData"
           :input-data-rules="inputDataRules"
+          :readonly="readonly"
           @register-form-refs="registerFormRefs"
         />
       </div>
@@ -27,7 +28,11 @@
 
     <v-scroll-x-transition hide-on-leave mode="out-in">
       <div v-show="activedTab === 3">
-        <WarehouseOrderEDocs v-model:input-data="inputData" :actived-tab="activedTab" />
+        <WarehouseOrderEDocs
+          v-model:input-data="inputData"
+          :actived-tab="activedTab"
+          :readonly="readonly"
+        />
       </div>
     </v-scroll-x-transition>
 

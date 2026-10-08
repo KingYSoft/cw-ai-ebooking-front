@@ -77,6 +77,7 @@ export default {
     newTabTitle: '新建倉庫',
     printTitle: 'Shipping Order',
     button: {
+      edit: '進入編輯模式',
       save: '儲存',
       submit: '提交',
       cancel: '取消',
@@ -134,6 +135,10 @@ export default {
     },
     itemDetail: {
       upload: '上傳',
+      download: '下載',
+      downloadLoading: '正在下載範本...',
+      downloadSuccess: '訂單明細範本下載成功。',
+      downloadFailed: '訂單明細範本下載失敗。',
       uploadSuccess: '已根據檔案更新訂單明細。',
       uploadEmptyLines: '識別結果中沒有訂單明細資料。',
       uploadMarketMismatch: '識別到的 Market 與 Order Header 所選 Market 不一致，未更新訂單明細。',

@@ -77,6 +77,7 @@ export default {
     newTabTitle: 'New Warehouse',
     printTitle: 'Shipping Order',
     button: {
+      edit: 'Enter Edit Mode',
       save: 'Save',
       submit: 'Submit',
       cancel: 'Cancel',
@@ -134,6 +135,10 @@ export default {
     },
     itemDetail: {
       upload: 'Upload',
+      download: 'Download',
+      downloadLoading: 'Downloading template...',
+      downloadSuccess: 'Order Line template downloaded.',
+      downloadFailed: 'Failed to download the Order Line template.',
       uploadSuccess: 'Order lines updated from file.',
       uploadEmptyLines: 'Recognition response has no order line data.',
       uploadMarketMismatch:
