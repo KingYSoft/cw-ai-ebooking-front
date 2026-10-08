@@ -79,6 +79,14 @@ export const parseEbookingWhsOrderItemsExcel = (formData, params = {}) =>
     },
   })
 
+/** GET /whs-order/download-order-line-template */
+export const downloadWhsOrderLineTemplate = () =>
+  service({
+    url: '/whs-order/download-order-line-template',
+    method: 'get',
+    responseType: 'blob',
+  })
+
 /** @deprecated 使用 whsOrderQueryPage */
 export const pageWhsOrder = whsOrderQueryPage
 
