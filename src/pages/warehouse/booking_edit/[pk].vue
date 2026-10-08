@@ -31,6 +31,17 @@
 
         <template v-if="showToolbarActions" #actions>
           <v-btn
+            v-if="!isEditing && isOrderedStatus"
+            color="primary"
+            prepend-icon="mdi-pencil"
+            size="small"
+            variant="flat"
+            @click.stop="onEnterEditMode"
+          >
+            {{ editButton('edit') }}
+          </v-btn>
+
+          <v-btn
             v-if="showPrintButton"
             color="secondary"
             :disabled="cardLoading"
@@ -42,7 +53,7 @@
           </v-btn>
 
           <v-btn
-            v-if="activedTab === 1 || activedTab === 2"
+            v-if="isEditing && (activedTab === 1 || activedTab === 2)"
             color="primary"
             :disabled="cardLoading || isEditLockedByOther || isOrderReceived || (isOrderSubmitted && activedTab === 1)"
             size="small"
@@ -53,7 +64,7 @@
           </v-btn>
 
           <v-btn
-            v-if="activedTab === 1 || activedTab === 2"
+            v-if="isEditing && (activedTab === 1 || activedTab === 2)"
             color="primary"
             :disabled="cardLoading || isEditLockedByOther || isOrderReceived || isOrderSubmitted"
             size="small"
@@ -78,7 +89,7 @@
         <PagesWarehouseOrderEdit
           v-model:input-data="inputData"
           :actived-tab="activedTab"
-          :readonly="isOrderSubmitted || isOrderReceived"
+          :readonly="!isFormEditable"
           @register-form-refs="registerFormRefs"
         />
       </v-sheet>
@@ -208,6 +219,7 @@
   // const activedTab = ref(1)
   const bookingEmptyVis = ref(false)
   const submitConfirmVis = ref(false)
+  const isEditMode = ref(false)
   const { pdfTitle, pdfUrl, pdfDiaVis, closePdfPreview, onPrintWhsOrder } = useWhsOrderPrint()
 
   const queryData = async pk => {
@@ -225,26 +237,48 @@
     }
   }
 
-  const editLockGuard = useEditLockGuard({
-    businessType: 'warehouse_order',
-    pk: route.params.pk?.toString() || '',
-  })
-  const isEditLockedByOther = computed(() => editLockGuard.isSaveBlocked.value)
-  const editLockWarningText = computed(() => editLockGuard.lockWarningText.value)
-  const resolveOrderStatus = () =>
-    String(inputData.value?.wso_status ?? inputData.value?.wso_shipment_status ?? '')
+  const resolveShipmentStatus = () =>
+    String(inputData.value?.wso_shipment_status ?? inputData.value?.wso_status ?? '')
       .trim()
       .toLowerCase()
+  const resolveEbookingStatus = () =>
+    String(inputData.value?.wso_status ?? '')
+      .trim()
+      .toLowerCase()
+  const isOrderedStatus = computed(() => resolveShipmentStatus() === 'ordered')
   const isOrderSubmitted = computed(() => {
-    const status = resolveOrderStatus()
+    const status = resolveEbookingStatus()
     // API may return "Submitted" or misspelled "Submited"
     return status === 'submitted' || status === 'submited'
   })
-  const isOrderReceived = computed(() => resolveOrderStatus() === 'received')
+  const isOrderReceived = computed(() => resolveShipmentStatus() === 'received')
+  const isEditing = computed(() => isEditMode.value && isOrderedStatus.value)
+  const editLockGuard = useEditLockGuard({
+    businessType: 'warehouse_order',
+    pk: computed(() => (isEditing.value ? route.params.pk?.toString() || '' : '')),
+  })
+  const isEditLockedByOther = computed(() => editLockGuard.isSaveBlocked.value)
+  const isFormEditable = computed(() => isEditing.value && !isEditLockedByOther.value)
+  const editLockWarningText = computed(() => editLockGuard.lockWarningText.value)
   const showPrintButton = computed(() => isOrderSubmitted.value)
   const showToolbarActions = computed(
-    () => showPrintButton.value || activedTab.value === 1 || activedTab.value === 2,
+    () =>
+      showPrintButton.value ||
+      (!isEditing.value && isOrderedStatus.value) ||
+      (isEditing.value && (activedTab.value === 1 || activedTab.value === 2)),
   )
+
+  const onEnterEditMode = async () => {
+    if (!isOrderedStatus.value || isEditing.value) {
+      return
+    }
+
+    isEditMode.value = true
+    const acquired = await editLockGuard.acquireLock()
+    if (!acquired) {
+      isEditMode.value = false
+    }
+  }
 
   const onPrintHandle = async () => {
     try {
@@ -256,7 +290,7 @@
   }
 
   const onSaveHandle = async () => {
-    if (isOrderReceived.value) {
+    if (!isEditing.value || !isOrderedStatus.value || isOrderReceived.value) {
       return
     }
     if (isOrderSubmitted.value && activedTab.value === 1) {
@@ -334,7 +368,7 @@
   }
 
   const onSubmitClick = () => {
-    if (isOrderSubmitted.value || isOrderReceived.value) {
+    if (!isEditing.value || !isOrderedStatus.value || isOrderSubmitted.value || isOrderReceived.value) {
       return
     }
     if (!editLockGuard.ensureCanSave()) {
@@ -348,7 +382,7 @@
 
   const onSubmitConfirm = async () => {
     submitConfirmVis.value = false
-    if (isOrderSubmitted.value || isOrderReceived.value) {
+    if (!isEditing.value || !isOrderedStatus.value || isOrderSubmitted.value || isOrderReceived.value) {
       return
     }
 
@@ -375,6 +409,7 @@
             inputData.value.wso_shipment_status = 'Submited'
           }
         }
+        await editLockGuard.releaseLock()
         await queryData(pk)
         markInputDataSaved()
       }
@@ -389,7 +424,9 @@
     const pk = route.params.pk?.toString()
 
     await queryData(pk)
-    await editLockGuard.acquireLock()
+    if (isEditing.value) {
+      await editLockGuard.acquireLock()
+    }
     syncEditTabTitle()
   }
 

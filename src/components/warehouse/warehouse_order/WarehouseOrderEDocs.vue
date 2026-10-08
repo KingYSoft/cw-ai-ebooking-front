@@ -17,6 +17,7 @@
     <template #actions>
       <div class="d-flex ga-2">
         <v-btn
+          v-if="!readonly"
           color="primary"
           density="default"
           prepend-icon="mdi-upload"
@@ -109,8 +110,12 @@
       type: Number,
       default: 1,
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
   })
-  const { activedTab } = toRefs(props)
+  const { activedTab, readonly } = toRefs(props)
 
   const appStore = useAppStore()
   const { t } = useLocale()
