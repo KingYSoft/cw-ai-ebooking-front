@@ -544,6 +544,7 @@
           <v-row dense>
             <v-col :cols="rescols('c12l3s6')">
               <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <!-- Original Carrier SO control retained for reference; this field is display-only.
                 <v-text-field
                   v-model="inputData.wso_so_number"
                   color="primary"
@@ -559,7 +560,17 @@
                       {{ detailField('carrierSoNumber') }}:
                     </div>
                   </template>
-                </v-text-field>
+                </v-text-field> -->
+
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('carrierSoNumber') }}<span class="text-primary">^</span>:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_so_number) }}
+                  </div>
+                </div>
 
                 <!-- <v-autocomplete
               id="1@bkg_destination"
@@ -609,6 +620,7 @@
                 </div>
               </template>
             </v-autocomplete> -->
+                <!-- Original POL control retained for reference; this field is display-only.
                 <v-autocomplete
                   auto-select-first
                   autocomplete="off"
@@ -654,8 +666,19 @@
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">{{ detailField('load') }}</div>
                   </template>
-                </v-autocomplete>
+                </v-autocomplete> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('load') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_load_port) }}
+                  </div>
+                </div>
+
+                <!-- Original POD control retained for reference; this field is display-only.
                 <v-autocomplete
                   auto-select-first
                   autocomplete="off"
@@ -703,8 +726,19 @@
                       {{ detailField('discharge') }}
                     </div>
                   </template>
-                </v-autocomplete>
+                </v-autocomplete> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('discharge') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_discharge_port) }}
+                  </div>
+                </div>
+
+                <!-- Original ETD control retained for reference; this field is display-only.
                 <FDatePicker
                   id="1@wso_etd"
                   v-model:date-value="inputData.wso_etd"
@@ -716,8 +750,19 @@
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">{{ detailField('etd') }}:</div>
                   </template>
-                </FDatePicker>
+                </FDatePicker> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('etd') }}<span class="text-primary">^</span>:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_etd) }}
+                  </div>
+                </div>
+
+                <!-- Original ETA control retained for reference; this field is display-only.
                 <FDatePicker
                   id="1@wso_eta"
                   v-model:date-value="inputData.wso_eta"
@@ -729,7 +774,17 @@
                   <template #prepend>
                     <div class="text-caption text-end w-label-110">{{ detailField('eta') }}:</div>
                   </template>
-                </FDatePicker>
+                </FDatePicker> -->
+
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('eta') }}<span class="text-primary">^</span>:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_eta) }}
+                  </div>
+                </div>
               </div>
             </v-col>
 
@@ -1014,6 +1069,7 @@
 
             <v-col :cols="rescols('c12l3s6')">
               <div class="d-flex align-start flex-column flex-wrap ga-1">
+                <!-- Original SI cut-off control retained for reference; this field is display-only.
                 <FDateTimePicker
                   v-model:date-time-value="inputData.wso_si_cut_off"
                   :date-props="{ clearable: true }"
@@ -1026,8 +1082,19 @@
                       {{ detailField('siCutOff') }}
                     </div>
                   </template>
-                </FDateTimePicker>
+                </FDateTimePicker> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('siCutOff') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_si_cut_off) }}
+                  </div>
+                </div>
+
+                <!-- Original VGM cut-off control retained for reference; this field is display-only.
                 <FDatePicker
                   v-model:date-value="inputData.wso_vgm_cut_off_date"
                   :date-props="{ clearable: false, readonly: true }"
@@ -1040,8 +1107,19 @@
                       {{ detailField('vgmCutOff') }}
                     </div>
                   </template>
-                </FDatePicker>
+                </FDatePicker> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('vgmCutOff') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_vgm_cut_off_date) }}
+                  </div>
+                </div>
+
+                <!-- Original document cut-off control retained for reference; this field is display-only.
                 <FDatePicker
                   v-model:date-value="inputData.wso_doc_cut_off_date"
                   :date-props="{ clearable: false, readonly: true }"
@@ -1054,8 +1132,19 @@
                       {{ detailField('docCutOff') }}
                     </div>
                   </template>
-                </FDatePicker>
+                </FDatePicker> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('docCutOff') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_doc_cut_off_date) }}
+                  </div>
+                </div>
+
+                <!-- Original CY cut-off control retained for reference; this field is display-only.
                 <FDatePicker
                   v-model:date-value="inputData.wso_port_cargo_cut_off_date"
                   :date-props="{ clearable: false, readonly: true }"
@@ -1069,8 +1158,19 @@
                       {{ detailField('cyCutOff') }}
                     </div>
                   </template>
-                </FDatePicker>
+                </FDatePicker> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('cyCutOff') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_port_cargo_cut_off_date) }}
+                  </div>
+                </div>
+
+                <!-- Original CFS cut-off control retained for reference; this field is display-only.
                 <FDateTimePicker
                   v-model:date-time-value="inputData.wso_cfs_cut_off"
                   :date-props="{ clearable: true }"
@@ -1083,8 +1183,19 @@
                       {{ detailField('cfsCutOff') }}
                     </div>
                   </template>
-                </FDateTimePicker>
+                </FDateTimePicker> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('cfsCutOff') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_cfs_cut_off) }}
+                  </div>
+                </div>
+
+                <!-- Original intended vessel control retained for reference; this field is display-only.
                 <v-text-field
                   id="1@intended_vessel"
                   v-model="inputData.wso_intended_vessel"
@@ -1101,8 +1212,19 @@
                       {{ detailField('intendedVessel') }}
                     </div>
                   </template>
-                </v-text-field>
+                </v-text-field> -->
 
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('intendedVessel') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_intended_vessel) }}
+                  </div>
+                </div>
+
+                <!-- Original place of delivery control retained for reference; this field is display-only.
                 <v-autocomplete
                   id="1@place_of_delivery"
                   auto-select-first
@@ -1152,7 +1274,17 @@
                       {{ detailField('placeOfDelivery') }}
                     </div>
                   </template>
-                </v-autocomplete>
+                </v-autocomplete> -->
+
+                <div class="warehouse-order-display-field">
+                  <div class="text-caption text-end w-label-110">
+                    {{ displayWarehouseLabel('placeOfDelivery') }}:
+                  </div>
+
+                  <div class="warehouse-order-display-value text-body-2">
+                    {{ displayWarehouseValue(inputData.wso_place_of_delivery) }}
+                  </div>
+                </div>
                 <!-- <v-select
               v-model="inputData.job.job_direction"
               auto-select-first
@@ -1342,6 +1474,13 @@
     type: Object,
     default: () => ({}),
   })
+
+  const displayWarehouseValue = value => {
+    const text = String(value ?? '').trim()
+    return text || '-'
+  }
+
+  const displayWarehouseLabel = key => String(detailField(key) ?? '').replace(/\s*:$/, '')
 
   const emit = defineEmits(['query-port', 'on-select-addr', 'on-clear-addr', 'register-form-refs'])
 
@@ -1896,6 +2035,23 @@
 </script>
 
 <style lang="scss" scoped>
+  .warehouse-order-display-field {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 40px;
+    gap: 8px;
+  }
+
+  .warehouse-order-display-value {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    color: inherit;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .whs-order-detail--readonly {
     pointer-events: none;
     user-select: none;

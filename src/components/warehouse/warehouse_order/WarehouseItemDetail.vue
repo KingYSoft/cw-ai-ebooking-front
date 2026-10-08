@@ -132,7 +132,9 @@
             v-model="item.woi_hs_code"
             density="compact"
             hide-details
+            :rules="lineTextRules.woi_hs_code"
             variant="outlined"
+            @update:model-value="normalizeHsCode(item, $event)"
           />
         </template>
 
@@ -661,7 +663,12 @@
     woi_packlist_no: [requiredRule(itemHeader('packingListNo'))],
     woi_desc: [requiredRule(itemHeader('description'))],
     woi_item: [requiredRule(itemHeader('itemCode'))],
+    woi_hs_code: [requiredRule(itemHeader('hsCode'))],
   }))
+
+  const normalizeHsCode = (item, value) => {
+    item.woi_hs_code = String(value ?? '').toUpperCase()
+  }
 
   const lineMeasureRules = computed(() => ({
     woi_gross_wt: [measureRequiredRule(itemHeader('grossWeight'))],

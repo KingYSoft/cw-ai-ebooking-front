@@ -172,7 +172,12 @@
     { title: header('warehouse'), key: 'wso_warehouse_code', align: 'start', minWidth: '120px' },
     { title: header('status'), key: 'wso_status', align: 'start', minWidth: '90px' },
     { title: header('bookingNo'), key: 'wso_temp_number', align: 'start', minWidth: '165px' },
-    { title: header('soNumber'), key: 'wso_consign_no', align: 'start', minWidth: '165px' },
+    {
+      title: header('soNumber'),
+      key: 'wso_consign_no',
+      align: 'start',
+      minWidth: '220px',
+    },
     {
       title: header('containerNumber'),
       key: 'wso_so_number',
