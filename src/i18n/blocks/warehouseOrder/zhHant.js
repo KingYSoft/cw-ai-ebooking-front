@@ -78,6 +78,7 @@ export default {
     printTitle: 'Shipping Order',
     button: {
       edit: '請求解鎖',
+      enterEdit: '編輯',
       save: '儲存',
       submit: '提交',
       cancel: '取消',
@@ -103,6 +104,7 @@ export default {
     message: {
       copySuccess: '訂單號已複製到剪貼板。',
       submitted: '倉庫訂單已提交。',
+      unlockRequested: '解鎖申請已提交。',
       unknownTab: '未知標籤頁。',
       carrierSoRequiredForPrint: '僅當已填寫 Carrier SO number 時才可列印。',
       generating: '正在產生文件...',

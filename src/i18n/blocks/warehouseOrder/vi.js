@@ -78,6 +78,7 @@ export default {
     printTitle: 'Shipping Order',
     button: {
       edit: 'Yêu cầu mở khóa',
+      enterEdit: 'Sửa',
       save: 'Lưu',
       submit: 'Gửi',
       cancel: 'Hủy',
@@ -103,6 +104,7 @@ export default {
     message: {
       copySuccess: 'Đã sao chép số đơn vào clipboard.',
       submitted: 'Đã gửi đơn kho.',
+      unlockRequested: 'Đã gửi yêu cầu mở khóa.',
       unknownTab: 'Tab không xác định.',
       carrierSoRequiredForPrint: 'Chỉ in được khi đã điền Carrier SO number.',
       generating: 'Đang tạo tài liệu...',

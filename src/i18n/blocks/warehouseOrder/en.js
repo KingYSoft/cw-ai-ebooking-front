@@ -78,6 +78,7 @@ export default {
     printTitle: 'Shipping Order',
     button: {
       edit: 'Request Unlock',
+      enterEdit: 'Edit',
       save: 'Save',
       submit: 'Submit',
       cancel: 'Cancel',
@@ -103,6 +104,7 @@ export default {
     message: {
       copySuccess: 'Order No. copied to clipboard.',
       submitted: 'Warehouse order submitted.',
+      unlockRequested: 'Unlock request submitted.',
       unknownTab: 'Unknown tab.',
       carrierSoRequiredForPrint: 'Print is only available when Carrier SO number is filled.',
       generating: 'Generating document...',
