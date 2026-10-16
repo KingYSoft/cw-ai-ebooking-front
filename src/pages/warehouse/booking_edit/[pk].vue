@@ -270,6 +270,7 @@
   const ebookingStatus = computed(resolveEbookingStatus)
   const isOrderedStatus = computed(() => resolveShipmentStatus() === 'ordered')
   const isOrderSubmitted = computed(() => ebookingStatus.value === 'Submited')
+  const isPendingApproveStatus = computed(() => ebookingStatus.value === 'Pending Approve')
   const isDraftStatus = computed(() => ebookingStatus.value === 'Draft')
   const isOrderReceived = computed(() => resolveShipmentStatus() === 'received')
   const isEditing = computed(
@@ -292,7 +293,9 @@
   const showEnterEditButton = computed(
     () => isDraftStatus.value && isOrderedStatus.value && !isEditing.value,
   )
-  const showPrintButton = computed(() => isOrderSubmitted.value)
+  const showPrintButton = computed(
+    () => isOrderSubmitted.value || isPendingApproveStatus.value,
+  )
   const showToolbarActions = computed(
     () =>
       showPrintButton.value ||
