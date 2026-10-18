@@ -49,6 +49,14 @@ export const whsOrderSubmit = pk =>
     data: { pk },
   })
 
+/** GET /whs-order/whs-ebooking-order-request-unlock — request unlock */
+export const whsOrderRequestUnlock = pk =>
+  service({
+    url: '/whs-order/whs-ebooking-order-request-unlock',
+    method: 'get',
+    params: { orderPk: pk },
+  })
+
 /**
  * 上传 PDF/XLSX Booking 文件识别，回填新建仓库订单
  * @param {FormData} formData 字段 file

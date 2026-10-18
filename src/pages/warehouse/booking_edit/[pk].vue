@@ -13,6 +13,16 @@
                 </span>
 
                 <v-icon icon="mdi-content-copy" size="14" @click="handleCopyOrderNo" />
+
+                <v-chip
+                  v-if="ebookingStatus"
+                  color="primary"
+                  density="comfortable"
+                  size="small"
+                  variant="tonal"
+                >
+                  {{ ebookingStatus }}
+                </v-chip>
               </div>
             </div>
 
@@ -31,14 +41,27 @@
 
         <template v-if="showToolbarActions" #actions>
           <v-btn
-            v-if="!isEditing && isOrderedStatus"
+            v-if="showRequestUnlockButton"
             color="primary"
+            :disabled="cardLoading || unlockLoading"
+            prepend-icon="mdi-lock-open-outline"
+            size="small"
+            variant="flat"
+            @click.stop="onRequestUnlock"
+          >
+            {{ editButton('edit') }}
+          </v-btn>
+
+          <v-btn
+            v-if="showEnterEditButton"
+            color="primary"
+            :disabled="cardLoading"
             prepend-icon="mdi-pencil"
             size="small"
             variant="flat"
             @click.stop="onEnterEditMode"
           >
-            {{ editButton('edit') }}
+            {{ editButton('enterEdit') }}
           </v-btn>
 
           <v-btn
@@ -165,7 +188,7 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { whsOrderSubmit } from '@/api/whs-order'
+  import { whsOrderRequestUnlock, whsOrderSubmit } from '@/api/whs-order'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FPdfPreview from '@/components/FPdfPreview.vue'
   import LayoutWithToolbar from '@/components/LayoutWithToolbar.vue'
@@ -219,6 +242,7 @@
   // const activedTab = ref(1)
   const bookingEmptyVis = ref(false)
   const submitConfirmVis = ref(false)
+  const unlockLoading = ref(false)
   const isEditMode = ref(false)
   const { pdfTitle, pdfUrl, pdfDiaVis, closePdfPreview, onPrintWhsOrder } = useWhsOrderPrint()
 
@@ -242,17 +266,16 @@
       .trim()
       .toLowerCase()
   const resolveEbookingStatus = () =>
-    String(inputData.value?.wso_status ?? '')
-      .trim()
-      .toLowerCase()
+    String(inputData.value?.wso_status ?? '').trim()
+  const ebookingStatus = computed(resolveEbookingStatus)
   const isOrderedStatus = computed(() => resolveShipmentStatus() === 'ordered')
-  const isOrderSubmitted = computed(() => {
-    const status = resolveEbookingStatus()
-    // API may return "Submitted" or misspelled "Submited"
-    return status === 'submitted' || status === 'submited'
-  })
+  const isOrderSubmitted = computed(() => ebookingStatus.value === 'Submited')
+  const isPendingApproveStatus = computed(() => ebookingStatus.value === 'Pending Approve')
+  const isDraftStatus = computed(() => ebookingStatus.value === 'Draft')
   const isOrderReceived = computed(() => resolveShipmentStatus() === 'received')
-  const isEditing = computed(() => isEditMode.value && isOrderedStatus.value)
+  const isEditing = computed(
+    () => isEditMode.value && isOrderedStatus.value && isDraftStatus.value,
+  )
   const editLockGuard = useEditLockGuard({
     businessType: 'warehouse_order',
     pk: computed(() => (isEditing.value ? route.params.pk?.toString() || '' : '')),
@@ -260,16 +283,29 @@
   const isEditLockedByOther = computed(() => editLockGuard.isSaveBlocked.value)
   const isFormEditable = computed(() => isEditing.value && !isEditLockedByOther.value)
   const editLockWarningText = computed(() => editLockGuard.lockWarningText.value)
-  const showPrintButton = computed(() => isOrderSubmitted.value)
+  const showRequestUnlockButton = computed(
+    () =>
+      isOrderSubmitted.value &&
+      isOrderedStatus.value &&
+      !isEditing.value &&
+      !unlockLoading.value,
+  )
+  const showEnterEditButton = computed(
+    () => isDraftStatus.value && isOrderedStatus.value && !isEditing.value,
+  )
+  const showPrintButton = computed(
+    () => isOrderSubmitted.value || isPendingApproveStatus.value,
+  )
   const showToolbarActions = computed(
     () =>
       showPrintButton.value ||
-      (!isEditing.value && isOrderedStatus.value) ||
+      showRequestUnlockButton.value ||
+      showEnterEditButton.value ||
       (isEditing.value && (activedTab.value === 1 || activedTab.value === 2)),
   )
 
   const onEnterEditMode = async () => {
-    if (!isOrderedStatus.value || isEditing.value) {
+    if (!showEnterEditButton.value) {
       return
     }
 
@@ -277,6 +313,36 @@
     const acquired = await editLockGuard.acquireLock()
     if (!acquired) {
       isEditMode.value = false
+    }
+  }
+
+  const onRequestUnlock = async () => {
+    if (!showRequestUnlockButton.value) {
+      return
+    }
+
+    const pk = inputData.value.pk || route.params.pk?.toString()
+    if (!pk) {
+      return
+    }
+
+    try {
+      unlockLoading.value = true
+      cardLoading.value = true
+      const response = await whsOrderRequestUnlock(pk)
+      if (response?.success === false) {
+        return
+      }
+      appStore.openMessage({
+        content: editMessage('unlockRequested'),
+        color: 'success',
+      })
+      await queryData(pk)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      unlockLoading.value = false
+      cardLoading.value = false
     }
   }
 
@@ -404,9 +470,8 @@
           color: 'success',
         })
         if (inputData.value) {
-          inputData.value.wso_status = 'Submited'
-          if (Object.prototype.hasOwnProperty.call(inputData.value, 'wso_shipment_status')) {
-            inputData.value.wso_shipment_status = 'Submited'
+          if (Object.prototype.hasOwnProperty.call(inputData.value, 'wso_status')) {
+            inputData.value.wso_status = 'Submited'
           }
         }
         await editLockGuard.releaseLock()

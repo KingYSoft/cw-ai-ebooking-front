@@ -78,6 +78,7 @@ export default {
     printTitle: '发货订单',
     button: {
       edit: '请求解锁',
+      enterEdit: '编辑',
       save: '保存',
       submit: '提交',
       cancel: '取消',
@@ -103,6 +104,7 @@ export default {
     message: {
       copySuccess: '订单号已复制到剪贴板。',
       submitted: '仓库订单已提交。',
+      unlockRequested: '解锁申请已提交。',
       unknownTab: '未知标签页。',
       carrierSoRequiredForPrint: '仅当已填写 Carrier SO number 时才可打印。',
       generating: '正在生成文档...',
