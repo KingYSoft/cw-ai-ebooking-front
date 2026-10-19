@@ -557,11 +557,11 @@ function hasFieldValue(val) {
 }
 
 function resolveWsoFieldValue(form, wsoKey, bkgKey) {
-  if (hasFieldValue(form[bkgKey])) {
-    return form[bkgKey]
-  }
   if (hasFieldValue(form[wsoKey])) {
     return form[wsoKey]
+  }
+  if (hasFieldValue(form[bkgKey])) {
+    return form[bkgKey]
   }
   return undefined
 }
@@ -651,7 +651,7 @@ export function mapWhsOrderFormToSave(form, options = {}) {
     }
   }
 
-  // UI 绑定的是 bkg_*，必须用表单当前值覆盖 wso_*（此前优先 wso 导致修改不生效）
+  // Warehouse Booking 页面绑定 wso_*，保存时必须优先使用表单当前的 wso_* 值。
   for (const [wsoKey, bkgKey] of WSO_TO_BKG_FIELDS) {
     const val = resolveWsoFieldValue(form, wsoKey, bkgKey)
     if (hasFieldValue(val)) {
