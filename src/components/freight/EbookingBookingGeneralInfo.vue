@@ -779,6 +779,21 @@
                 </div>
               </template>
             </v-text-field>
+
+            <v-text-field
+              :id="`${fieldIdPrefix}@bkg_po_number`"
+              v-model="inputData.bkg_po_number"
+              color="primary"
+              density="compact"
+              hide-details
+              min-width="100%"
+              type="input"
+              variant="outlined"
+            >
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">{{ detailField('po') }}:</div>
+              </template>
+            </v-text-field>
           </div>
         </v-col>
 

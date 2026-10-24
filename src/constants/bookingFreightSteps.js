@@ -3,7 +3,7 @@ export const BOOKING_FREIGHT_STEPS = [
   { value: 'saved', title: 'Saved', icon: 'mdi-content-save-outline' },
   { value: 'submitted', title: 'Submitted', icon: 'mdi-send-outline' },
   { value: 'request_approve', title: 'Request for Approve', icon: 'mdi-account-check-outline' },
-  { value: 'approved', title: 'Approved', icon: 'mdi-check-circle-outline' },
+  { value: 'processing', title: 'Processing', icon: 'mdi-progress-clock' },
   { value: 'booking_released', title: 'Booking Released', icon: 'mdi-ferry' },
   { value: 'si_submitted', title: 'SI Submitted', icon: 'mdi-file-document-outline' },
   { value: 'booking_completed', title: 'Booking Completed', icon: 'mdi-checkbox-marked-circle-outline' },
@@ -11,7 +11,7 @@ export const BOOKING_FREIGHT_STEPS = [
 
 const BOOKING_RELEASED_STEP_INDEX = BOOKING_FREIGHT_STEPS.findIndex(s => s.value === 'booking_released')
 const SI_SUBMITTED_STEP_INDEX = BOOKING_FREIGHT_STEPS.findIndex(s => s.value === 'si_submitted')
-const APPROVED_STEP_INDEX = BOOKING_FREIGHT_STEPS.findIndex(s => s.value === 'approved')
+const PROCESSING_STEP_INDEX = BOOKING_FREIGHT_STEPS.findIndex(s => s.value === 'processing')
 
 export function getFreightStepIndex(status) {
   const raw = String(status ?? '').trim()
@@ -19,10 +19,10 @@ export function getFreightStepIndex(status) {
   return Math.max(idx, 0)
 }
 
-export function isApprovedOrLater(status) {
+export function isProcessingOrLater(status) {
   const raw = String(status ?? '').trim()
   const idx = BOOKING_FREIGHT_STEPS.findIndex(s => s.title === raw)
-  return idx >= APPROVED_STEP_INDEX
+  return idx >= PROCESSING_STEP_INDEX
 }
 
 export function isBookingReleasedOrLater(status) {

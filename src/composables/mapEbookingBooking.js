@@ -160,6 +160,7 @@ export function createDefaultBookingForm(appStore) {
     bkg_service_level: '',
     bkg_delivery_mode: 'CY/CY',
     bkg_commodity: '',
+    bkg_po_number: '',
     bkg_goods_value: null,
     bkg_goods_value_currency: 'USD',
     bkg_insurance_value: null,

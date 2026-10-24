@@ -72,6 +72,17 @@
         >
           {{ editButton('cancelBooking') }}
         </v-btn>
+
+        <v-btn
+          v-if="showRequestModificationButton"
+          color="primary"
+          :disabled="actionDisabled"
+          size="small"
+          variant="tonal"
+          @click="onRequestModification"
+        >
+          {{ editButton('requestModification') }}
+        </v-btn>
       </template>
     </LayoutWithToolbar>
 
@@ -92,7 +103,7 @@
         <PagesFreightBookingEdit
           v-model:input-data="inputData"
           :actived-tab="activedTab"
-          :lock-non-si-fields="isApprovedLocked"
+          :lock-non-si-fields="isStatusLocked"
           @add-container="addNewContainer"
           @remove-container="removeNewContainer"
         />
@@ -230,7 +241,13 @@
 <script setup>
   import { ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { bookingCancel, bookingDetail, bookingSiSubmit, bookingSubmit } from '@/api/booking'
+  import {
+    bookingCancel,
+    bookingDetail,
+    bookingRequestModification,
+    bookingSiSubmit,
+    bookingSubmit,
+  } from '@/api/booking'
   import { organizationQueryOrgAddress } from '@/api/organization'
   import FPageLayout from '@/components/FPageLayout.vue'
   import BookingFreightStepper from '@/components/freight/BookingFreightStepper.vue'
@@ -238,7 +255,7 @@
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useEditLockGuard } from '@/composables/useEditLockGuard'
   import { useFreightBookingForm } from '@/composables/useFreightBookingForm'
-  import { isApprovedOrLater, isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
+  import { isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({
@@ -295,7 +312,10 @@
     () => freightStatus.value === 'cancelled' || Boolean(inputData.value?.bkg_is_cancelled),
   )
   const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
-  const isApprovedLocked = computed(() => isApprovedOrLater(activeStatusTitle.value))
+  const isStatusLocked = computed(() => {
+    const status = activeStatusTitle.value
+    return Boolean(status) && status !== 'Draft' && status !== 'Saved'
+  })
   const showShippingInstructionTab = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
   watch(showShippingInstructionTab, show => {
     if (!show && activedTab.value === 4) {
@@ -303,7 +323,7 @@
     }
   })
   const showSaveButton = computed(() => {
-    if (isApprovedLocked.value) {
+    if (isStatusLocked.value) {
       return activedTab.value === 4
     }
     return activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4
@@ -317,8 +337,7 @@
   const showSubmitButton = computed(
     () =>
       showBookingActionButtons.value &&
-      Boolean(activeStatusTitle.value) &&
-      !isApprovedLocked.value,
+      (activeStatusTitle.value === 'Draft' || activeStatusTitle.value === 'Saved'),
   )
   const showSiSubmitButton = computed(
     () => showBookingActionButtons.value && activeStatusTitle.value === 'Booking Released',
@@ -330,6 +349,12 @@
       !isBookingCancelled.value &&
       !isSiSubmittedOrLater(activeStatusTitle.value),
   )
+  const showRequestModificationButton = computed(() => {
+    if (!showBookingActionButtons.value || isBookingCancelled.value) {
+      return false
+    }
+    return activeStatusTitle.value === 'Submitted' || activeStatusTitle.value === 'Processing'
+  })
   const showToolbarActions = computed(
     () => showSaveButton.value || showBookingActionButtons.value,
   )
@@ -648,6 +673,27 @@
     }
     cancelReason.value = ''
     cancelConfirmVis.value = true
+  }
+
+  const onRequestModification = async () => {
+    if (!canRunBookingAction() || !showRequestModificationButton.value) {
+      return
+    }
+    try {
+      cardLoading.value = true
+      const { success } = await bookingRequestModification(bookingIdentity())
+      if (success) {
+        appStore.openMessage({
+          content: editMessage('modificationRequested'),
+          color: 'success',
+        })
+        await reloadBookingDetail()
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      cardLoading.value = false
+    }
   }
 
   const onCancelFirstConfirm = () => {
