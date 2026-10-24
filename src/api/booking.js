@@ -48,6 +48,14 @@ export const bookingCancel = data =>
     data,
   })
 
+/** POST /booking/request-modification */
+export const bookingRequestModification = data =>
+  service({
+    url: '/booking/request-modification',
+    method: 'post',
+    data,
+  })
+
 // --- 以下接口暂未对接，保留 stub 供其他模块使用 ---
 
 const ok = (data = null) => Promise.resolve({ success: true, data })
