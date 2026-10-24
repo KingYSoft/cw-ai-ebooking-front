@@ -79,9 +79,14 @@
               <v-btn
                 v-for="status in statusOptions"
                 :key="status.value"
+                class="booking-status-btn"
                 :color="isStatusSelected(status.value) ? 'primary' : 'default'"
+                min-width="auto"
+                :prepend-icon="
+                  isStatusSelected(status.value) ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline'
+                "
                 size="small"
-                :variant="isStatusSelected(status.value) ? 'flat' : 'tonal'"
+                :variant="isStatusSelected(status.value) ? 'outlined' : 'tonal'"
                 @click="toggleStatus(status.value)"
               >
                 {{ status.title }}

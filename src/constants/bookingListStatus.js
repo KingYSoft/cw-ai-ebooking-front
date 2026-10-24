@@ -15,7 +15,7 @@ export const DASHBOARD_CARD_STATUS_MAP = {
 }
 
 export function defaultBookingListStatusSelection() {
-  return [...BOOKING_LIST_STATUS_VALUES]
+  return []
 }
 
 export function statusesFromQuery(statusQuery) {
