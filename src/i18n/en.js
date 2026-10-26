@@ -501,6 +501,8 @@ export default {
         menu: {
           copy: 'Copy',
           deactivate: 'Deactive',
+          newBooking: 'New Booking',
+          ocrBooking: 'OCR Booking',
         },
         listStatus: {
           saved: 'Saved',
@@ -508,6 +510,14 @@ export default {
           pending_si: 'Pending for Submit SI',
           deactive: 'Deactive',
         },
+      },
+      ocr: {
+        recognition: 'OCR Recognition',
+        inProgress: 'OCR recognition in progress…',
+        uploadPdfFirst: 'Please upload the PDF file first.',
+        success: 'OCR recognition successfully.',
+        failed: 'OCR recognition failed, please try.',
+        missingData: 'OCR response missing booking data',
       },
     },
     upload: {

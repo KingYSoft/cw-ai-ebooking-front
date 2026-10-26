@@ -501,6 +501,8 @@ export default {
         menu: {
           copy: '复制',
           deactivate: '停用',
+          newBooking: '新建委托',
+          ocrBooking: 'OCR 委托',
         },
         listStatus: {
           saved: 'Saved',
@@ -508,6 +510,14 @@ export default {
           pending_si: 'Pending for Submit SI',
           deactive: 'Deactive',
         },
+      },
+      ocr: {
+        recognition: 'OCR 识别',
+        inProgress: '正在进行 OCR 识别…',
+        uploadPdfFirst: '请先上传 PDF 文件。',
+        success: 'OCR 识别成功。',
+        failed: 'OCR 识别失败，请重试。',
+        missingData: 'OCR 返回数据缺少委托信息',
       },
     },
     upload: {

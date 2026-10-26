@@ -20,6 +20,7 @@ export function useBookingPageI18n() {
   const logs = key => bp(`edit.shared.logs.${key}`)
   const freightStep = key => bp(`edit.freightSteps.${key}`)
   const listStatus = key => bp(`list.listStatus.${key}`)
+  const ocr = key => bp(`ocr.${key}`)
 
   return {
     t,
@@ -41,5 +42,6 @@ export function useBookingPageI18n() {
     logs,
     freightStep,
     listStatus,
+    ocr,
   }
 }

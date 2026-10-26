@@ -209,6 +209,8 @@ export default {
     menu: {
       copy: 'Sao chép',
       deactivate: 'Vô hiệu hóa',
+      newBooking: 'Booking mới',
+      ocrBooking: 'OCR Booking',
     },
     listStatus: {
       saved: 'Saved',
@@ -216,5 +218,13 @@ export default {
       pending_si: 'Pending for Submit SI',
       deactive: 'Deactive',
     },
+  },
+  ocr: {
+    recognition: 'Nhận dạng OCR',
+    inProgress: 'Đang nhận dạng OCR…',
+    uploadPdfFirst: 'Vui lòng tải lên tệp PDF trước.',
+    success: 'Nhận dạng OCR thành công.',
+    failed: 'Nhận dạng OCR thất bại, vui lòng thử lại.',
+    missingData: 'Phản hồi OCR thiếu dữ liệu booking',
   },
 }
