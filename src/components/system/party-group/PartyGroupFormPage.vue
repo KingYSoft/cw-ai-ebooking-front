@@ -39,6 +39,7 @@
               v-model:input-data="inputData"
               :actived-tab="activedTab"
               :group-pk="groupPk"
+              :role-type="roleType"
             />
           </div>
         </v-scroll-x-transition>

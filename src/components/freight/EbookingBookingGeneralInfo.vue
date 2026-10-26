@@ -31,7 +31,7 @@
               :query-extra="{ address_type: 'SHIPPER' }"
               :text-field-props="{
                 'min-width': '100%',
-                readonly: true,
+                readonly: false,
                 rules: inputDataRules.shipper_name,
               }"
               virtual
@@ -546,7 +546,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('volumeWeight') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('volumeWeight') }}:
+                </div>
               </template>
 
               <template #append>
@@ -586,7 +588,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('chargeableWeight') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('chargeableWeight') }}:
+                </div>
               </template>
 
               <template #append>
@@ -692,7 +696,9 @@
               :rules="inputDataRules.bkg_cargo_ready"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('cargoReadyDate') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('cargoReadyDate') }}:
+                </div>
               </template>
             </FDatePicker>
 
@@ -715,7 +721,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('releaseType') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('releaseType') }}:
+                </div>
               </template>
             </v-select>
 
@@ -738,7 +746,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('serviceLevel') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('serviceLevel') }}:
+                </div>
               </template>
             </v-select>
 
@@ -759,7 +769,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('deliveryMode') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('deliveryMode') }}:
+                </div>
               </template>
             </v-select>
 
@@ -882,7 +894,9 @@
               "
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('cargoValue') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('cargoValue') }}:
+                </div>
               </template>
 
               <template #append>
@@ -992,7 +1006,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('shipperRef') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('shipperRef') }}:
+                </div>
               </template>
             </v-text-field>
 
@@ -1006,7 +1022,9 @@
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('additionalTerms') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('additionalTerms') }}:
+                </div>
               </template>
             </v-text-field>
           </div>
@@ -1041,12 +1059,7 @@
         </v-col>
       </v-row>
 
-      <fieldset
-        v-if="showSiRouteFields"
-        class="booking-lock-fieldset is-locked"
-        disabled
-        inert
-      >
+      <fieldset v-if="showSiRouteFields" class="booking-lock-fieldset is-locked" disabled inert>
         <BookingShippingInstructionRoute
           v-model:input-data="inputData"
           :input-data-rules="inputDataRules"
@@ -1650,12 +1663,7 @@
   import { BOOKING_CUT_OFF_FIELDS } from '@/constants/bookingPartyFields'
   import { useAppStore } from '@/stores/app'
 
-  const {
-    detailSection,
-    detailField,
-    cutOffLabel,
-    containerHeader,
-  } = useBookingPageI18n()
+  const { detailSection, detailField, cutOffLabel, containerHeader } = useBookingPageI18n()
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
 

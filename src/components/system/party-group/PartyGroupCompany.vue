@@ -121,14 +121,14 @@
             striped="even"
             @update:options="loadOptions"
           >
-            <template #item.is_active="{ item }">
+            <template #item.org_is_active="{ item }">
               <v-chip
-                :color="item.is_active === 1 ? 'success' : 'error'"
+                :color="item.org_is_active === 1 ? 'success' : 'error'"
                 density="comfortable"
                 size="small"
                 variant="tonal"
               >
-                {{ item.is_active === 1 ? common('yes') : common('no') }}
+                {{ item.org_is_active === 1 ? common('yes') : common('no') }}
               </v-chip>
             </template>
           </v-data-table-server>
@@ -170,6 +170,10 @@
       type: String,
       default: null,
     },
+    roleType: {
+      type: String,
+      default: null,
+    },
   })
   const inputData = defineModel('input-data', {
     type: Object,
@@ -185,7 +189,7 @@
     { title: 'Name', key: 'org_full_name', align: 'start', minWidth: '220px' },
     {
       title: 'Is Active',
-      key: 'is_active',
+      key: 'org_is_active',
       align: 'start',
       minWidth: '120px',
     },
@@ -223,7 +227,7 @@
   }
 
   const page = ref(1)
-  const pageSize = ref(200)
+  const pageSize = ref(2000)
   const totalCount = ref(0)
 
   let controller
@@ -238,6 +242,7 @@
       const response = await userQueryOrgHeader(
         {
           query: companyQuerySearch.value?.trim() || '',
+          address_type: props.roleType,
           SkipCount: offset,
           MaxResultCount: pageSize.value,
         },
