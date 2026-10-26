@@ -211,7 +211,7 @@ export default {
       packingListNo: '裝箱單號',
       description: '描述',
       itemCode: '物料代碼',
-      hsCode: 'Hs Code',
+      hsCode: 'HS CODE',
       grossWeight: '毛重',
       netWeight: '淨重',
       volume: '體積',
