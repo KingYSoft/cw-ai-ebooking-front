@@ -51,7 +51,7 @@ function formatContainerSummary(value) {
       return count == null || count === '' ? type : `${type} x ${count}`
     })
     .filter(Boolean)
-  return parts.length ? parts.join(', ') : '—'
+  return parts.length > 0 ? parts.join(', ') : '—'
 }
 
 function formatBookingNo(item) {
@@ -83,7 +83,9 @@ export function useDashboardData() {
   }))
 
   const latestTransactions = computed(() =>
-    (analysisData.value.latest_bookings || []).map((item, index) => mapLatestBooking(item, index + 1)),
+    (analysisData.value.latest_bookings || []).map((item, index) =>
+      mapLatestBooking(item, index + 1),
+    ),
   )
 
   const periodCounts = computed(() => ({

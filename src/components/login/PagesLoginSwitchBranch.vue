@@ -33,7 +33,7 @@
                     min-width="100%"
                     no-data-text="$vuetify.custom.app.searchMore"
                     no-filter
-                    :rules="[v => (v ? true : 'please select company.')]"
+                    :rules="[v => (v ? true : 'please Select Company.')]"
                     variant="outlined"
                     @update:model-value="onSelectedCompany"
                   >

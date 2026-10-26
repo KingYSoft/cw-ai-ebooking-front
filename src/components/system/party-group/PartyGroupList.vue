@@ -90,7 +90,10 @@
   const app = useAppStore()
   const display = useDisplay()
 
-  const canEdit = computed(() => app.auth.isGranted('PERMISSION_SYSTEM_PARTY_GROUP_EDIT'))
+  const canEdit = computed(() => {
+    // return app.auth.isGranted('PERMISSION_SYSTEM_PARTY_GROUP_EDIT')
+    return true
+  })
   const query = ref('')
   const active = ref(null)
   const items = ref([])

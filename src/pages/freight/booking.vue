@@ -185,13 +185,13 @@
   } from '@/composables/mapEbookingBooking'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useLayoutCols } from '@/composables/useLayoutCols'
+  import { isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import {
     BOOKING_LIST_STATUS_OPTIONS,
     defaultBookingListStatusSelection,
     getBookingListStatusChipProps,
     statusesFromQuery,
   } from '@/constants/bookingListStatus'
-  import { isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
 
   defineOptions({ name: 'Booking' })

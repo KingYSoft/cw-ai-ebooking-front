@@ -1762,7 +1762,7 @@
     const items = [...(appStore.appCombobox.getCombobox('containerMode') ?? [])]
     if (isAirTransport.value) {
       const lseItems = items.filter(item => item.code === 'LSE')
-      return lseItems.length ? lseItems : [{ code: 'LSE', title: 'LSE' }]
+      return lseItems.length > 0 ? lseItems : [{ code: 'LSE', title: 'LSE' }]
     }
     if (!items.some(item => item.code === 'BCN')) {
       items.push({ code: 'BCN', title: 'BCN', id: 4 })

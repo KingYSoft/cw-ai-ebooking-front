@@ -48,8 +48,8 @@
       </div>
 
       <v-textarea
-        class="si-party-addr"
         :auto-grow="false"
+        class="si-party-addr"
         density="compact"
         hide-details
         :model-value="formatPartyAddr(col.prefix)"
@@ -93,10 +93,7 @@
   const { rescols } = useLayoutCols()
 
   const doc = computed(() => {
-    if (!inputData.value.doc_data) {
-      inputData.value.doc_data = {}
-    }
-    return inputData.value.doc_data
+    return inputData.value.doc_data ? inputData.value.doc_data : {}
   })
 
   const partyCols = computed(() => [

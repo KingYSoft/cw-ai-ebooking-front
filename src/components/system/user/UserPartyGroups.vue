@@ -2,7 +2,7 @@
   <v-sheet color="transparent">
     <v-card-text>
       <v-btn color="primary" size="small" variant="flat" @click="openGroupDialog">
-        select groups
+        Select Groups
       </v-btn>
     </v-card-text>
 
@@ -59,7 +59,7 @@
     <v-dialog v-model="groupDialogVisible" max-width="900" persistent>
       <v-card>
         <v-card-title class="d-flex align-center">
-          select groups
+          Select Groups
           <v-spacer />
 
           <v-chip color="primary" size="small" variant="tonal">
