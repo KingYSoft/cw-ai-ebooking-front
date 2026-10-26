@@ -212,7 +212,7 @@ export default {
       packingListNo: 'Số packing list',
       description: 'Mô tả',
       itemCode: 'Mã hàng',
-      hsCode: 'Hs Code',
+      hsCode: 'HS CODE',
       grossWeight: 'Trọng lượng tổng',
       netWeight: 'Trọng lượng tịnh',
       volume: 'Thể tích',
