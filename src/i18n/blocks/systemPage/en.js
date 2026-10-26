@@ -10,7 +10,7 @@ export default {
     cancel: 'Cancel',
     apply: 'Apply',
     preview: 'Preview',
-    selected: '{0} selected',
+    selected: '{0} Selected',
     queryKeywordsPlaceholder: 'input query keywords',
   },
   user: {

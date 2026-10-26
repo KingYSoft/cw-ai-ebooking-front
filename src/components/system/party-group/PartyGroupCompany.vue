@@ -2,7 +2,7 @@
   <v-sheet color="transparent">
     <v-card-text>
       <v-btn color="primary" size="small" variant="flat" @click="openCompanyDialog">
-        select company
+        Select company
       </v-btn>
     </v-card-text>
 
