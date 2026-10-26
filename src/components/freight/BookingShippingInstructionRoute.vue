@@ -451,10 +451,7 @@
   const { detailField } = useBookingPageI18n()
   const appStore = useAppStore()
   const doc = computed(() => {
-    if (!inputData.value.doc_data) {
-      inputData.value.doc_data = {}
-    }
-    return inputData.value.doc_data
+    return inputData.value.doc_data ? inputData.value.doc_data : {}
   })
 
   const portRows = [
