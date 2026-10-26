@@ -209,6 +209,8 @@ export default {
     menu: {
       copy: '複製',
       deactivate: '停用',
+      newBooking: '新建委託',
+      ocrBooking: 'OCR 委託',
     },
     listStatus: {
       saved: 'Saved',
@@ -216,5 +218,13 @@ export default {
       pending_si: 'Pending for Submit SI',
       deactive: 'Deactive',
     },
+  },
+  ocr: {
+    recognition: 'OCR 識別',
+    inProgress: '正在進行 OCR 識別…',
+    uploadPdfFirst: '請先上傳 PDF 檔案。',
+    success: 'OCR 識別成功。',
+    failed: 'OCR 識別失敗，請重試。',
+    missingData: 'OCR 返回資料缺少委託資訊',
   },
 }

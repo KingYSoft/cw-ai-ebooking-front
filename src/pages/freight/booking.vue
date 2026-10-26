@@ -111,15 +111,23 @@
       @row-dblclick="onRowDblClick"
     >
       <template #actions>
-        <v-btn
-          color="primary"
-          prepend-icon="$plus"
-          size="small"
-          variant="flat"
-          @click="router.push({ name: 'booking_new' })"
-        >
-          {{ list('new') }}
-        </v-btn>
+        <v-menu open-on-hover>
+          <template #activator="{ props }">
+            <v-btn v-bind="props" color="primary" prepend-icon="$plus" size="small" variant="flat">
+              {{ list('new') }}
+            </v-btn>
+          </template>
+
+          <v-list
+            density="compact"
+            item-props
+            item-value="code"
+            :items="newMenuItems"
+            size="small"
+            slim
+            @click:select="handleNewMenuSelect"
+          />
+        </v-menu>
       </template>
 
       <template #item-actions="{ item }">
@@ -165,6 +173,39 @@
         />
       </template>
     </FTableLayout>
+
+    <v-dialog v-model="ocrDialogOpen" max-width="800" persistent>
+      <v-card
+        :disabled="ocrDialogLoading"
+        :loading="ocrDialogLoading"
+        :title="t('$vuetify.custom.upload.ocr.title')"
+      >
+        <template #loader="{ isActive }">
+          <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
+        </template>
+
+        <template #append>
+          <v-btn
+            density="comfortable"
+            icon="mdi-close"
+            size="small"
+            variant="text"
+            @click="handleOcrCancel"
+          />
+        </template>
+
+        <v-card-text>
+          <FUploadZone
+            ref="refOcrUpload"
+            accept="application/pdf,.pdf"
+            :max-files="1"
+            :upload-button-text="ocr('recognition')"
+            @clear="handleOcrClear"
+            @upload="handleOcrUpload"
+          />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </FPageLayout>
 </template>
 
@@ -173,10 +214,11 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
 
-  import { bookingQueryPage } from '@/api/booking'
+  import { bookingOcrNewBooking, bookingQueryPage } from '@/api/booking'
   import { debounceFn } from '@/api/utils'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
+  import FUploadZone from '@/components/FUploadZone.vue'
   import PageFilterBar from '@/components/PageFilterBar.vue'
   import {
     buildBookingListFilters,
@@ -213,7 +255,8 @@
   const display = useDisplay()
   const appStore = useAppStore()
   const { rescols } = useLayoutCols()
-  const { list, tableHeader, menu, listStatus } = useBookingPageI18n()
+  const { t, list, tableHeader, menu, listStatus, ocr } = useBookingPageI18n()
+  const OCR_BOOKING_STORAGE_KEY = 'booking_ocr_prefill'
 
   const contentHeight = computed(() => display.height.value - 65 - 35)
   const refFilter = ref(null)
@@ -346,6 +389,84 @@
     },
     { title: tableHeader('inco'), key: 'bkg_inco', align: 'start', minWidth: '80px' },
   ])
+
+  const ocrDialogOpen = ref(false)
+  const ocrDialogLoading = ref(false)
+  const refOcrUpload = ref(null)
+  const newMenuItems = computed(() => [
+    { title: menu('newBooking'), prependIcon: 'mdi-text-box-edit-outline', code: 'new' },
+    { type: 'divider' },
+    { title: menu('ocrBooking'), prependIcon: 'mdi-file-upload', code: 'ocr' },
+  ])
+
+  const handleNewMenuSelect = e => {
+    switch (e.id) {
+      case 'new': {
+        return router.push({ name: 'booking_new' })
+      }
+      case 'ocr': {
+        ocrDialogOpen.value = true
+        return
+      }
+      default: {
+        break
+      }
+    }
+  }
+
+  const handleOcrUpload = async data => {
+    if (!data?.files?.length || !data.files[0]?.file) {
+      appStore.openMessage({
+        content: ocr('uploadPdfFirst'),
+        color: 'warning',
+      })
+      return
+    }
+    ocrDialogLoading.value = true
+    try {
+      appStore.openGlobalLoading(ocr('inProgress'))
+      const formData = new FormData()
+      formData.append('file', data.files[0].file)
+      const resp = await bookingOcrNewBooking(formData)
+      if (resp && resp.success) {
+        const ocrResult = resp.data
+        if (!ocrResult || typeof ocrResult !== 'object') {
+          throw new Error(ocr('missingData'))
+        }
+        appStore.closeGlobalLoading()
+        appStore.openMessage({
+          content: ocr('success'),
+          color: 'success',
+        })
+        refOcrUpload.value?.clearFiles?.()
+        sessionStorage.setItem(OCR_BOOKING_STORAGE_KEY, JSON.stringify(ocrResult))
+        ocrDialogOpen.value = false
+        router.push({
+          name: 'booking_new',
+          query: { source: 'ocr' },
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      appStore.openMessage({
+        content: error?.message || ocr('failed'),
+        color: 'error',
+      })
+    } finally {
+      appStore.closeGlobalLoading()
+      ocrDialogLoading.value = false
+    }
+  }
+
+  const handleOcrClear = () => {
+    sessionStorage.removeItem(OCR_BOOKING_STORAGE_KEY)
+  }
+
+  const handleOcrCancel = () => {
+    sessionStorage.removeItem(OCR_BOOKING_STORAGE_KEY)
+    refOcrUpload.value?.clearFiles?.()
+    ocrDialogOpen.value = false
+  }
 
   const getRowMenuItems = item => {
     const items = [{ title: menu('copy'), prependIcon: 'mdi-content-copy', code: 'copy' }]

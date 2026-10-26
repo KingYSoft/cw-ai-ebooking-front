@@ -56,14 +56,23 @@ export const bookingRequestModification = data =>
     data,
   })
 
+/** POST /booking/ocr-new-booking — OCR 识别新建 */
+export const bookingOcrNewBooking = data =>
+  service({
+    url: '/booking/ocr-new-booking',
+    method: 'post',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+
 // --- 以下接口暂未对接，保留 stub 供其他模块使用 ---
 
 const ok = (data = null) => Promise.resolve({ success: true, data })
 
 /** @deprecated 使用 bookingQueryPage */
 export const bookingTbl = bookingQueryPage
-
-export const bookingOcrNewBooking = () => ok(null)
 
 export const bookingQueryPortCode = () => ok({ list: [] })
 

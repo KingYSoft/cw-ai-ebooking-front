@@ -274,6 +274,7 @@
   const route = useRoute()
   const appStore = useAppStore()
   const isCopyAsNew = computed(() => String(route.query.copy ?? '') === '1')
+  const OCR_BOOKING_STORAGE_KEY = 'booking_ocr_prefill'
 
   const {
     inputData,
@@ -440,7 +441,23 @@
     } else {
       try {
         cardLoading.value = true
-        await fillShipperFromSession()
+        if (route.query.source === 'ocr') {
+          const rawOcrBooking = sessionStorage.getItem(OCR_BOOKING_STORAGE_KEY)
+          if (rawOcrBooking) {
+            try {
+              applyBookingInput(JSON.parse(rawOcrBooking))
+            } catch (error) {
+              console.log(error)
+              await fillShipperFromSession()
+            } finally {
+              sessionStorage.removeItem(OCR_BOOKING_STORAGE_KEY)
+            }
+          } else {
+            await fillShipperFromSession()
+          }
+        } else {
+          await fillShipperFromSession()
+        }
         skeletonLoading.value = false
         markInputDataSaved()
       } catch (error) {
