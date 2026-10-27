@@ -2,7 +2,6 @@ export const BOOKING_FREIGHT_STEPS = [
   { value: 'draft', title: 'Draft', icon: 'mdi-file-document-edit-outline' },
   { value: 'saved', title: 'Saved', icon: 'mdi-content-save-outline' },
   { value: 'submitted', title: 'Submitted', icon: 'mdi-send-outline' },
-  { value: 'request_approve', title: 'Request for Approve', icon: 'mdi-account-check-outline' },
   { value: 'processing', title: 'Processing', icon: 'mdi-progress-clock' },
   { value: 'booking_released', title: 'Booking Released', icon: 'mdi-ferry' },
   { value: 'si_submitted', title: 'SI Submitted', icon: 'mdi-file-document-outline' },

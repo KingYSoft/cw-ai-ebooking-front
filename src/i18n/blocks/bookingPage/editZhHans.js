@@ -172,7 +172,6 @@ export default {
     draft: '草稿',
     saved: '已保存',
     submitted: '已提交',
-    request_approve: '申请审批',
     processing: '处理中',
     booking_released: '订舱已放舱',
     si_submitted: 'SI 已提交',

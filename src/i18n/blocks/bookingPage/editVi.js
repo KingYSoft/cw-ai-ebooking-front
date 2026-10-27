@@ -172,7 +172,6 @@ export default {
     draft: 'Bản nháp',
     saved: 'Đã lưu',
     submitted: 'Đã gửi',
-    request_approve: 'Yêu cầu phê duyệt',
     processing: 'Đang xử lý',
     booking_released: 'Đã phát hành booking',
     si_submitted: 'Đã gửi SI',
