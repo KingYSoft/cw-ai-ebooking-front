@@ -172,7 +172,6 @@ export default {
     draft: 'Draft',
     saved: 'Saved',
     submitted: 'Submitted',
-    request_approve: 'Request for Approve',
     processing: 'Processing',
     booking_released: 'Booking Released',
     si_submitted: 'SI Submitted',
