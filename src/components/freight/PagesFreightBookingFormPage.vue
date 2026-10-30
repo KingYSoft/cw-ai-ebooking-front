@@ -351,7 +351,11 @@
       !isSiSubmittedOrLater(activeStatusTitle.value),
   )
   const showRequestModificationButton = computed(() => {
-    if (!showBookingActionButtons.value || isBookingCancelled.value) {
+    if (
+      !showBookingActionButtons.value ||
+      isBookingCancelled.value ||
+      inputData.value?.bkg_is_forward_registered === 1
+    ) {
       return false
     }
     return activeStatusTitle.value === 'Submitted' || activeStatusTitle.value === 'Processing'
