@@ -1059,14 +1059,14 @@
         </v-col>
       </v-row>
 
-      <fieldset v-if="showSiRouteFields" class="booking-lock-fieldset is-locked" disabled inert>
+      <div v-if="showSiRouteFields">
         <BookingShippingInstructionRoute
           v-model:input-data="inputData"
           :input-data-rules="inputDataRules"
           :query-port-list="queryPortList"
           @query-port="queryPort"
         />
-      </fieldset>
+      </div>
     </v-card-text>
 
     <template v-if="showContainerTable">

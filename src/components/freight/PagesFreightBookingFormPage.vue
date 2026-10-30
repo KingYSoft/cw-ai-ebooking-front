@@ -104,6 +104,7 @@
           v-model:input-data="inputData"
           :actived-tab="activedTab"
           :lock-non-si-fields="isStatusLocked"
+          :lock-si-fields="isSiSubmittedOrLater(activeStatusTitle)"
           @add-container="addNewContainer"
           @remove-container="removeNewContainer"
         />
@@ -351,7 +352,11 @@
       !isSiSubmittedOrLater(activeStatusTitle.value),
   )
   const showRequestModificationButton = computed(() => {
-    if (!showBookingActionButtons.value || isBookingCancelled.value) {
+    if (
+      !showBookingActionButtons.value
+      || isBookingCancelled.value
+      || Number(inputData.value?.bkg_is_forward_registered) === 1
+    ) {
       return false
     }
     return activeStatusTitle.value === 'Submitted' || activeStatusTitle.value === 'Processing'
@@ -669,7 +674,12 @@
     }
     try {
       cardLoading.value = true
-      const ok = await saveThenRun(payload => bookingSiSubmit(payload))
+      const ok = await saveThenRun(payload =>
+        bookingSiSubmit({
+          ...payload,
+          doc_data: inputData.value.doc_data,
+        }),
+      )
       if (ok) {
         appStore.openMessage({
           content: editMessage('siSubmitted'),
