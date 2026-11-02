@@ -309,9 +309,10 @@
       </v-row> -->
 
       <v-row v-if="showCargoFields" dense>
-        <v-col :cols="rescols('c12l3s6')">
+        <v-col :cols="cargoColCols">
           <div class="d-flex align-start flex-column flex-wrap ga-1">
             <v-select
+              v-if="!showSiRouteFields"
               :id="`${fieldIdPrefix}@bkg_transport_mode`"
               v-model="inputData.bkg_transport_mode"
               auto-select-first
@@ -339,6 +340,7 @@
             </v-select>
 
             <v-select
+              v-if="!showSiRouteFields"
               :id="`${fieldIdPrefix}@bkg_packing_mode`"
               v-model="inputData.bkg_packing_mode"
               auto-select-first
@@ -366,6 +368,7 @@
             </v-select>
 
             <FRemoteTableMenu
+              v-if="!showSiRouteFields"
               :id="`${fieldIdPrefix}@bkg_origin`"
               v-model="inputData.bkg_origin"
               bind-key="rl_code"
@@ -390,6 +393,7 @@
             </FRemoteTableMenu>
 
             <v-autocomplete
+              v-if="!showSiRouteFields"
               :id="`${fieldIdPrefix}@bkg_destination`"
               auto-select-first
               autocomplete="off"
@@ -662,9 +666,10 @@
           </div>
         </v-col>
 
-        <v-col :cols="rescols('c12l3s6')">
+        <v-col :cols="cargoColCols">
           <div class="d-flex align-start flex-column flex-wrap ga-1">
             <FDatePicker
+              v-if="!showSiRouteFields"
               :id="`${fieldIdPrefix}@bkg_etd`"
               v-model:date-value="inputData.bkg_etd"
               max="2099-12-31"
@@ -677,6 +682,7 @@
             </FDatePicker>
 
             <FDatePicker
+              v-if="!showSiRouteFields"
               :id="`${fieldIdPrefix}@bkg_eta`"
               v-model:date-value="inputData.bkg_eta"
               max="2099-12-31"
@@ -809,7 +815,7 @@
           </div>
         </v-col>
 
-        <v-col :cols="rescols('c12l3s6')">
+        <v-col :cols="cargoColCols">
           <div class="d-flex align-start flex-column flex-wrap ga-1">
             <v-select
               :id="`${fieldIdPrefix}@bkg_inco`"
@@ -977,6 +983,7 @@
             </v-number-input>
 
             <FTextInput
+              v-if="!showSiRouteFields"
               v-model:text-value="inputData.bkg_goods_description"
               min-width="100%"
               :textarea-props="{ label: detailField('goodDesc') }"
@@ -987,6 +994,7 @@
             </FTextInput>
 
             <FTextInput
+              v-if="!showSiRouteFields"
               v-model:text-value="inputData.bkg_marks_nos"
               min-width="100%"
               :textarea-props="{ label: detailField('marksNos') }"
@@ -1030,7 +1038,7 @@
           </div>
         </v-col>
 
-        <v-col :cols="rescols('c12l3s6')">
+        <v-col v-if="!showSiRouteFields" :cols="rescols('c12l3s6')">
           <v-divider>
             <div class="my-1 text-center text-caption text-uppercase text-on-surface opacity-70">
               <v-icon color="primary" icon="mdi-calendar-clock" size="18" />
@@ -1153,7 +1161,6 @@
             v-model="item.pac_container_num"
             color="primary"
             density="compact"
-            :disabled="!item.pac_is_soc"
             hide-details
             min-width="100%"
             type="input"
@@ -1166,7 +1173,6 @@
             v-model="item.pac_seal_num"
             color="primary"
             density="compact"
-            :disabled="!item.pac_is_soc"
             hide-details
             min-width="100%"
             type="input"
@@ -1694,6 +1700,9 @@
     },
   })
   const { inputDataRules, queryPortList } = toRefs(props)
+  const cargoColCols = computed(() =>
+    props.showSiRouteFields ? rescols('c12l4s6') : rescols('c12l3s6'),
+  )
 
   const inputData = defineModel('input-data', { type: Object, required: true })
 
