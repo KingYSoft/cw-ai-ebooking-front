@@ -314,6 +314,8 @@
     () => freightStatus.value === 'cancelled' || Boolean(inputData.value?.bkg_is_cancelled),
   )
   const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
+  const canSave = computed(() => inputData.value?.can_save === true)
+  const canSubmit = computed(() => inputData.value?.can_submit === true)
   const isStatusLocked = computed(() => {
     const status = activeStatusTitle.value
     return Boolean(status) && status !== 'Draft' && status !== 'Saved'
@@ -325,10 +327,7 @@
     }
   })
   const showSaveButton = computed(() => {
-    if (isStatusLocked.value) {
-      return activedTab.value === 4
-    }
-    return activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4
+    return canSave.value && (activedTab.value === 1 || activedTab.value === 2 || activedTab.value === 4)
   })
   const showBookingActionButtons = computed(
     () =>
@@ -339,7 +338,7 @@
   const showSubmitButton = computed(
     () =>
       showBookingActionButtons.value &&
-      (activeStatusTitle.value === 'Draft' || activeStatusTitle.value === 'Saved'),
+      canSubmit.value,
   )
   const showSiSubmitButton = computed(
     () => showBookingActionButtons.value && activeStatusTitle.value === 'Booking Released',
@@ -375,6 +374,8 @@
 
     inputData.value = Object.assign({}, el, {
       pk: el.pk ?? '',
+      can_save: el.can_save !== false,
+      can_submit: el.can_submit !== false,
       shipper: el.shipper || {},
       consignee: el.consignee || {},
       notify_party: el.notify_party || {},
@@ -419,6 +420,8 @@
         pk: '',
       })),
       shipper: {},
+      can_save: true,
+      can_submit: true,
     }
   }
 
@@ -549,6 +552,9 @@
   }
 
   const onSaveHandle = async () => {
+    if (!canSave.value) {
+      return
+    }
     if (!editLockGuard.ensureCanSave()) {
       return
     }
@@ -623,11 +629,21 @@
     if (!ensureContainerRows()) {
       return false
     }
-    const saved = await bookingSaveHandle({ showMessage: false })
-    if (!saved) {
-      return false
+    if (canSave.value) {
+      const saved = await bookingSaveHandle({ showMessage: false })
+      if (!saved) {
+        return false
+      }
     }
-    const { success } = await run(bookingIdentity())
+    const { success, data } = await run(bookingIdentity())
+    if (success && data && typeof data === 'object') {
+      if (typeof data.can_save === 'boolean') {
+        inputData.value.can_save = data.can_save
+      }
+      if (typeof data.can_submit === 'boolean') {
+        inputData.value.can_submit = data.can_submit
+      }
+    }
     return Boolean(success)
   }
 
