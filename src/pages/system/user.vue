@@ -47,14 +47,10 @@
       </template>
 
       <template #item.is_active="{ item }">
-        <v-chip
-          :color="item.is_active === 1 ? 'success' : 'error'"
-          density="comfortable"
-          size="small"
-          variant="tonal"
-        >
-          {{ item.is_active === 1 ? common('active') : common('inactive') }}
-        </v-chip>
+        <StatusBadge
+          :text="item.is_active === 1 ? common('active') : common('inactive')"
+          :tone-key="item.is_active === 1 ? 'active' : 'inactive'"
+        />
       </template>
 
       <template #bottom>

@@ -7,7 +7,7 @@
           @on-reset-more="onResetMore"
           @on-search="queryData"
         >
-          <v-col :cols="rescols('c12m4s6')">
+          <v-col :cols="rescols('c12l4m4')">
             <div class="d-flex align-center ga-1">
               <v-select
                 v-model="inputSearchData.field1.key"
@@ -41,7 +41,7 @@
             </div>
           </v-col>
 
-          <v-col :cols="rescols('c12m4s6')">
+          <v-col :cols="rescols('c12l3m3s6')">
             <div class="d-flex align-center ga-1">
               <v-select
                 v-model="inputSearchData.field2.key"
@@ -66,34 +66,42 @@
               />
             </div>
           </v-col>
-        </PageFilterBar>
 
-        <v-card-text class="booking-status-filter py-2">
-          <div class="d-flex align-center flex-wrap ga-2">
-            <div class="d-flex align-center text-caption text-medium-emphasis">
-              <span>{{ list('status') }}</span>
-              <v-icon class="ml-1" icon="mdi-information-outline" size="14" />
-            </div>
+          <v-col :cols="rescols('c12l3m3s6')">
+            <div class="d-flex align-center ga-1">
+              <v-select
+                density="compact"
+                hide-details
+                :items="[list('status')]"
+                max-width="120"
+                min-width="120"
+                :model-value="list('status')"
+                readonly
+                variant="underlined"
+                width="120"
+              />
 
-            <div class="d-flex align-center flex-wrap booking-status-toggle">
-              <v-btn
-                v-for="status in statusOptions"
-                :key="status.value"
-                class="booking-status-btn"
-                :color="isStatusSelected(status.value) ? 'primary' : 'default'"
-                min-width="auto"
-                :prepend-icon="
-                  isStatusSelected(status.value) ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline'
-                "
-                size="small"
-                :variant="isStatusSelected(status.value) ? 'outlined' : 'tonal'"
-                @click="toggleStatus(status.value)"
+              <v-select
+                v-model="selectedStatuses"
+                class="flex-1-1 status-filter-select"
+                density="compact"
+                hide-details
+                :items="statusOptions"
+                item-title="title"
+                item-value="value"
+                multiple
+                single-line
+                variant="outlined"
               >
-                {{ status.title }}
-              </v-btn>
+                <template #selection="{ index }">
+                  <span v-if="index === 0" class="status-filter-select__text">
+                    {{ selectedStatusText }}
+                  </span>
+                </template>
+              </v-select>
             </div>
-          </div>
-        </v-card-text>
+          </v-col>
+        </PageFilterBar>
       </div>
     </template>
 
@@ -165,13 +173,7 @@
       </template>
 
       <template #item.bkg_status="{ item }">
-        <span
-          v-if="item.bkg_status"
-          class="booking-status-badge"
-          :class="`booking-status-badge--${getBookingStatusBadgeTone(item.bkg_status)}`"
-        >
-          {{ displayBookingStatus(item.bkg_status) }}
-        </span>
+        <StatusBadge :text="displayBookingStatus(item.bkg_status)" :tone-key="item.bkg_status" />
       </template>
 
       <template #bottom>
@@ -226,11 +228,11 @@
   import { useDisplay } from 'vuetify'
 
   import { bookingOcrNewBooking, bookingQueryPage } from '@/api/booking'
-  import { debounceFn } from '@/api/utils'
   import FPageLayout from '@/components/FPageLayout.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import FUploadZone from '@/components/FUploadZone.vue'
   import PageFilterBar from '@/components/PageFilterBar.vue'
+  import StatusBadge from '@/components/StatusBadge.vue'
   import {
     buildBookingListFilters,
     buildBookingStatusFilters,
@@ -242,7 +244,6 @@
   import {
     BOOKING_LIST_STATUS_OPTIONS,
     defaultBookingListStatusSelection,
-    getBookingStatusBadgeTone,
     statusesFromQuery,
   } from '@/constants/bookingListStatus'
   import { useAppStore } from '@/stores/app'
@@ -289,6 +290,12 @@
       title: listStatus(item.labelKey),
     })),
   )
+  const selectedStatusText = computed(() =>
+    statusOptions.value
+      .filter(item => selectedStatuses.value.includes(item.value))
+      .map(item => item.title)
+      .join(', '),
+  )
 
   const displayBookingStatus = status => {
     if (!status) {
@@ -325,26 +332,17 @@
     queryData()
   }
 
-  const isStatusSelected = value => selectedStatuses.value.includes(value)
-
-  const queryDataByStatus = debounceFn(() => {
-    pageObj.value.pageIndex = 1
-    queryData()
-  }, 1000)
-
-  const toggleStatus = value => {
-    if (isStatusSelected(value)) {
-      selectedStatuses.value = selectedStatuses.value.filter(item => item !== value)
-    } else {
-      selectedStatuses.value = [...selectedStatuses.value, value]
-    }
-    queryDataByStatus()
-  }
-
   const tblHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
     { title: tableHeader('bookingNo'), key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
     { title: tableHeader('status'), key: 'bkg_status', align: 'start', minWidth: '140px' },
+    { title: tableHeader('origin'), key: 'bkg_origin', align: 'start', minWidth: '100px' },
+    {
+      title: tableHeader('destination'),
+      key: 'bkg_destination',
+      align: 'start',
+      minWidth: '100px',
+    },
     {
       title: tableHeader('transMode'),
       key: 'bkg_transport_mode',
@@ -358,29 +356,18 @@
       minWidth: '140px',
     },
     // { title: 'Shipment No.', key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
-    { title: tableHeader('houseBill'), key: 'bkg_house_bill', align: 'start', minWidth: '120px' },
+    { title: tableHeader('houseBill'), key: 'bkg_house_bill', align: 'start', minWidth: '170px' },
     {
       title: tableHeader('shipperName'),
       key: 'shipper_name',
       align: 'start',
       minWidth: '140px',
-      maxWidth: '200px',
-      cellProps: { class: 'text-truncate' },
     },
     {
       title: tableHeader('consigneeName'),
       key: 'consignee_name',
       align: 'start',
       minWidth: '140px',
-      maxWidth: '200px',
-      cellProps: { class: 'text-truncate' },
-    },
-    { title: tableHeader('origin'), key: 'bkg_origin', align: 'start', minWidth: '100px' },
-    {
-      title: tableHeader('destination'),
-      key: 'bkg_destination',
-      align: 'start',
-      minWidth: '100px',
     },
     { title: tableHeader('crd'), key: 'bkg_cargo_ready', align: 'start', minWidth: '112px' },
     { title: tableHeader('etd'), key: 'bkg_etd', align: 'start', minWidth: '112px' },
@@ -571,20 +558,6 @@
 </script>
 
 <style lang="scss" scoped>
-  .booking-status-filter {
-    border-top: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
-  }
-
-  .booking-status-toggle {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .booking-status-btn {
-    min-width: auto;
-    letter-spacing: normal;
-  }
-
   .booking-ref-link {
     padding: 0;
     border: 0;
@@ -598,45 +571,6 @@
 
   .booking-ref-link:hover {
     text-decoration: underline;
-  }
-
-  .booking-status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-  }
-
-  .booking-status-badge--pending {
-    background: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
-  }
-
-  .booking-status-badge--approved {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #6ee7b7;
-  }
-
-  .booking-status-badge--si {
-    background: #cffafe;
-    color: #155e75;
-    border: 1px solid #67e8f9;
-  }
-
-  .booking-status-badge--shipped {
-    background: #0f766e;
-    color: #fff;
-  }
-
-  .booking-status-badge--default {
-    background: #f1f5f9;
-    color: #334155;
   }
 
   .table-layout {

@@ -6,7 +6,7 @@
         @on-reset-more="onResetMore"
         @on-search="fetchData"
       >
-        <v-col :cols="rescols('c12m4s6')">
+        <v-col :cols="rescols('c12l4m4')">
           <div class="d-flex align-center ga-1">
             <v-select
               v-model="inputSearchData.field1.key"
@@ -40,7 +40,7 @@
           </div>
         </v-col>
 
-        <v-col :cols="rescols('c12m4s6')">
+        <v-col :cols="rescols('c12l6m6s6')">
           <div class="d-flex align-center ga-1">
             <v-select
               v-model="inputSearchData.field2.key"

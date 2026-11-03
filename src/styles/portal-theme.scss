@@ -107,13 +107,21 @@
   background: #fff !important;
 }
 
+.v-main .v-tabs .v-tab,
 .portal-tabs .v-tab {
   color: var(--portal-muted);
   font-weight: 600;
 }
 
+.v-main .v-tabs .v-tab--selected,
 .portal-tabs .v-tab--selected {
   color: rgb(var(--v-theme-primary));
+}
+
+.v-main .v-tabs .v-tab__slider,
+.portal-tabs .v-tab__slider {
+  color: rgb(var(--v-theme-primary));
+  background: rgb(var(--v-theme-primary));
 }
 
 .table-filter.v-table > .v-table__wrapper > table > thead > tr {
@@ -144,4 +152,61 @@
 .table-filter.v-table > .v-table__wrapper {
   border: 1px solid var(--portal-border);
   border-radius: var(--portal-radius-lg);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.status-badge--pending {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.status-badge--approved {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.status-badge--si {
+  background: #cffafe;
+  color: #155e75;
+  border: 1px solid #67e8f9;
+}
+
+.status-badge--shipped {
+  background: #0f766e;
+  color: #fff;
+}
+
+.status-badge--default {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.status-filter-select .v-field__input {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.status-filter-select .v-select__selection {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.status-filter-select__text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

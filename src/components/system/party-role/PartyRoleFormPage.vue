@@ -15,7 +15,7 @@
       </template>
     </LayoutWithToolbar>
 
-    <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
+    <v-tabs v-model="activedTab" color="primary" density="comfortable">
       <v-tab :value="1">Detail</v-tab>
       <v-tab :value="2">Party Role</v-tab>
     </v-tabs>

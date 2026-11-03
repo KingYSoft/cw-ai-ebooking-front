@@ -48,52 +48,67 @@ export function getBookingListStatusChipProps(status) {
   return BOOKING_LIST_STATUS_CHIP[status] ?? { color: 'default', variant: 'tonal' }
 }
 
-const PENDING_STATUSES = new Set([
-  'draft',
-  'saved',
-  'submit',
-  'submitted',
-  'processing',
-  'request for approve',
-  'waiting for approve',
-  'pending approval',
-])
-
-const APPROVED_STATUSES = new Set([
-  'accept',
-  'accepted',
-  'approved',
-  'booking released',
-  'release',
-])
-
-const SI_STATUSES = new Set(['si submitted', 'pending for submit si'])
-
-const SHIPPED_STATUSES = new Set(['booking completed', 'shipped', 'completed'])
-
-const CANCELLED_STATUSES = new Set(['cancel', 'cancelled', 'canceled', 'deactive'])
+const STATUS_BADGE_TONE = {
+  draft: 'default',
+  saved: 'pending',
+  submit: 'pending',
+  new: 'pending',
+  processing: 'si',
+  'in progress': 'si',
+  'pending approve': 'pending',
+  'pending approval': 'pending',
+  'request for approve': 'pending',
+  'waiting for approve': 'pending',
+  submitted: 'approved',
+  submited: 'approved',
+  accept: 'approved',
+  accepted: 'approved',
+  approved: 'approved',
+  confirmed: 'approved',
+  active: 'approved',
+  yes: 'approved',
+  release: 'approved',
+  'booking released': 'approved',
+  'si submitted': 'si',
+  'pending for submit si': 'si',
+  'booking completed': 'shipped',
+  shipped: 'shipped',
+  completed: 'shipped',
+  cancel: 'default',
+  cancelled: 'default',
+  canceled: 'default',
+  deactive: 'default',
+  inactive: 'default',
+  no: 'default',
+}
 
 export function getBookingStatusBadgeTone(status) {
+  if (status === 1 || status === true) {
+    return 'approved'
+  }
+  if (status === 0 || status === false) {
+    return 'default'
+  }
   const raw = String(status ?? '')
     .trim()
     .toLowerCase()
   if (!raw) {
     return 'default'
   }
-  if (CANCELLED_STATUSES.has(raw)) {
-    return 'default'
+  if (STATUS_BADGE_TONE[raw]) {
+    return STATUS_BADGE_TONE[raw]
   }
-  if (SHIPPED_STATUSES.has(raw)) {
-    return 'shipped'
-  }
-  if (SI_STATUSES.has(raw) || raw.includes('si submit')) {
+  if (raw.includes('si submit')) {
     return 'si'
   }
-  if (APPROVED_STATUSES.has(raw)) {
-    return 'approved'
-  }
-  if (PENDING_STATUSES.has(raw) || raw.includes('pending')) {
+  if (raw.includes('pending')) {
     return 'pending'
+  }
+  if (raw.includes('ship') || raw.includes('complete')) {
+    return 'shipped'
+  }
+  if (raw.includes('approv') || raw.includes('accept') || raw.includes('release')) {
+    return 'approved'
   }
   return 'default'
 }

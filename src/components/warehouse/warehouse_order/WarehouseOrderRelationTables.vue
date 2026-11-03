@@ -30,7 +30,8 @@
           </template>
 
           <template #item.status="{ item }">
-            {{ displayValue(item.status) }}
+            <StatusBadge v-if="String(item.status ?? '').trim()" :text="item.status" />
+            <span v-else>-</span>
           </template>
 
           <template #item.date="{ item }">

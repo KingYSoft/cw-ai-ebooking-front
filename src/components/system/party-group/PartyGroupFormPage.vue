@@ -17,7 +17,7 @@
       </template>
     </LayoutWithToolbar>
 
-    <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
+    <v-tabs v-model="activedTab" color="primary" density="comfortable">
       <v-tab :value="1">{{ t('detail') }}</v-tab>
       <v-tab :value="2">{{ t('members') }}</v-tab>
       <v-tab :value="3">{{ t('links') }}</v-tab>

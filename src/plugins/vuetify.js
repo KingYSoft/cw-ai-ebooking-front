@@ -68,6 +68,9 @@ const vuetify = createVuetify({
     VChip: {
       rounded: 'lg',
     },
+    VTabs: {
+      color: 'primary',
+    },
     VDataTable: {
       density: 'compact',
     },

@@ -5,12 +5,13 @@
     @on-search="onSearch"
   >
     <template #default>
-      <v-col :cols="rescols('c12m6l4')">
+      <v-col :cols="rescols('c12l4m4')">
         <div class="d-flex align-center ga-1">
           <v-select
             v-model="inputSearchData.field1.key"
             auto-select-first
             autocomplete="off"
+            class="flex-0-0"
             density="compact"
             hide-details
             item-title="title"
@@ -18,25 +19,28 @@
             :items="inputSearchData.field1.keyItems"
             :list-props="{ density: 'compact' }"
             :menu-props="{ 'max-width': 'auto' }"
+            max-width="120"
             min-width="120"
             no-filter
             variant="underlined"
-            width="auto"
+            width="120"
           />
 
           <v-select
             v-model="inputSearchData.field1.op"
             auto-select-first
             autocomplete="off"
+            class="flex-0-0"
             density="compact"
             hide-details
             :items="inputSearchData.field1.opItems"
             :list-props="{ density: 'compact' }"
             :menu-props="{ 'max-width': 'auto' }"
-            min-width="96"
+            max-width="120"
+            min-width="120"
             no-filter
             variant="outlined"
-            width="auto"
+            width="120"
           />
 
           <v-text-field

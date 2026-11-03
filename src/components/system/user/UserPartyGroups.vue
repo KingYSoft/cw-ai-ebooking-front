@@ -43,14 +43,10 @@
       </template>
 
       <template #item.is_active="{ item }">
-        <v-chip
-          :color="item.is_active === 1 ? 'success' : 'error'"
-          density="comfortable"
-          size="small"
-          variant="tonal"
-        >
-          {{ item.is_active === 1 ? common('yes') : common('no') }}
-        </v-chip>
+        <StatusBadge
+          :text="item.is_active === 1 ? common('yes') : common('no')"
+          :tone-key="item.is_active === 1 ? 'yes' : 'no'"
+        />
       </template>
 
       <template #bottom />
@@ -109,14 +105,10 @@
             striped="even"
           >
             <template #item.is_active="{ item }">
-              <v-chip
-                :color="item.is_active === 1 ? 'success' : 'error'"
-                density="comfortable"
-                size="small"
-                variant="tonal"
-              >
-                {{ item.is_active === 1 ? common('yes') : common('no') }}
-              </v-chip>
+              <StatusBadge
+                :text="item.is_active === 1 ? common('yes') : common('no')"
+                :tone-key="item.is_active === 1 ? 'yes' : 'no'"
+              />
             </template>
           </v-data-table>
         </v-card-text>

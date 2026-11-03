@@ -9,7 +9,7 @@
       <v-row dense>
         <slot />
 
-        <v-col class="d-flex align-center" cols="auto">
+        <v-col class="d-flex align-center" :cols="resolvedSearchCols">
           <v-btn color="primary" size="small" @click="onSearch">
             {{ t('$vuetify.custom.dialog.btn.search') }}
           </v-btn>
@@ -64,17 +64,27 @@
 <script setup>
   import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
   import { useLocale } from 'vuetify'
+  import { useLayoutCols } from '@/composables/useLayoutCols'
 
   defineOptions({
     name: 'PageFilterBar',
   })
 
-  defineProps({
+  const props = defineProps({
     inner: {
       type: Boolean,
       default: false,
     },
+    searchCols: {
+      type: [Number, String],
+      default: undefined,
+    },
   })
+
+  const { rescols } = useLayoutCols()
+  const resolvedSearchCols = computed(() =>
+    props.searchCols === undefined ? rescols('c12l2m2') : props.searchCols,
+  )
 
   const { t } = useLocale()
   // const display = useDisplay()

@@ -14,7 +14,7 @@
       </template>
     </LayoutWithToolbar>
 
-    <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
+    <v-tabs v-model="activedTab" color="primary" density="comfortable">
       <v-tab :value="1">{{ userEditTab('detail') }}</v-tab>
       <v-tab :value="2">{{ userEditTab('warehouse') }}</v-tab>
       <v-tab :value="3">{{ groupText('linkedAgent') }}</v-tab>

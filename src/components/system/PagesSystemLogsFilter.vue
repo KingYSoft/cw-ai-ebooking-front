@@ -5,7 +5,7 @@
     @on-search="onSearch"
   >
     <template #default>
-      <v-col :cols="rescols('c12m4s6')">
+      <v-col :cols="rescols('c12l4m4')">
         <div class="d-flex align-center ga-1">
           <v-select
             v-model="inputSearchData.field1.key"
@@ -43,7 +43,7 @@
         </div>
       </v-col>
 
-      <v-col :cols="rescols('c12m4')">
+      <v-col :cols="rescols('c12l6m6s6')">
         <div class="d-flex align-center ga-1">
           <div>
             <v-select
@@ -57,10 +57,10 @@
               :items="inputSearchData.field2.keyItems"
               :list-props="{ density: 'compact' }"
               :menu-props="{ 'max-width': 'auto' }"
-              min-width="140"
+              min-width="120"
               no-filter
               variant="underlined"
-              width="140"
+              width="120"
             />
           </div>
 
