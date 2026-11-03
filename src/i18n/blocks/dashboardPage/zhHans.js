@@ -47,7 +47,7 @@ export default {
   peakMonth: 'Peak Month',
   avgMonthly: 'Avg Monthly TEU',
   totalYtd: 'Total YTD Volume',
-  fullListTitle: 'Full Booking List',
+  fullListTitle: 'Recents',
   moreDetails: 'More Details',
   newBooking: 'New Booking',
 }

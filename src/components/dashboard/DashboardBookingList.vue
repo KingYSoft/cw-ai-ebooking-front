@@ -5,7 +5,6 @@
     </div>
 
     <FTableLayout
-      ref="refTableLayout"
       v-model="tblSelected"
       :headers="tblHeaders"
       :items="tblItems"
@@ -36,25 +35,16 @@
 
       <template #bottom>
         <v-divider />
-
-        <FDataTableFooter
-          v-model:page-obj="pageObj"
-          :total-count="totalCount"
-          @query-tbl="queryData"
-        />
       </template>
     </FTableLayout>
   </v-card>
 </template>
 
 <script setup>
-  import { computed, nextTick, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { bookingQueryPage } from '@/api/booking'
-  import FDataTableFooter from '@/components/FDataTableFooter.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
   import StatusBadge from '@/components/StatusBadge.vue'
-  import { mapBookingListRow } from '@/composables/mapEbookingBooking'
   import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { BOOKING_LIST_STATUS_OPTIONS } from '@/constants/bookingListStatus'
   import { useAppStore } from '@/stores/app'
@@ -63,10 +53,14 @@
     name: 'DashboardBookingList',
   })
 
-  defineProps({
+  const props = defineProps({
     title: {
       type: String,
       required: true,
+    },
+    items: {
+      type: Array,
+      default: () => [],
     },
   })
 
@@ -74,11 +68,8 @@
   const appStore = useAppStore()
   const { tableHeader, listStatus } = useBookingPageI18n()
 
-  const refTableLayout = ref(null)
   const tblSelected = ref([])
-  const tblItems = ref([])
-  const totalCount = ref(0)
-  const pageObj = ref({ pageSize: 50, pageIndex: 1 })
+  const tblItems = computed(() => props.items.slice(0, 10))
 
   const displayBookingStatus = status => {
     if (!status) {
@@ -139,12 +130,6 @@
     },
     { title: tableHeader('houseBill'), key: 'bkg_house_bill', align: 'start', minWidth: '170px' },
     {
-      title: tableHeader('shipperName'),
-      key: 'shipper_name',
-      align: 'start',
-      minWidth: '140px',
-    },
-    {
       title: tableHeader('consigneeName'),
       key: 'consignee_name',
       align: 'start',
@@ -169,37 +154,6 @@
     { title: tableHeader('inco'), key: 'bkg_inco', align: 'start', minWidth: '80px' },
   ])
 
-  const queryData = async () => {
-    try {
-      const { success, data } = await bookingQueryPage({
-        filters: [],
-        skipCount: (pageObj.value.pageIndex - 1) * pageObj.value.pageSize,
-        maxResultCount: pageObj.value.pageSize,
-      })
-
-      if (success && data) {
-        const items = data.items ?? []
-        tblItems.value = items.map((item, index) =>
-          mapBookingListRow(
-            item,
-            (pageObj.value.pageIndex - 1) * pageObj.value.pageSize + index + 1,
-          ),
-        )
-        totalCount.value = data.totalCount || 0
-      } else {
-        tblItems.value = []
-        totalCount.value = 0
-      }
-
-      nextTick(() => {
-        refTableLayout.value?.initHeaders?.()
-        refTableLayout.value?.initScrollListener?.()
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   function openBookingDetail(item) {
     if (!item?.pk) {
       return
@@ -218,7 +172,6 @@
     openBookingDetail(item)
   }
 
-  queryData()
 </script>
 
 <style lang="scss" scoped>

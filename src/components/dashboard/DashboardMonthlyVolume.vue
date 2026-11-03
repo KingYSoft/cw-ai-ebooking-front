@@ -34,13 +34,12 @@
 <script setup>
   import { computed } from 'vue'
   import VueApexCharts from 'vue3-apexcharts'
-  import { DASHBOARD_MOCK_MONTHLY } from '@/constants/dashboardMock'
 
   defineOptions({
     name: 'DashboardMonthlyVolume',
   })
 
-  defineProps({
+  const props = defineProps({
     title: {
       type: String,
       required: true,
@@ -57,12 +56,43 @@
       type: Array,
       default: () => [],
     },
+    volume: {
+      type: Array,
+      default: () => [],
+    },
   })
+
+  const monthLabels = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ]
+
+  const formatMonthLabel = value => {
+    const match = String(value || '').match(/^\d{4}-(\d{1,2})$/)
+    if (!match) {
+      return value || ''
+    }
+
+    return monthLabels[Number(match[1]) - 1] || value
+  }
+
+  const getMonthNumber = value => {
+    const match = String(value || '').match(/^\d{4}-(\d{1,2})$/)
+    return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER
+  }
+
+  const orderedVolume = computed(() =>
+    [...props.volume].sort((left, right) => {
+      const leftMonth = getMonthNumber(left.month_label || left.month)
+      const rightMonth = getMonthNumber(right.month_label || right.month)
+      return leftMonth - rightMonth
+    }),
+  )
 
   const chartSeries = computed(() => [
     {
       name: 'Bookings (TEU)',
-      data: DASHBOARD_MOCK_MONTHLY.values,
+      data: orderedVolume.value.map(item => Number(item.teu) || 0),
     },
   ])
 
@@ -88,7 +118,7 @@
       padding: { left: 8, right: 8 },
     },
     xaxis: {
-      categories: DASHBOARD_MOCK_MONTHLY.labels,
+      categories: orderedVolume.value.map(item => formatMonthLabel(item.month_label || item.month || '')),
       axisBorder: { show: false },
       axisTicks: { show: false },
       labels: {
@@ -100,7 +130,7 @@
     },
     yaxis: {
       min: 0,
-      max: DASHBOARD_MOCK_MONTHLY.max,
+      max: Math.max(...orderedVolume.value.map(item => Number(item.teu) || 0), 1),
       tickAmount: 5,
       labels: {
         style: {

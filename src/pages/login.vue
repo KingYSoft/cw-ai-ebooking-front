@@ -1,177 +1,174 @@
 <template>
-  <v-responsive>
-    <v-row no-gutters>
-      <v-col :cols="rescols('c12m5')">
-        <v-img cover height="100%" :lazy-src="bgImg" :src="bgImg" />
-      </v-col>
+  <v-app class="login-app">
+    <div class="login-page">
+      <section class="login-hero" :style="{ backgroundImage: heroBg }">
+        <div class="login-hero__overlay" />
 
-      <v-col :cols="rescols('c12m7')">
-        <v-app>
-          <v-app-bar color="transparent" :elevation="0">
-            <template #append>
-              <v-menu>
-                <template #activator="{ props }">
-                  <v-btn v-bind="props" :disabled="loading" icon="mdi-translate" />
-                </template>
+        <div class="login-hero__center">
+          <div class="login-hero__intro">
+            <div class="login-hero__chip">
+              <v-icon color="#7dd3fc" icon="mdi-anchor" size="14" />
+              <span>{{ l('heroBadge') }}</span>
+            </div>
 
-                <v-list activatable min-width="120">
-                  <v-list-item @click="changeAppLanguage('en')">English</v-list-item>
-                  <v-list-item @click="changeAppLanguage('zhHans')">中文简体</v-list-item>
-                  <v-list-item @click="changeAppLanguage('zhHant')">中文繁體</v-list-item>
-                  <v-list-item @click="changeAppLanguage('vi')">Tiếng Việt</v-list-item>
-                </v-list>
-              </v-menu>
+            <h1 class="login-hero__title">{{ l('heroTitle') }}</h1>
+            <p class="login-hero__desc">{{ l('heroDesc') }}</p>
+          </div>
+        </div>
 
-              <v-btn
-                :disabled="loading"
-                :icon="appThemeIcon === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-                @click="changeAppTheme()"
-              />
-            </template>
-          </v-app-bar>
+        <div class="login-hero__features">
+          <div v-for="item in features" :key="item.title" class="login-feature">
+            <div class="login-feature__icon">
+              <v-icon :color="item.iconColor" :icon="item.icon" size="16" />
+            </div>
+            <div class="login-feature__title">{{ item.title }}</div>
+            <p class="login-feature__desc">{{ item.desc }}</p>
+          </div>
+        </div>
+      </section>
 
-          <v-main class="d-flex flex-column">
-            <v-sheet color="transparent">
-              <div class="w-100 pa-4">
-                <v-sheet class="ma-auto my-10" color="transparent" max-width="300">
-                  <v-img :lazy-src="logoSrc" :src="logoSrc" />
-                </v-sheet>
+      <section class="login-panel">
+        <div class="login-panel__top">
+          <img alt="SJ Clemenger" class="login-panel__logo" :src="logoSrc" />
 
-                <v-card class="ma-auto" :disabled="loading" :loading="loading" max-width="600">
-                  <template #loader="{ isActive }">
-                    <v-progress-linear
-                      :active="isActive"
-                      color="deep-purple"
-                      height="4"
-                      indeterminate
-                    />
-                  </template>
+          <div class="login-panel__lang">
+            <v-icon color="#94a3b8" icon="mdi-earth" size="14" />
+            <v-select
+              class="login-panel__lang-field"
+              density="compact"
+              hide-details
+              item-title="title"
+              item-value="value"
+              :items="langItems"
+              menu-icon="mdi-chevron-down"
+              :model-value="current"
+              variant="outlined"
+              @update:model-value="changeAppLanguage"
+            />
+          </div>
+        </div>
 
-                  <v-toolbar color="primary">
-                    <v-card-title class="text-h5">
-                      {{ t('$vuetify.custom.app.title') }}
-                    </v-card-title>
-                  </v-toolbar>
+        <div class="login-panel__form">
+          <div class="login-panel__welcome">
+            <div class="login-panel__access">
+              <span class="login-panel__access-dot" />
+              {{ l('portalAccess') }}
+            </div>
+            <h2>{{ l('signInTitle') }}</h2>
+            <p>{{ l('signInSubtitle') }}</p>
+          </div>
 
-                  <v-card-title class="py-4 text-subtitle-1">
-                    {{ t('$vuetify.custom.loginPage.title') }}
-                  </v-card-title>
+          <v-form ref="refLoginForm" class="login-form" @submit.prevent="loginHandle">
+            <label class="login-form__label">{{ l('label.email') }}</label>
+            <v-text-field
+              v-model="email"
+              class="login-form__field"
+              clearable
+              density="comfortable"
+              hide-details="auto"
+              :placeholder="l('placeholder.email')"
+              prepend-inner-icon="mdi-email-outline"
+              :rules="emailRules"
+              variant="outlined"
+            />
 
-                  <v-card-text>
-                    <v-form ref="refLoginForm" @submit.prevent="loginHandle">
-                      <v-text-field
-                        v-model="email"
-                        clearable
-                        color="primary"
-                        :label="t('$vuetify.custom.loginPage.label.email')"
-                        :placeholder="t('$vuetify.custom.loginPage.placeholder.email')"
-                        :rules="emailRules"
-                        variant="outlined"
-                      />
+            <div class="login-form__password-row">
+              <label class="login-form__label">{{ l('label.password') }}</label>
+              <a class="login-form__forgot" href="#" @click.prevent>{{ l('forgotPassword') }}</a>
+            </div>
+            <v-text-field
+              v-model="pwd"
+              :append-inner-icon="pwdVis ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+              class="login-form__field"
+              density="comfortable"
+              hide-details="auto"
+              :placeholder="l('placeholder.password')"
+              prepend-inner-icon="mdi-lock-outline"
+              :rules="pwdRules"
+              :type="pwdVis ? 'text' : 'password'"
+              variant="outlined"
+              @click:append-inner="pwdVis = !pwdVis"
+            />
 
-                      <v-text-field
-                        v-model="pwd"
-                        :append-inner-icon="pwdVis ? 'mdi-eye-off' : 'mdi-eye'"
-                        class="mt-4"
-                        color="primary"
-                        :label="t('$vuetify.custom.loginPage.label.password')"
-                        :placeholder="t('$vuetify.custom.loginPage.placeholder.password')"
-                        :rules="pwdRules"
-                        :type="pwdVis ? 'text' : 'password'"
-                        variant="outlined"
-                        @click:append-inner="pwdVis = !pwdVis"
-                      />
+            <v-btn
+              block
+              class="login-form__submit"
+              :loading="loading"
+              size="large"
+              type="submit"
+              variant="flat"
+            >
+              {{ l('submitBtn') }}
+              <v-icon end icon="mdi-arrow-right" size="16" />
+            </v-btn>
+          </v-form>
+        </div>
 
-                      <v-row no-gutters>
-                        <v-spacer />
+        <div class="login-panel__footer">
+          <span>{{ l('copyright') }}</span>
+          <div class="login-panel__links">
+            <button type="button" @click="supportOpen = true">{{ l('help') }}</button>
+            <a href="/privacy" rel="noopener noreferrer" target="_blank">{{ l('p2') }}</a>
+            <a href="#" @click.prevent>{{ l('terms') }}</a>
+          </div>
+        </div>
+      </section>
+    </div>
 
-                        <v-col class="d-flex justify-end" :cols="rescols('c6')">
-                          <!-- <v-btn
-                            class="text-none"
-                            color="primary"
-                            :ripple="false"
-                            slim
-                            text
-                            variant="text"
-                          >
-                            {{ t('$vuetify.custom.loginPage.forgotPassword') }}
-                          </v-btn> -->
-                          <a
-                            class="text-decoration-none text-primary"
-                            href="#"
-                            rel="noopener noreferrer"
-                          >
-                            {{ t('$vuetify.custom.loginPage.forgotPassword') }}
-                          </a>
-                        </v-col>
-                      </v-row>
-
-                      <v-btn
-                        block
-                        class="mt-4"
-                        color="primary"
-                        size="x-large"
-                        type="submit"
-                        variant="flat"
-                      >
-                        {{ t('$vuetify.custom.loginPage.submitBtn') }}
-                      </v-btn>
-                    </v-form>
-                  </v-card-text>
-                  <!-- <v-card-text class="d-flex justify-center align-baseline">
-                    <span class="text-none">{{ t('$vuetify.custom.loginPage.newMessage') }}</span>
-                    <v-btn
-                      class="pa-0 ml-2 text-none"
-                      color="primary"
-                      height="auto"
-                      :ripple="false"
-                      variant="text"
-                    >
-                      {{ t('$vuetify.custom.loginPage.newBtn') }}
-                    </v-btn>
-                  </v-card-text> -->
-                  <v-card-text class="px-5 d-flex justify-center align-baseline">
-                    <span class="text-caption">
-                      {{ t('$vuetify.custom.loginPage.p1') }}
-                      <a
-                        class="text-primary"
-                        href="/privacy"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                      >
-                        {{ t('$vuetify.custom.loginPage.p2') }}
-                      </a>
-                    </span>
-                  </v-card-text>
-                </v-card>
-              </div>
-            </v-sheet>
-
-            <v-spacer />
-            <app-footer />
-          </v-main>
-        </v-app>
-      </v-col>
-    </v-row>
+    <v-dialog v-model="supportOpen" max-width="440">
+      <v-card class="login-support" rounded="xl">
+        <div class="login-support__header">
+          <div class="login-support__title">
+            <v-icon color="#0f2c59" icon="mdi-headset" size="18" />
+            <span>{{ l('supportTitle') }}</span>
+          </div>
+          <v-btn icon="mdi-close" size="small" variant="text" @click="supportOpen = false" />
+        </div>
+        <v-card-text>
+          <p class="login-support__intro">{{ l('supportIntro') }}</p>
+          <div class="login-support__box">
+            <div class="login-support__row">
+              <span>{{ l('supportHotline') }}</span>
+              <strong>{{ l('supportHotlineValue') }}</strong>
+            </div>
+            <div class="login-support__row">
+              <span>{{ l('supportDesk') }}</span>
+              <strong class="login-support__accent">{{ l('supportDeskValue') }}</strong>
+            </div>
+            <div class="login-support__row">
+              <span>{{ l('supportHours') }}</span>
+              <strong>{{ l('supportHoursValue') }}</strong>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions class="px-6 pb-5">
+          <v-btn
+            block
+            class="login-form__submit"
+            variant="flat"
+            @click="supportOpen = false"
+          >
+            {{ l('close') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <MessageSnack />
     <PrivacyPolicyDialog v-model:open-value="privacyPolicyValue" />
-  </v-responsive>
+  </v-app>
 </template>
 
 <script setup>
-  import { inject, ref } from 'vue'
+  import { computed, inject, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
   import { login } from '@/api/login'
   import bgImg from '@/assets/images/login/bg.jpg'
   import logoSrc from '@/assets/images/login/logo.png'
-  import { useLayoutCols } from '@/composables/useLayoutCols'
   import { useAppStore } from '@/stores/app'
   import { clearAuthSession, setAuthSession } from '@/utils/authSession'
   import { resolveLoginRedirect } from '@/utils/loginRedirect'
-
-  const { rescols } = useLayoutCols()
 
   definePage({
     name: 'login',
@@ -187,14 +184,40 @@
   const router = useRouter()
   const route = useRoute()
   const appStore = useAppStore()
-  const { t } = useLocale()
-
-  //   const reload = inject('reload')
+  const { t, current } = useLocale()
   const appInit = inject('appInit')
-  // appInit()
   const changeAppLanguage = inject('changeAppLanguage')
-  const appThemeIcon = inject('appThemeIcon')
-  const changeAppTheme = inject('changeAppTheme')
+
+  const l = key => t(`$vuetify.custom.loginPage.${key}`)
+  const heroBg = `linear-gradient(to right, rgb(15 44 89 / 0.4), rgb(15 44 89 / 0.15)), url(${bgImg})`
+
+  const langItems = computed(() => [
+    { title: l('langEn'), value: 'en' },
+    { title: l('langZhHant'), value: 'zhHant' },
+    { title: l('langZhHans'), value: 'zhHans' },
+    { title: l('langVi'), value: 'vi' },
+  ])
+
+  const features = computed(() => [
+    {
+      icon: 'mdi-calendar-check',
+      iconColor: '#fff',
+      title: l('feature1Title'),
+      desc: l('feature1Desc'),
+    },
+    {
+      icon: 'mdi-compass',
+      iconColor: '#7dd3fc',
+      title: l('feature2Title'),
+      desc: l('feature2Desc'),
+    },
+    {
+      icon: 'mdi-file-document',
+      iconColor: '#fff',
+      title: l('feature3Title'),
+      desc: l('feature3Desc'),
+    },
+  ])
 
   const loading = ref(false)
   const email = ref('')
@@ -203,20 +226,25 @@
   }
   const emailRules = ref([
     value => {
-      //   if (/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$/.test(value)) return true
-      if (value) return true
+      if (value) {
+        return true
+      }
       return t('$vuetify.custom.loginPage.err.email')
     },
   ])
   const pwd = ref('')
   const pwdRules = ref([
     value => {
-      if (value) return true
+      if (value) {
+        return true
+      }
       return t('$vuetify.custom.loginPage.err.password')
     },
   ])
   const pwdVis = ref(false)
   const refLoginForm = ref(null)
+  const supportOpen = ref(false)
+
   const loginHandle = async () => {
     if (refLoginForm.value) {
       const { valid } = await refLoginForm.value.validate()
@@ -229,29 +257,12 @@
   const loginRealHandle = async () => {
     loading.value = true
     try {
-      // 普通登录前清理旧会话，避免旧 token 干扰新登录。
       clearAuthSession()
       const { data } = await login({
         email: email.value,
         password: pwd.value,
       })
       if (data && data.access_token) {
-        // sessionStorage.setItem('token', data.access_token)
-        // localStorage.setItem('email', email.value)
-
-        // localStorage.removeItem('remind-last-timer')
-        // appInit()
-        // const redirect = route.query.redirect
-        // if (redirect) {
-        //   router.replace({ path: redirect })
-        // } else {
-        //   if (appStore.firstMenuPath) {
-        //     router.replace({ path: appStore.firstMenuPath })
-        //   } else {
-        //     router.replace({ path: '/404' })
-        //   }
-        // }
-        // 登录成功后统一写入 access token、refresh token 和本地过期时间。
         setAuthSession(data)
         localStorage.setItem('email', email.value)
 
@@ -275,6 +286,7 @@
       loading.value = false
     }
   }
+
   const privacyPolicyValue = ref(false)
   if (localStorage.getItem('privacy_policy_accepted') !== '1') {
     privacyPolicyValue.value = true
@@ -282,216 +294,440 @@
 </script>
 
 <style scoped lang="scss">
-  // .login-container {
-  //   height: 100vh;
-  //   padding: 0;
-  //   margin: 0;
-  //   max-width: 100%;
-  // }
+  .login-app {
+    background: #f1f5f9;
+  }
 
-  // .fill-height {
-  //   height: 100%;
-  // }
+  .login-page {
+    display: flex;
+    min-height: 100dvh;
+    width: 100%;
+  }
 
-  // // Hero Section
-  // .hero-section {
-  //   background-image: url('@/assets/login/bg.jpg');
-  //   background-size: cover;
-  //   background-position: center;
-  //   background-repeat: no-repeat;
-  //   position: relative;
-  //   display: flex;
-  //   align-items: flex-end;
-  //   padding: 60px;
+  .login-hero {
+    position: relative;
+    flex: 0 0 58%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0 56px 50px;
+    color: #fff;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
 
-  //   &::before {
-  //     content: '';
-  //     position: absolute;
-  //     top: 0;
-  //     left: 0;
-  //     right: 0;
-  //     bottom: 0;
-  //     background: linear-gradient(to bottom, rgba(0, 51, 153, 0.1) 0%, rgba(0, 51, 153, 0.4) 100%);
-  //   }
-  // }
+  .login-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(10 29 60 / 0.8), transparent 45%, rgb(12 74 110 / 0.3));
+    pointer-events: none;
+  }
 
-  // .hero-content {
-  //   position: relative;
-  //   z-index: 1;
-  //   color: white;
-  //   max-width: 600px;
-  // }
+  .login-hero__center {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 32px;
+    max-width: 672px;
+    padding: 48px 0 32px;
+  }
 
-  // .hero-text {
-  //   margin-bottom: 32px;
-  // }
+  .login-hero__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 
-  // .subtitle-small {
-  //   font-size: 12px;
-  //   font-weight: 600;
-  //   letter-spacing: 2px;
-  //   text-transform: uppercase;
-  //   margin-bottom: 16px;
-  //   opacity: 0.9;
-  // }
+  .login-hero__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.2);
+    border: 1px solid rgb(255 255 255 / 0.3);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    backdrop-filter: blur(12px);
+  }
 
-  // .hero-title {
-  //   font-size: 48px;
-  //   font-weight: 700;
-  //   line-height: 1.2;
-  //   margin-bottom: 16px;
-  //   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  // }
+  .login-hero__title {
+    margin: 0;
+    color: #fff;
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    text-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+  }
 
-  // .hero-description {
-  //   font-size: 16px;
-  //   font-weight: 400;
-  //   opacity: 0.9;
-  //   margin-bottom: 8px;
-  // }
+  .login-hero__desc {
+    margin: 0;
+    color: #f1f5f9;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.625;
+    text-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  }
 
-  // .signup-btn {
-  //   background: linear-gradient(135deg, #5ba3d0 0%, #4a90c2 100%) !important;
-  //   color: white !important;
-  //   text-transform: none !important;
-  //   font-weight: 500 !important;
-  //   padding: 0 28px !important;
-  //   height: 48px !important;
-  //   font-size: 15px !important;
-  //   border-radius: 24px !important;
+  .login-hero__features {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    max-width: 672px;
+    margin-bottom: 0;
+  }
 
-  //   &:hover {
-  //     background: linear-gradient(135deg, #6ab3e0 0%, #5aa0d2 100%) !important;
-  //   }
-  // }
+  .login-feature {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.85);
+    border: 1px solid rgb(255 255 255 / 0.6);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 24px rgb(15 44 89 / 0.12);
+  }
 
-  // // Login Section
-  // .login-section {
-  //   background-color: #ffffff;
-  //   display: flex;
-  //   align-items: center;
-  //   justify-content: center;
-  //   padding: 40px;
-  // }
+  .login-feature__icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #0f2c59;
+    color: #fff;
+    box-shadow: 0 1px 2px rgb(15 44 89 / 0.2);
+  }
 
-  // .login-content {
-  //   width: 100%;
-  //   max-width: 360px;
-  //   display: flex;
-  //   flex-direction: column;
-  //   align-items: center;
-  // }
+  .login-feature__title {
+    color: #0f2c59;
+    font-size: 12px;
+    font-weight: 700;
+  }
 
-  // .brand-container {
-  //   display: flex;
-  //   flex-direction: column;
-  //   align-items: center;
-  //   margin-bottom: 40px;
-  // }
+  .login-feature__desc {
+    margin: 0;
+    color: #475569;
+    font-size: 11px;
+    line-height: 1.4;
+  }
 
-  // .logo-img {
-  //   margin-bottom: 16px;
-  // }
+  .login-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 56px;
+    background: #fff;
+    border-left: 1px solid #e2e8f0;
+  }
 
-  // .brand-name {
-  //   color: #000099;
-  //   font-size: 28px;
-  //   font-weight: 700;
-  //   letter-spacing: -0.5px;
-  // }
+  .login-panel__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 48px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+  }
 
-  // .login-form {
-  //   width: 100%;
-  //   margin-bottom: 60px;
-  // }
+  .login-panel__logo {
+    width: 200px;
+    max-width: 200px;
+    display: block;
+  }
 
-  // .form-field {
-  //   margin-bottom: 16px;
+  .login-panel__lang {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-  //   :deep(.v-field) {
-  //     border-radius: 8px;
-  //   }
+  .login-panel__lang-field {
+    width: 210px;
+    flex: none;
+  }
 
-  //   :deep(.v-field__outline) {
-  //     --v-field-border-opacity: 0.4;
-  //   }
+  .login-panel__lang-field :deep(.v-input__control) {
+    height: 32px;
+    min-height: 32px;
+  }
 
-  //   :deep(.v-field__input) {
-  //     font-size: 14px;
-  //     padding: 12px 16px;
-  //   }
-  // }
+  .login-panel__lang-field :deep(.v-field) {
+    --v-field-padding-start: 16px;
+    --v-field-padding-end: 4px;
+    --v-field-input-padding-top: 0;
+    --v-field-input-padding-bottom: 0;
+    height: 32px;
+    min-height: 32px !important;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+  }
 
-  // .form-actions {
-  //   display: flex;
-  //   align-items: center;
-  //   justify-content: space-between;
-  //   margin-top: 8px;
-  // }
+  .login-panel__lang-field :deep(.v-field__outline) {
+    --v-field-border-opacity: 1;
+    color: #e2e8f0;
+  }
 
-  // .forgot-password {
-  //   color: #1976d2;
-  //   font-size: 14px;
-  //   text-decoration: none;
-  //   font-weight: 500;
+  .login-panel__lang-field :deep(.v-field--focused .v-field__outline) {
+    color: #0f2c59;
+  }
 
-  //   &:hover {
-  //     text-decoration: underline;
-  //   }
-  // }
+  .login-panel__lang-field :deep(.v-field__input) {
+    min-height: 32px !important;
+    padding: 0 0 0 16px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 20px;
+  }
 
-  // .login-btn {
-  //   background-color: #000066 !important;
-  //   color: white !important;
-  //   min-width: 56px !important;
-  //   width: 56px !important;
-  //   height: 48px !important;
-  //   border-radius: 8px !important;
+  .login-panel__lang-field :deep(.v-select__selection) {
+    margin-inline-start: 0;
+    padding-left: 2px;
+  }
 
-  //   &:hover {
-  //     background-color: #000080 !important;
-  //   }
+  .login-panel__lang-field :deep(.v-select__selection-text) {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 20px;
+  }
 
-  //   :deep(.v-btn__content) {
-  //     font-size: 20px;
-  //   }
-  // }
+  .login-panel__lang-field :deep(.v-field__append-inner) {
+    padding-top: 0;
+    align-self: center;
+  }
 
-  // .copyright {
-  //   color: #9e9e9e;
-  //   font-size: 12px;
-  //   text-align: center;
-  // }
+  .login-panel__lang-field :deep(.v-icon) {
+    font-size: 16px;
+    opacity: 0.7;
+  }
 
-  // // Responsive Adjustments
-  // @media (max-width: 960px) {
-  //   .hero-section {
-  //     min-height: 50vh;
-  //     padding: 40px 24px;
-  //   }
+  .login-panel__form {
+    width: 100%;
+    max-width: 448px;
+    margin: 32px auto;
+  }
 
-  //   .hero-title {
-  //     font-size: 32px;
-  //   }
+  .login-panel__welcome {
+    margin-bottom: 32px;
+  }
 
-  //   .login-section {
-  //     min-height: 50vh;
-  //     padding: 40px 24px;
-  //   }
-  // }
+  .login-panel__access {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #f0f5fa;
+    border: 1px solid #e1ebf5;
+    color: #0f2c59;
+    font-size: 12px;
+    font-weight: 700;
+  }
 
-  // @media (max-width: 600px) {
-  //   .hero-title {
-  //     font-size: 28px;
-  //   }
+  .login-panel__access-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0f2c59;
+  }
 
-  //   .signup-btn {
-  //     font-size: 14px !important;
-  //     padding: 0 20px !important;
-  //   }
+  .login-panel__welcome h2 {
+    margin: 12px 0 6px;
+    color: #0f172a;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
 
-  //   .brand-name {
-  //     font-size: 24px;
-  //   }
-  // }
+  .login-panel__welcome p {
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  .login-form__label {
+    display: block;
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .login-form__password-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 32px;
+  }
+
+  .login-form__forgot {
+    color: #0f2c59;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .login-form__forgot:hover {
+    text-decoration: underline;
+  }
+
+  .login-form__field {
+    margin-bottom: 4px;
+  }
+
+  .login-form__field :deep(.v-field) {
+    --v-field-border-opacity: 1;
+    background: #f8fafc;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .login-form__field :deep(.v-field--focused) {
+    background: #fff;
+  }
+
+  .login-form__submit {
+    margin-top: 32px;
+    height: 48px !important;
+    background: #0f2c59 !important;
+    color: #fff !important;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgb(15 44 89 / 0.2);
+  }
+
+  .login-form__submit:hover {
+    background: #1e3a8a !important;
+  }
+
+  .login-panel__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    color: #94a3b8;
+    font-size: 11px;
+  }
+
+  .login-panel__links {
+    display: flex;
+    gap: 16px;
+  }
+
+  .login-panel__links a,
+  .login-panel__links button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .login-panel__links a:hover,
+  .login-panel__links button:hover {
+    color: #0f2c59;
+  }
+
+  .login-support__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .login-support__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f2c59;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .login-support__intro {
+    color: #475569;
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .login-support__box {
+    padding: 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+  }
+
+  .login-support__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  .login-support__row strong {
+    color: #0f172a;
+  }
+
+  .login-support__accent {
+    color: #0f2c59 !important;
+  }
+
+  @media (max-width: 1100px) {
+    .login-page {
+      flex-direction: column;
+    }
+
+    .login-hero {
+      flex: none;
+      min-height: 520px;
+      padding: 32px 32px 50px;
+    }
+
+    .login-hero__title {
+      font-size: 32px;
+    }
+
+    .login-hero__features {
+      grid-template-columns: 1fr;
+    }
+
+    .login-panel {
+      padding: 32px 24px;
+      border-left: 0;
+    }
+  }
 </style>
