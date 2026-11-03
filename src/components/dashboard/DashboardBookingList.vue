@@ -128,7 +128,7 @@
       align: 'start',
       minWidth: '140px',
     },
-    { title: tableHeader('houseBill'), key: 'bkg_house_bill', align: 'start', minWidth: '170px' },
+    // { title: tableHeader('houseBill'), key: 'bkg_house_bill', align: 'start', minWidth: '170px' },
     {
       title: tableHeader('consigneeName'),
       key: 'consignee_name',
