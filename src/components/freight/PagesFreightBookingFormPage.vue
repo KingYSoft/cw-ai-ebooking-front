@@ -695,6 +695,7 @@
       const ok = await saveThenRun(payload =>
         bookingSiSubmit({
           ...payload,
+          pac_list: inputData.value.pac_list,
           doc_data: inputData.value.doc_data,
         }),
       )
