@@ -189,6 +189,7 @@ export default {
     endDate: '結束日期',
     jobNumber: '工作號',
     tableHeaders: {
+      date: 'Date',
       bookingNo: '訂艙號',
       status: '狀態',
       transMode: '運輸方式',

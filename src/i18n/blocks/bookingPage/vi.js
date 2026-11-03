@@ -189,6 +189,7 @@ export default {
     endDate: 'Đến ngày',
     jobNumber: 'Số công việc',
     tableHeaders: {
+      date: 'Date',
       bookingNo: 'Số đặt chỗ',
       status: 'Trạng thái',
       transMode: 'Phương thức vận chuyển',

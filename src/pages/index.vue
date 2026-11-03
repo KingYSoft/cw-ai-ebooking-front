@@ -1,67 +1,88 @@
 <template>
-  <v-sheet class="dashboard-page pa-6" color="transparent">
+  <v-sheet class="dashboard-page pa-8" color="transparent">
     <v-progress-linear :active="loading" color="primary" height="2" indeterminate />
 
-    <v-row class="dashboard-page__layout">
-      <v-col class="dashboard-page__col" cols="12" md="6">
-        <v-row class="dashboard-page__stats">
-          <v-col v-for="card in leftCards" :key="card.key" cols="6">
-            <DashboardStatCard
-              :title="card.title"
-              :value="card.value"
-              @click="goBookingList(card.key)"
-            />
-          </v-col>
-        </v-row>
+    <div class="dashboard-page__header">
+      <div>
+        <h1 class="dashboard-page__title">{{ d('pageTitle') }}</h1>
+        <p class="dashboard-page__subtitle">{{ d('pageSubtitle') }}</p>
+      </div>
 
-        <v-row class="dashboard-page__panel-row">
-          <v-col cols="12">
-            <DashboardLatestTransactions
-              :empty-text="d('emptyTransactions')"
-              :items="transactionItems"
-              :title="d('latestTransactions')"
-              @select="openBooking"
-            />
-          </v-col>
-        </v-row>
-      </v-col>
+      <div class="dashboard-page__controls">
+        <v-btn
+          class="dashboard-page__new"
+          color="primary"
+          prepend-icon="$plus"
+          size="small"
+          variant="flat"
+          @click="goNewBooking"
+        >
+          {{ d('newBooking') }}
+        </v-btn>
 
-      <v-col class="dashboard-page__col" cols="12" md="6">
-        <v-row class="dashboard-page__stats">
-          <v-col v-for="card in rightCards" :key="card.key" cols="6">
-            <DashboardStatCard
-              :title="card.title"
-              :value="card.value"
-              @click="goBookingList(card.key)"
-            />
-          </v-col>
-        </v-row>
+        <v-btn
+          class="dashboard-page__export"
+          elevation="0"
+          prepend-icon="mdi-download"
+          size="small"
+          variant="flat"
+          @click="exportReport"
+        >
+          {{ d('exportReport') }}
+        </v-btn>
+      </div>
+    </div>
 
-        <v-row class="dashboard-page__panel-row">
-          <v-col cols="12">
-            <DashboardBookingAnalysis
-              v-model:period="analysisPeriod"
-              :empty-text="d('emptyAnalysis')"
-              :period-items="periodItems"
-              :segments="analysis.segments"
-              :summaries="analysisSummaries"
-              :title="d('bookingAnalysis')"
-              :total="analysis.total"
-              :total-label="d('total')"
-            />
-          </v-col>
-        </v-row>
+    <v-row>
+      <v-col v-for="card in kpiCards" :key="card.key" cols="12" md="4">
+        <DashboardStatCard
+          :more-label="d('moreDetails')"
+          :title="card.title"
+          :unit="card.unit"
+          :value="card.value"
+          @click="goBookingList(card.key)"
+        />
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col cols="12" md="5">
+        <DashboardBookingAnalysis
+          :empty-text="d('emptyAnalysis')"
+          :segments="analysis.segments"
+          :subtitle="d('clientsSubtitle')"
+          :title="d('clientsTitle')"
+          :total="analysis.total"
+          :total-label="d('total')"
+        />
+      </v-col>
+
+      <v-col cols="12" md="7">
+        <DashboardMonthlyVolume
+          :legend="d('monthlyLegend')"
+          :metrics="monthlyMetrics"
+          :subtitle="d('monthlySubtitle')"
+          :title="d('monthlyTitle')"
+        />
+      </v-col>
+    </v-row>
+
+    <DashboardBookingList :title="d('fullListTitle')" />
   </v-sheet>
 </template>
 
 <script setup>
-  import { computed, ref, watch } from 'vue'
+  import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
+  import DashboardBookingAnalysis from '@/components/dashboard/DashboardBookingAnalysis.vue'
+  import DashboardBookingList from '@/components/dashboard/DashboardBookingList.vue'
+  import DashboardMonthlyVolume from '@/components/dashboard/DashboardMonthlyVolume.vue'
+  import DashboardStatCard from '@/components/dashboard/DashboardStatCard.vue'
   import { useDashboardData } from '@/composables/useDashboardData'
   import { DASHBOARD_CARD_STATUS_MAP } from '@/constants/bookingListStatus'
+  import { DASHBOARD_MOCK_MONTHLY } from '@/constants/dashboardMock'
+  import { useAppStore } from '@/stores/app'
 
   defineOptions({
     name: 'Dashboard',
@@ -81,80 +102,28 @@
 
   const { t } = useLocale()
   const router = useRouter()
-  const {
-    loading,
-    cardCounts,
-    latestTransactions,
-    periodCounts,
-    analysis,
-    loadData,
-    formatBookingNo,
-    itemTimestamp,
-    CARD_KEYS,
-  } = useDashboardData()
+  const appStore = useAppStore()
+  const { loading, analysis, cardCounts, loadData } = useDashboardData()
 
   const d = key => t(`$vuetify.custom.dashboardPage.${key}`)
-  const cardTitle = key => t(`$vuetify.custom.dashboardPage.cards.${key}`)
-  const analysisPeriod = ref('lastMonth')
 
-  const statCards = computed(() =>
-    CARD_KEYS.map(key => ({
-      key,
-      title: cardTitle(key),
-      value: cardCounts.value[key] ?? 0,
-    })),
-  )
-  const leftCards = computed(() => statCards.value.slice(0, 2))
-  const rightCards = computed(() => statCards.value.slice(2, 4))
-
-  const periodItems = computed(() => [
-    { value: 'lastMonth', title: d('lastMonth') },
-    { value: 'last3Months', title: d('last3Months') },
-    { value: 'thisYear', title: d('thisYear') },
-    { value: 'all', title: d('all') },
+  const kpiCards = computed(() => [
+    {
+      key: 'pendingSubmit',
+      title: d('cards.pendingSubmit'),
+      value: cardCounts.value.pendingSubmit,
+    },
+    {
+      key: 'waitingApproval',
+      title: d('cards.waitingApproval'),
+      value: cardCounts.value.waitingApproval,
+    },
+    {
+      key: 'pendingSi',
+      title: d('cards.pendingSi'),
+      value: cardCounts.value.pendingSi,
+    },
   ])
-
-  const analysisSummaries = computed(() => [
-    { key: 'daily', label: d('daily'), value: periodCounts.value.daily },
-    { key: 'weekly', label: d('weekly'), value: periodCounts.value.weekly },
-    { key: 'monthly', label: d('monthly'), value: periodCounts.value.monthly },
-  ])
-
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-  const formatTxnDate = timestamp => {
-    if (!timestamp) {
-      return '—'
-    }
-    const date = new Date(timestamp)
-    const today = new Date()
-    const isToday =
-      date.getFullYear() === today.getFullYear() &&
-      date.getMonth() === today.getMonth() &&
-      date.getDate() === today.getDate()
-    if (isToday) {
-      return d('today')
-    }
-    return `${MONTHS[date.getMonth()]} ${date.getDate()}`
-  }
-
-  const formatCbm = item => {
-    const cbm = item.bkg_actual_volume
-    if (cbm !== null && cbm !== undefined && cbm !== '') {
-      return `${cbm} CBM`
-    }
-    return '—'
-  }
-
-  const transactionItems = computed(() =>
-    latestTransactions.value.map(item => ({
-      ...item,
-      dateLabel: formatTxnDate(itemTimestamp(item)),
-      title: formatBookingNo(item),
-      container: item.container_summary || '—',
-      cbm: formatCbm(item),
-    })),
-  )
 
   const goBookingList = key => {
     const status = DASHBOARD_CARD_STATUS_MAP[key]
@@ -164,58 +133,100 @@
     })
   }
 
-  const openBooking = item => {
-    if (!item?.pk || String(item.pk).startsWith('mock-')) {
-      return
-    }
-    router.push({
-      name: 'booking_edit-pk',
-      params: { pk: item.pk },
-      query: { id: item.id, shipment_no: item.bkg_consign_no },
+  const goNewBooking = () => {
+    router.push({ name: 'booking_new' })
+  }
+
+  const monthlyMetrics = computed(() => [
+    { label: d('peakMonth'), value: DASHBOARD_MOCK_MONTHLY.peak },
+    { label: d('avgMonthly'), value: DASHBOARD_MOCK_MONTHLY.avg },
+    { label: d('totalYtd'), value: DASHBOARD_MOCK_MONTHLY.ytd, accent: true },
+  ])
+
+  const exportReport = () => {
+    appStore.openMessage({
+      content: d('exportMock'),
+      color: 'info',
     })
   }
 
-  watch(analysisPeriod, period => {
-    loadData(period)
-  }, { immediate: true })
+  loadData('lastMonth')
 </script>
 
 <style lang="scss" scoped>
   .dashboard-page {
     display: flex;
     flex-direction: column;
+    gap: 24px;
     width: 100%;
-    height: calc(100dvh - 112px);
     max-height: calc(100dvh - 112px);
-    overflow: hidden;
+    overflow-y: auto;
   }
 
-  .dashboard-page__layout {
-    flex: 1 1 0%;
-    min-height: 0;
-    margin-bottom: 0;
+  .dashboard-page > * {
+    flex-shrink: 0;
   }
 
-  .dashboard-page__col {
+  .dashboard-page__header {
     display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
-  .dashboard-page__stats {
-    flex: 0 0 auto;
+  .dashboard-page__title {
+    color: #0f172a;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
   }
 
-  .dashboard-page__panel-row {
-    flex: 1 1 0%;
-    min-height: 0;
-    margin-bottom: 0;
+  .dashboard-page__subtitle {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin-top: 2px;
   }
 
-  .dashboard-page__panel-row :deep(.v-col) {
+  .dashboard-page__controls {
     display: flex;
-    height: 100%;
-    min-height: 0;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-page__new {
+    height: 36px;
+    min-height: 36px;
+    padding: 0 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .dashboard-page__export {
+    height: 36px;
+    min-height: 36px;
+    padding: 0 16px;
+    background: #fff !important;
+    color: #334155 !important;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+
+  .dashboard-page__export:hover {
+    background: #f8fafc !important;
+  }
+
+  .dashboard-page__export :deep(.v-icon) {
+    color: #94a3b8;
+    font-size: 16px;
   }
 </style>
