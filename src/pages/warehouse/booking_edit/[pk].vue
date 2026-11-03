@@ -14,15 +14,7 @@
 
                 <v-icon icon="mdi-content-copy" size="14" @click="handleCopyOrderNo" />
 
-                <v-chip
-                  v-if="ebookingStatus"
-                  color="primary"
-                  density="comfortable"
-                  size="small"
-                  variant="tonal"
-                >
-                  {{ ebookingStatus }}
-                </v-chip>
+                <StatusBadge v-if="ebookingStatus" :text="ebookingStatus" />
               </div>
             </div>
 
@@ -99,7 +91,7 @@
         </template>
       </LayoutWithToolbar>
 
-      <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
+      <v-tabs v-model="activedTab" color="primary" density="comfortable">
         <v-tab :value="1">{{ editTab('orderDetail') }}</v-tab>
         <v-tab :value="2">{{ editTab('itemDetail') }}</v-tab>
         <v-tab :value="3">{{ editTab('docs') }}</v-tab>

@@ -44,7 +44,7 @@
             :headers="headers"
             height="280"
             hover
-            item-height="32"
+            item-height="48"
             :item-value="itemValue"
             :items="items"
             striped="even"

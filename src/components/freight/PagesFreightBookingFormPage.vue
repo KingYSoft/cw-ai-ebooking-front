@@ -89,7 +89,7 @@
     <BookingFreightStepper v-model:status="inputData.active_status" />
     <v-divider />
 
-    <v-tabs v-model="activedTab" color="deep-purple-accent-4" density="comfortable">
+    <v-tabs v-model="activedTab" color="primary" density="comfortable">
       <v-tab :value="1">{{ editTab('booking') }}</v-tab>
       <v-tab :value="2">{{ editTab('additionalDetails') }}</v-tab>
       <v-tab :value="3">{{ editTab('docs') }}</v-tab>

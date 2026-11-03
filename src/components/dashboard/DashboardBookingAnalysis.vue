@@ -1,88 +1,33 @@
 <template>
-  <v-card class="dashboard-panel" elevation="2" rounded="lg">
-    <div class="dashboard-panel__header d-flex align-center px-5 pt-5 pb-2">
-      <div class="dashboard-panel__title text-h6 font-weight-bold">{{ title }}</div>
+  <v-card border class="dashboard-panel" elevation="0" rounded="xl">
+    <div class="dashboard-panel__header">
+      <div class="dashboard-panel__title">{{ title }}</div>
+      <div v-if="subtitle" class="dashboard-panel__subtitle">{{ subtitle }}</div>
     </div>
 
-    <v-card-text class="dashboard-panel__body px-5 pb-5">
-      <div class="d-flex justify-space-between mb-6">
-        <div v-for="item in summaries" :key="item.key" class="text-center flex-grow-1">
-          <div class="text-caption text-medium-emphasis text-lowercase">{{ item.label }}</div>
+    <div v-if="segments.length === 0" class="dashboard-panel__empty">
+      {{ emptyText }}
+    </div>
 
-          <div class="text-h6 font-weight-bold">{{ item.value }}</div>
+    <template v-else>
+      <div class="dashboard-donut">
+        <VueApexCharts height="240" :options="chartOptions" :series="chartSeries" type="donut" />
+      </div>
+
+      <div class="dashboard-legend">
+        <div v-for="seg in segments" :key="seg.key" class="dashboard-legend__item">
+          <span class="dashboard-legend__swatch" :style="{ background: seg.color }" />
+          <span class="dashboard-legend__label">{{ seg.label }}</span>
+          <span class="dashboard-legend__value">({{ seg.value }})</span>
         </div>
       </div>
-
-      <div class="d-flex justify-end mb-2">
-        <v-select
-          density="compact"
-          hide-details
-          item-title="title"
-          item-value="value"
-          :items="periodItems"
-          max-width="160"
-          :model-value="period"
-          variant="plain"
-          @update:model-value="$emit('update:period', $event)"
-        />
-      </div>
-
-      <div v-if="segments.length === 0" class="text-medium-emphasis text-center py-10">
-        {{ emptyText }}
-      </div>
-
-      <div v-else class="d-flex align-center ga-6 flex-wrap">
-        <div class="dashboard-donut">
-          <svg class="dashboard-donut__svg" viewBox="0 0 120 120">
-            <g transform="rotate(-90 60 60)">
-              <circle
-                cx="60"
-                cy="60"
-                fill="none"
-                r="42"
-                stroke="rgba(var(--v-theme-on-surface), 0.08)"
-                stroke-width="16"
-              />
-
-              <circle
-                v-for="seg in donutSegments"
-                :key="seg.key"
-                cx="60"
-                cy="60"
-                fill="none"
-                r="42"
-                :stroke="seg.color"
-                :stroke-dasharray="seg.dashArray"
-                :stroke-dashoffset="seg.dashOffset"
-                stroke-linecap="butt"
-                stroke-width="16"
-              />
-            </g>
-          </svg>
-
-          <div class="dashboard-donut__center">
-            <div class="text-caption text-medium-emphasis">{{ totalLabel }}</div>
-
-            <div class="text-h5 font-weight-bold">{{ total }}</div>
-          </div>
-        </div>
-
-        <div class="dashboard-legend flex-grow-1">
-          <div v-for="seg in segments" :key="seg.key" class="dashboard-legend__item">
-            <span class="dashboard-legend__swatch" :style="{ background: seg.color }" />
-
-            <span class="dashboard-legend__label text-body-2 text-medium-emphasis">{{ seg.label }}</span>
-
-            <span class="dashboard-legend__value text-body-2 font-weight-medium">{{ seg.value }}</span>
-          </div>
-        </div>
-      </div>
-    </v-card-text>
+    </template>
   </v-card>
 </template>
 
 <script setup>
   import { computed } from 'vue'
+  import VueApexCharts from 'vue3-apexcharts'
 
   defineOptions({
     name: 'DashboardBookingAnalysis',
@@ -93,6 +38,10 @@
       type: String,
       required: true,
     },
+    subtitle: {
+      type: String,
+      default: '',
+    },
     emptyText: {
       type: String,
       default: '',
@@ -100,18 +49,6 @@
     totalLabel: {
       type: String,
       default: '',
-    },
-    summaries: {
-      type: Array,
-      default: () => [],
-    },
-    period: {
-      type: String,
-      default: 'lastMonth',
-    },
-    periodItems: {
-      type: Array,
-      default: () => [],
     },
     segments: {
       type: Array,
@@ -123,85 +60,123 @@
     },
   })
 
-  defineEmits(['update:period'])
+  const chartSeries = computed(() => props.segments.map(item => item.value))
 
-  const RADIUS = 42
-  const CIRCUMFERENCE = 2 * Math.PI * RADIUS
-
-  const donutSegments = computed(() => {
-    const total = props.segments.reduce((sum, item) => sum + item.value, 0) || 1
-    let offset = 0
-    return props.segments.map(item => {
-      const length = (item.value / total) * CIRCUMFERENCE
-      const seg = {
-        ...item,
-        dashArray: `${length} ${CIRCUMFERENCE}`,
-        dashOffset: -offset,
-      }
-      offset += length
-      return seg
-    })
-  })
+  const chartOptions = computed(() => ({
+    chart: {
+      type: 'donut',
+      fontFamily: 'Inter, sans-serif',
+      toolbar: { show: false },
+    },
+    labels: props.segments.map(item => item.label),
+    colors: props.segments.map(item => item.color),
+    stroke: {
+      width: 3,
+      colors: ['#ffffff'],
+    },
+    dataLabels: { enabled: false },
+    legend: { show: false },
+    tooltip: {
+      enabled: true,
+      fillSeriesColor: false,
+      y: {
+        formatter: value => String(value),
+      },
+    },
+    plotOptions: {
+      pie: {
+        expandOnClick: false,
+        donut: {
+          size: '72%',
+          labels: {
+            show: true,
+            name: {
+              show: true,
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#94a3b8',
+              offsetY: -4,
+            },
+            value: {
+              show: true,
+              fontSize: '30px',
+              fontWeight: 800,
+              color: '#0f172a',
+              offsetY: 4,
+              formatter: () => String(props.total),
+            },
+            total: {
+              show: true,
+              showAlways: true,
+              label: props.totalLabel,
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#94a3b8',
+              formatter: () => String(props.total),
+            },
+          },
+        },
+      },
+    },
+  }))
 </script>
 
 <style lang="scss" scoped>
   .dashboard-panel {
     display: flex !important;
-    flex: 1 1 auto;
     flex-direction: column;
     width: 100%;
     min-width: 0;
-    min-height: 0;
     height: 100%;
-    overflow: hidden;
-  }
-
-  .dashboard-panel__title {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    padding: 24px;
   }
 
   .dashboard-panel__header {
-    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 
-  .dashboard-panel__body {
-    flex: 1 1 0%;
-    min-height: 0;
-    overflow-y: auto;
+  .dashboard-panel__title {
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .dashboard-panel__subtitle {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .dashboard-panel__empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    min-height: 240px;
   }
 
   .dashboard-donut {
-    position: relative;
-    width: 180px;
-    height: 180px;
-    flex-shrink: 0;
-  }
-
-  .dashboard-donut__svg {
     width: 100%;
-    height: 100%;
-  }
-
-  .dashboard-donut__center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    text-align: center;
-    padding: 0 24px;
+    height: 240px;
+    flex-shrink: 0;
   }
 
   .dashboard-legend {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    min-width: 120px;
+    gap: 4px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    max-height: 180px;
+    overflow-y: auto;
   }
 
   .dashboard-legend__item {
@@ -209,6 +184,12 @@
     align-items: center;
     gap: 10px;
     min-width: 0;
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  .dashboard-legend__item:hover {
+    background: #f8fafc;
   }
 
   .dashboard-legend__label {
@@ -217,16 +198,22 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #334155;
+    font-size: 0.75rem;
+    font-weight: 600;
   }
 
   .dashboard-legend__value {
     flex-shrink: 0;
+    color: #0f172a;
+    font-size: 0.75rem;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
   .dashboard-legend__swatch {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 2px;
     flex-shrink: 0;
   }

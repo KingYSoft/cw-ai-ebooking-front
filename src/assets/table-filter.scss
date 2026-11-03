@@ -2,15 +2,15 @@
 
 // 在 :root 中定义全局变量
 :root {
-  --table-filter-header-height: 36px;
-  --table-filter-row-height: 32px;
-  --table-filter-th-font-size: 0.8rem;
+  --table-filter-header-height: 48px;
+  --table-filter-row-height: 48px;
+  --table-filter-th-font-size: 11px;
   --table-filter-selection-control-size: 28px;
-  --table-filter-td-padding: 0 4px;
+  --table-filter-td-padding: 0 16px;
   --table-filter-checkbox-font-size: 0.75rem;
   --table-filter-sort-icon-multiplier: 0.8;
   --table-filter-btn-size: 0.7rem;
-  --table-filter-tr-font-size: 0.7rem;
+  --table-filter-tr-font-size: 12px;
   --table-filter-footer-padding: 4px;
   --table-filter-input-control-height: 28px;
   --table-filter-input-padding-top: 0px;
@@ -33,10 +33,24 @@
   }
   &.v-table > .v-table__wrapper > table > thead > tr > th,
   &.v-table > .v-table__wrapper > table > tbody > tr > td {
-    padding: 0 4px;
+    padding: var(--table-filter-td-padding);
     &.v-data-table-column--no-padding {
-      padding: 0 4px;
+      padding: 0 8px;
     }
+  }
+
+  &.v-table > .v-table__wrapper > table > thead > tr > th {
+    color: #64748b;
+    font-size: var(--table-filter-th-font-size);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  &.v-table > .v-table__wrapper > table > tbody > tr > td {
+    color: #334155;
+    font-size: var(--table-filter-tr-font-size);
+    font-weight: 500;
   }
 
   .v-selection-control--density-default {

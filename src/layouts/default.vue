@@ -12,7 +12,7 @@
         <CompanyEditRightDrawer v-if="rightDrawerStore.drawerName === 'COMPANY_EDIT'" /> -->
       </v-navigation-drawer>
 
-      <v-app-bar border="b-thin" :elevation="0">
+      <v-app-bar color="surface" :elevation="0">
         <v-progress-linear
           absolute
           :active="appStore.appLoading"
@@ -320,20 +320,21 @@
 
       <v-navigation-drawer
         ref="refDrawer"
-        :class="fluid ? 'nav-collapse' : ''"
-        color="primary"
+        :class="['portal-sidebar', sidebarCompact ? 'portal-sidebar--compact' : '', fluid ? 'nav-collapse' : '']"
+        color="nav"
         expand-on-hover
         :model-value="drawer"
         :rail="rail"
-        width="240"
+        width="256"
+        @mouseenter="drawerHovering = true"
+        @mouseleave="drawerHovering = false"
         @update:model-value="handleChangeDrawer"
       >
         <v-list
           v-model:opened="menusOpened"
           v-model:selected="selected"
           base-color="transparent"
-          class="pl-0 nav-list"
-          :class="fluid ? 'pr-0' : 'pr-4'"
+          class="nav-list"
           density="compact"
           lines="one"
           mandatory
@@ -353,15 +354,16 @@
         </v-list>
 
         <template #append>
-          <app-footer v-if="!rail" />
+          <app-footer v-if="!sidebarCompact" />
         </template>
       </v-navigation-drawer>
 
       <!-- color="surface" -->
       <v-main>
         <v-tabs
-          bg-color="primary"
-          class="border-b-thin border-e-thin"
+          bg-color="surface"
+          class="portal-tabs"
+          color="primary"
           density="compact"
           mandatory
           :model-value="route.name"
@@ -472,7 +474,7 @@
 </template>
 
 <script setup>
-  import { inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
+  import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useDisplay, useLocale } from 'vuetify'
   import logoSrc from '@/assets/images/login/logo.png'
@@ -499,6 +501,8 @@
   }
   const drawer = ref(true)
   const rail = ref(false)
+  const drawerHovering = ref(false)
+  const sidebarCompact = computed(() => rail.value && !drawerHovering.value)
   if (mobile.value) {
     drawer.value = false
     rail.value = false
@@ -726,6 +730,23 @@
     return currentRouteName.replace('_new', '').replace('_edit-pk', '')
   }
   const menusOpened = ref([])
+  const collectMenuGroupCodes = items => {
+    const codes = []
+    ;(items || []).forEach(item => {
+      if (item?.children?.length) {
+        codes.push(item.code)
+        codes.push(...collectMenuGroupCodes(item.children))
+      }
+    })
+    return codes
+  }
+  watch(
+    () => appStore.appMenus,
+    menus => {
+      menusOpened.value = collectMenuGroupCodes(menus)
+    },
+    { immediate: true },
+  )
   const selected = ref([]) // 菜单选中
   const changeRouteName = currentRouteName => {
     const parent = findParentByChild(appStore.appMenus, resolveRouteParentName(currentRouteName))
@@ -1118,25 +1139,128 @@
 </script>
 
 <style scoped lang="scss">
-  .nav-list {
-    :deep(.v-list-item__prepend) {
-      margin-left: 8px;
+  .portal-sidebar {
+    border-right: 1px solid #1e293b !important;
+
+    :deep(.v-navigation-drawer__content) {
+      &::-webkit-scrollbar-track {
+        background: #0b192e;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #1e293b;
+      }
     }
+  }
+
+  .nav-list {
+    padding: 12px 8px !important;
+
+    :deep(.v-list-item__overlay) {
+      opacity: 0;
+    }
+
+    :deep(.portal-nav-group > .v-list-group__header) {
+      min-height: 32px !important;
+      margin-top: 12px;
+      padding: 8px 12px !important;
+      pointer-events: none;
+      background: transparent !important;
+      border: 0 !important;
+
+      .v-list-item__prepend,
+      .v-list-item__append {
+        display: none;
+      }
+
+      .v-list-item-title {
+        color: #64748b !important;
+        font-size: 10px !important;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+    }
+
+    :deep(.portal-nav-group:first-child > .v-list-group__header) {
+      margin-top: 0;
+    }
+
+    :deep(.v-list-group__items .v-list-item) {
+      padding-inline-start: 12px !important;
+    }
+
+    :deep(.portal-nav-item) {
+      min-height: 40px;
+      margin: 2px 0;
+      color: #94a3b8 !important;
+      font-weight: 500;
+
+      .v-list-item-title {
+        color: inherit;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .v-icon {
+        color: inherit;
+        opacity: 1;
+      }
+
+      &:hover {
+        background: rgb(30 41 59 / 0.6) !important;
+        color: #e2e8f0 !important;
+      }
+    }
+
+    :deep(.portal-nav-item .v-list-item__append) {
+      display: none;
+    }
+
+    :deep(.portal-nav-item .portal-nav-dot) {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22d3ee;
+    }
+
+    :deep(.portal-nav-item.v-list-item--active) {
+      background: rgb(8 145 178 / 0.1) !important;
+      border: 1px solid rgb(6 182 212 / 0.2);
+      color: #22d3ee !important;
+      font-weight: 700;
+
+      .v-list-item-title {
+        font-weight: 700;
+      }
+
+      .v-list-item__append {
+        display: flex;
+      }
+    }
+
     &.v-list--slim {
       :deep(.v-list-group) {
-        --prepend-width: 8px;
+        --prepend-width: 0px;
         .v-list-group__items .v-list-item {
           transition: padding-inline-start 0.2s ease;
         }
       }
     }
+  }
 
-    // :deep(.v-list-group) {
-    // .v-list-item--active {
-    // background-color: rgba(var(--v-theme-primary), 0.1) !important;
-    // color: rgba(var(--v-theme-primary)) !important;
-    // }
-    // }
+  .portal-sidebar--compact {
+    .nav-list :deep(.portal-nav-group > .v-list-group__header) {
+      display: none !important;
+    }
+
+    .nav-list :deep(.v-list-group__items .v-list-item) {
+      padding-inline-start: 8px !important;
+    }
+
+    .nav-list :deep(.portal-nav-item.v-list-item--active .v-list-item__append) {
+      display: none !important;
+    }
   }
 
   .nav-collapse {

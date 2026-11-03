@@ -42,6 +42,13 @@
           <template #header.actions>
             <slot name="header-actions" />
           </template>
+          <template
+            v-for="header in autoStatusHeaders"
+            :key="`status-${header.key}`"
+            #[`item.${header.key}`]="{ item }"
+          >
+            <StatusBadge :text="item?.[header.key]" />
+          </template>
           <!-- 透传所有插槽，包括 item.[列名] 和 header.[列名] 插槽 -->
           <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
             <slot :name="name" v-bind="slotProps" />
@@ -80,6 +87,13 @@
           <template #header.actions>
             <slot name="header-actions" />
           </template>
+          <template
+            v-for="header in autoStatusHeaders"
+            :key="`status-${header.key}`"
+            #[`item.${header.key}`]="{ item }"
+          >
+            <StatusBadge :text="item?.[header.key]" />
+          </template>
           <!-- 透传所有插槽，包括 item.[列名] 和 header.[列名] 插槽 -->
           <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
             <slot :name="name" v-bind="slotProps" />
@@ -100,7 +114,10 @@
 </template>
 
 <script setup>
+  import { computed, onBeforeUnmount, ref, useSlots } from 'vue'
   import FTableSettingDialog from '@/components/FTableSettingDialog.vue'
+  import StatusBadge from '@/components/StatusBadge.vue'
+  import { ensureDateColumnMinWidth } from '@/composables/ensureDateColumnMinWidth'
 
   const props = defineProps({
     title: {
@@ -169,7 +186,7 @@
     },
     itemHeight: {
       type: Number,
-      default: 32,
+      default: 48,
     },
     tableClass: {
       type: [String, Array, Object],
@@ -207,8 +224,16 @@
    * 计算最终传给 v-data-table 的 headers。
    */
   const computedHeaders = computed(() => {
-    return tableHeaders.value
+    return ensureDateColumnMinWidth(tableHeaders.value)
   })
+
+  const slots = useSlots()
+  const autoStatusHeaders = computed(() =>
+    (props.headers || []).filter(header => {
+      const key = String(header?.key ?? '')
+      return /status/i.test(key) && !slots[`item.${key}`]
+    }),
+  )
 
   const computedTableClass = computed(() => {
     return scrollClass.value || props.tableClass

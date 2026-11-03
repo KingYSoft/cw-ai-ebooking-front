@@ -4,7 +4,7 @@ import { mapBookingListRow } from '@/composables/mapEbookingBooking'
 
 const CARD_KEYS = ['pendingSubmit', 'waitingApproval', 'pendingSi', 'rejected']
 
-const SEGMENT_COLORS = ['#2a5bd6', '#f5c542', '#8b5cf6', '#ef5b5b', '#f59e0b', '#2ec4a7', '#64748b']
+const SEGMENT_COLORS = ['#0f766e', '#f59e0b', '#6366f1', '#0e7490', '#ef5b5b', '#2ec4a7', '#64748b']
 
 const EMPTY_ANALYSIS = {
   total_count: 0,

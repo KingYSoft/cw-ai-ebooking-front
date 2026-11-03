@@ -170,7 +170,7 @@
 
   const tblHeaders = computed(() => [
     { title: header('warehouse'), key: 'wso_warehouse_code', align: 'start', minWidth: '120px' },
-    { title: header('status'), key: 'wso_status', align: 'start', minWidth: '90px' },
+    { title: header('status'), key: 'wso_status', align: 'start', minWidth: '140px' },
     { title: header('bookingNo'), key: 'wso_temp_number', align: 'start', minWidth: '165px' },
     {
       title: header('soNumber'),
@@ -208,8 +208,8 @@
       align: 'start',
       minWidth: '120px',
     },
-    { title: header('etd'), key: 'wso_etd', align: 'start', minWidth: '100px' },
-    { title: header('eta'), key: 'wso_eta', align: 'start', minWidth: '100px' },
+    { title: header('etd'), key: 'wso_etd', align: 'start', minWidth: '112px' },
+    { title: header('eta'), key: 'wso_eta', align: 'start', minWidth: '112px' },
     {
       title: header('grossWeight'),
       key: 'wso_actual_weight',

@@ -481,6 +481,7 @@ export default {
         endDate: '结束日期',
         jobNumber: '工作号',
         tableHeaders: {
+          date: 'Date',
           bookingNo: '订舱号',
           status: '状态',
           transMode: '运输方式',

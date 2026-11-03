@@ -1,12 +1,16 @@
 <template>
   <v-list-item
-    rounded="te-xl be-xl"
+    class="portal-nav-item"
+    rounded="lg"
     :title="menuInfo.title"
     :to="menuInfo.path"
     :value="menuInfo.code"
   >
     <template #prepend>
       <v-icon :icon="menuInfo.icon" size="20" />
+    </template>
+    <template #append>
+      <span class="portal-nav-dot" />
     </template>
   </v-list-item>
 </template>

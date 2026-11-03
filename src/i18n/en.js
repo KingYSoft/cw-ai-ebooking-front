@@ -481,6 +481,7 @@ export default {
         endDate: 'End Date',
         jobNumber: 'Job Number',
         tableHeaders: {
+          date: 'Date',
           bookingNo: 'Booking No.',
           status: 'Status',
           transMode: 'Trans Mode',

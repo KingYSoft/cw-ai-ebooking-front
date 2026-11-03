@@ -20,27 +20,27 @@
       <v-card class="mb-3">
         <v-card-text>
           <v-row dense>
-            <v-col :cols="rescols('c12l3m4s6')">
-              <f-date-picker
-                v-model="filterParams.date_from"
-                density="compact"
-                hide-details
-                :label="t('$vuetify.custom.poReportsPage.filter.dateFrom')"
-                variant="outlined"
-              />
+            <v-col :cols="rescols('c12l4m4')">
+              <div class="d-flex align-center ga-1">
+                <f-date-picker
+                  v-model="filterParams.date_from"
+                  density="compact"
+                  hide-details
+                  :label="t('$vuetify.custom.poReportsPage.filter.dateFrom')"
+                  variant="outlined"
+                />
+                -
+                <f-date-picker
+                  v-model="filterParams.date_to"
+                  density="compact"
+                  hide-details
+                  :label="t('$vuetify.custom.poReportsPage.filter.dateTo')"
+                  variant="outlined"
+                />
+              </div>
             </v-col>
 
-            <v-col :cols="rescols('c12l3m4s6')">
-              <f-date-picker
-                v-model="filterParams.date_to"
-                density="compact"
-                hide-details
-                :label="t('$vuetify.custom.poReportsPage.filter.dateTo')"
-                variant="outlined"
-              />
-            </v-col>
-
-            <v-col :cols="rescols('c12l3m4s6')">
+            <v-col :cols="rescols('c12l3m3s6')">
               <v-select
                 v-model="filterParams.order_status"
                 clearable
@@ -52,7 +52,7 @@
               />
             </v-col>
 
-            <v-col :cols="rescols('c12l3m4s6')">
+            <v-col :cols="rescols('c12l3m3s6')">
               <v-select
                 v-model="filterParams.transport_mode"
                 clearable
@@ -63,19 +63,19 @@
                 variant="outlined"
               />
             </v-col>
+
+            <v-col class="d-flex align-center" :cols="rescols('c12l2m2')">
+              <v-btn size="small" variant="outlined" @click="onReset">
+                <v-icon start>mdi-refresh</v-icon>
+                {{ t('$vuetify.custom.poReportsPage.button.reset') }}
+              </v-btn>
+
+              <v-btn class="ml-2" color="primary" size="small" variant="flat" @click="onFilter">
+                <v-icon start>mdi-filter</v-icon>
+                {{ t('$vuetify.custom.poReportsPage.button.applyFilter') }}
+              </v-btn>
+            </v-col>
           </v-row>
-
-          <div class="d-flex justify-end ga-2 mt-3">
-            <v-btn size="small" variant="outlined" @click="onReset">
-              <v-icon start>mdi-refresh</v-icon>
-              {{ t('$vuetify.custom.poReportsPage.button.reset') }}
-            </v-btn>
-
-            <v-btn color="primary" size="small" variant="flat" @click="onFilter">
-              <v-icon start>mdi-filter</v-icon>
-              {{ t('$vuetify.custom.poReportsPage.button.applyFilter') }}
-            </v-btn>
-          </div>
         </v-card-text>
       </v-card>
 
@@ -190,14 +190,7 @@
                 <tbody>
                   <tr v-for="item in statusDistribution" :key="item.status">
                     <td>
-                      <v-chip
-                        :color="getStatusColor(item.status)"
-                        density="compact"
-                        size="small"
-                        variant="tonal"
-                      >
-                        {{ item.status }}
-                      </v-chip>
+                      <StatusBadge :text="item.status" />
                     </td>
 
                     <td class="text-right">{{ item.count }}</td>
@@ -476,18 +469,6 @@
         maximumFractionDigits: 2,
       })
     )
-  }
-
-  // 获取状态颜色
-  const getStatusColor = status => {
-    const colors = {
-      Draft: 'grey',
-      Confirmed: 'blue',
-      'In Progress': 'orange',
-      Completed: 'success',
-      Cancelled: 'error',
-    }
-    return colors[status] || 'grey'
   }
 
   // 加载报表数据

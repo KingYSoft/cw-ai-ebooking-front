@@ -82,14 +82,10 @@
 </style> -->
 <template>
   <div>
-    <v-divider />
-
-    <v-footer class="d-flex justify-center" color="primary" height="35">
-      <div class="text-caption text-center">
-        &copy; {{ new Date().getFullYear() }}
-        <span class="d-none d-sm-inline-block">
-          {{ t('$vuetify.custom.app.title') }}
-        </span>
+    <v-footer class="portal-sidebar-footer px-4 py-3" color="transparent" height="auto">
+      <div class="portal-sidebar-footer__text">
+        <span class="portal-sidebar-footer__title">{{ t('$vuetify.custom.app.title') }}</span>
+        <span>&copy; {{ new Date().getFullYear() }}</span>
       </div>
     </v-footer>
   </div>
@@ -102,3 +98,26 @@
     name: 'AppFooter',
   })
 </script>
+
+<style scoped>
+  .portal-sidebar-footer {
+    border-top: 1px solid rgb(30 41 59 / 0.8);
+  }
+
+  .portal-sidebar-footer__text {
+    width: 100%;
+    overflow: hidden;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.4;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .portal-sidebar-footer__title {
+    margin-right: 4px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+</style>

@@ -58,13 +58,10 @@
       </template>
 
       <template #item.is_active="{ item }">
-        <v-chip
-          :color="item.is_active === 1 ? 'success' : 'warning'"
-          density="comfortable"
-          size="small"
-        >
-          {{ t(item.is_active === 1 ? 'active' : 'inactive') }}
-        </v-chip>
+        <StatusBadge
+          :text="t(item.is_active === 1 ? 'active' : 'inactive')"
+          :tone-key="item.is_active === 1 ? 'active' : 'inactive'"
+        />
       </template>
 
       <template #bottom>

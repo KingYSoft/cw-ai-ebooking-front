@@ -47,3 +47,68 @@ export const BOOKING_LIST_STATUS_CHIP = {
 export function getBookingListStatusChipProps(status) {
   return BOOKING_LIST_STATUS_CHIP[status] ?? { color: 'default', variant: 'tonal' }
 }
+
+const STATUS_BADGE_TONE = {
+  draft: 'default',
+  saved: 'pending',
+  submit: 'pending',
+  new: 'pending',
+  processing: 'si',
+  'in progress': 'si',
+  'pending approve': 'pending',
+  'pending approval': 'pending',
+  'request for approve': 'pending',
+  'waiting for approve': 'pending',
+  submitted: 'approved',
+  submited: 'approved',
+  accept: 'approved',
+  accepted: 'approved',
+  approved: 'approved',
+  confirmed: 'approved',
+  active: 'approved',
+  yes: 'approved',
+  release: 'approved',
+  'booking released': 'approved',
+  'si submitted': 'si',
+  'pending for submit si': 'si',
+  'booking completed': 'shipped',
+  shipped: 'shipped',
+  completed: 'shipped',
+  cancel: 'default',
+  cancelled: 'default',
+  canceled: 'default',
+  deactive: 'default',
+  inactive: 'default',
+  no: 'default',
+}
+
+export function getBookingStatusBadgeTone(status) {
+  if (status === 1 || status === true) {
+    return 'approved'
+  }
+  if (status === 0 || status === false) {
+    return 'default'
+  }
+  const raw = String(status ?? '')
+    .trim()
+    .toLowerCase()
+  if (!raw) {
+    return 'default'
+  }
+  if (STATUS_BADGE_TONE[raw]) {
+    return STATUS_BADGE_TONE[raw]
+  }
+  if (raw.includes('si submit')) {
+    return 'si'
+  }
+  if (raw.includes('pending')) {
+    return 'pending'
+  }
+  if (raw.includes('ship') || raw.includes('complete')) {
+    return 'shipped'
+  }
+  if (raw.includes('approv') || raw.includes('accept') || raw.includes('release')) {
+    return 'approved'
+  }
+  return 'default'
+}

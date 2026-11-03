@@ -6,7 +6,7 @@
     @submit.prevent="onSearch"
   >
     <template #default>
-      <v-col :cols="rescols('c12m6l4')">
+      <v-col :cols="rescols('c12l4m4')">
         <div class="d-flex align-center ga-1">
           <v-select
             v-model="inputSearchData.field1.key"
@@ -20,10 +20,11 @@
             :items="inputSearchData.field1.keyItems"
             :list-props="{ density: 'compact' }"
             :menu-props="{ 'max-width': 'auto' }"
+            max-width="120"
             min-width="120"
             no-filter
             variant="underlined"
-            width="auto"
+            width="120"
           />
 
           <v-select
@@ -36,10 +37,11 @@
             :items="inputSearchData.field1.opItems"
             :list-props="{ density: 'compact' }"
             :menu-props="{ 'max-width': 'auto' }"
-            min-width="96"
+            max-width="120"
+            min-width="120"
             no-filter
             variant="outlined"
-            width="auto"
+            width="120"
           />
 
           <v-text-field

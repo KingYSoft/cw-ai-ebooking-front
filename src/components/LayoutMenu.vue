@@ -1,6 +1,4 @@
 <template>
-  <v-divider v-if="menuInfo && menuInfo.code === 'system'" class="my-2" />
-
   <component :is="menuComponent" :fluid="fluid" :menu-info="menuInfo">
     <template v-if="menuInfo && menuInfo.children && menuInfo.children.length > 0">
       <LayoutMenu

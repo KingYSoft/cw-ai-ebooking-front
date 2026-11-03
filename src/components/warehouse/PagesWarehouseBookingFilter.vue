@@ -5,7 +5,7 @@
     @on-search="onSearch"
   >
     <template #default>
-      <v-col cols="auto">
+      <v-col :cols="rescols('c12l4m4')">
         <div class="d-flex align-center ga-1">
           <v-select
             v-model="inputSearchData.field1.key"
@@ -21,7 +21,7 @@
             no-data-text="$vuetify.custom.app.searchMore"
             no-filter
             variant="underlined"
-            width="60"
+            width="70"
           />
 
           <f-date-picker
@@ -50,7 +50,7 @@
         </div>
       </v-col>
 
-      <v-col cols="auto">
+      <v-col :cols="rescols('c12l3m3s6')">
         <div class="d-flex align-center ga-1 filter-field-compact">
           <v-select
             v-model="inputSearchData.field2.key"
@@ -63,14 +63,17 @@
             :items="inputSearchData.field2.keyItems"
             :list-props="{ density: 'compact' }"
             :menu-props="{ 'max-width': 'auto' }"
+            max-width="120"
+            min-width="120"
             no-data-text="$vuetify.custom.app.searchMore"
             no-filter
             variant="underlined"
-            width="88"
+            width="120"
           />
 
           <v-text-field
             v-model="inputSearchData.field2.val"
+            class="flex-1-1"
             clearable
             color="primary"
             density="compact"
@@ -78,19 +81,29 @@
             :placeholder="filter('searchPlaceholder')"
             type="input"
             variant="outlined"
-            width="168"
           />
         </div>
       </v-col>
 
-      <v-col cols="auto">
+      <v-col :cols="rescols('c12l3m3s6')">
         <div class="d-flex align-center ga-1 filter-field-compact">
-          <div class="text-caption text-end filter-label">{{ filter('marketId') }}:</div>
+          <v-select
+            density="compact"
+            hide-details
+            :items="[filter('marketId')]"
+            max-width="120"
+            min-width="120"
+            :model-value="filter('marketId')"
+            readonly
+            variant="underlined"
+            width="120"
+          />
 
           <v-select
             v-model="inputSearchData.wso_market.val"
             auto-select-first
             autocomplete="off"
+            class="flex-1-1"
             clearable
             density="compact"
             hide-details
@@ -100,7 +113,6 @@
             :menu-props="{ maxWidth: '280px' }"
             no-filter
             variant="outlined"
-            width="160"
           />
         </div>
       </v-col>
@@ -112,9 +124,11 @@
   import { onMounted, ref } from 'vue'
   import { getWhsMarketOptions } from '@/api/whs-market'
   import PageFilterBar from '@/components/PageFilterBar.vue'
+  import { useLayoutCols } from '@/composables/useLayoutCols'
   import { useWarehouseOrderPageI18n } from '@/composables/useWarehouseOrderPageI18n'
 
   const { filter } = useWarehouseOrderPageI18n()
+  const { rescols } = useLayoutCols()
 
   defineOptions({
     name: 'PagesWarehouseBookingFilter',
@@ -154,9 +168,5 @@
 <style lang="scss" scoped>
   .filter-field-compact {
     flex-wrap: nowrap;
-  }
-
-  .filter-label {
-    min-width: 64px;
   }
 </style>

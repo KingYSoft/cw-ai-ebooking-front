@@ -1,7 +1,7 @@
 <template>
-  <v-card class="dashboard-panel" elevation="2" rounded="lg">
+  <v-card border class="dashboard-panel" elevation="0" rounded="lg">
     <div class="dashboard-panel__header d-flex align-center px-5 pt-5 pb-2">
-      <div class="dashboard-panel__title text-h6 font-weight-bold">{{ title }}</div>
+      <div class="dashboard-panel__title">{{ title }}</div>
     </div>
 
     <v-card-text class="dashboard-panel__body pt-2 pb-4 px-4">
@@ -72,6 +72,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #0f172a;
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
   .dashboard-panel__header {
