@@ -172,7 +172,7 @@
   const tblEDocHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
     { title: eDocs('fileName'), key: 'file_name', align: 'start', minWidth: '140' },
-    { title: eDocs('filePath'), key: 'file_path', align: 'start', minWidth: '200' },
+    { title: eDocs('fileType'), key: 'file_type', align: 'start', minWidth: '140' },
     { title: eDocs('refNo'), key: 'ref_no', align: 'start', minWidth: '140' },
     { title: eDocs('receivedTime'), key: 'received_time', align: 'start', minWidth: '140' },
   ])
