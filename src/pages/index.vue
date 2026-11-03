@@ -63,11 +63,12 @@
           :metrics="monthlyMetrics"
           :subtitle="d('monthlySubtitle')"
           :title="d('monthlyTitle')"
+          :volume="monthlyVolume.items"
         />
       </v-col>
     </v-row>
 
-    <DashboardBookingList :title="d('fullListTitle')" />
+    <DashboardBookingList :items="latestTransactions" :title="d('fullListTitle')" />
   </v-sheet>
 </template>
 
@@ -75,14 +76,13 @@
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
+  import { downloadDashboardLatestBookings } from '@/api/dashboard'
   import DashboardBookingAnalysis from '@/components/dashboard/DashboardBookingAnalysis.vue'
   import DashboardBookingList from '@/components/dashboard/DashboardBookingList.vue'
   import DashboardMonthlyVolume from '@/components/dashboard/DashboardMonthlyVolume.vue'
   import DashboardStatCard from '@/components/dashboard/DashboardStatCard.vue'
   import { useDashboardData } from '@/composables/useDashboardData'
   import { DASHBOARD_CARD_STATUS_MAP } from '@/constants/bookingListStatus'
-  import { DASHBOARD_MOCK_MONTHLY } from '@/constants/dashboardMock'
-  import { useAppStore } from '@/stores/app'
 
   defineOptions({
     name: 'Dashboard',
@@ -102,8 +102,7 @@
 
   const { t } = useLocale()
   const router = useRouter()
-  const appStore = useAppStore()
-  const { loading, analysis, cardCounts, loadData } = useDashboardData()
+  const { loading, analysis, cardCounts, latestTransactions, monthlyVolume, loadData } = useDashboardData()
 
   const d = key => t(`$vuetify.custom.dashboardPage.${key}`)
 
@@ -138,16 +137,35 @@
   }
 
   const monthlyMetrics = computed(() => [
-    { label: d('peakMonth'), value: DASHBOARD_MOCK_MONTHLY.peak },
-    { label: d('avgMonthly'), value: DASHBOARD_MOCK_MONTHLY.avg },
-    { label: d('totalYtd'), value: DASHBOARD_MOCK_MONTHLY.ytd, accent: true },
+    {
+      label: d('peakMonth'),
+      value: monthlyVolume.value.peak_month
+        ? `${monthlyVolume.value.peak_month} (${monthlyVolume.value.peak_teu} TEU)`
+        : '—',
+    },
+    {
+      label: d('avgMonthly'),
+      value: `${monthlyVolume.value.average_monthly_teu} TEU / mo`,
+    },
+    {
+      label: d('totalYtd'),
+      value: `${monthlyVolume.value.total_ytd_volume_cbm} CBM`,
+      accent: true,
+    },
   ])
 
-  const exportReport = () => {
-    appStore.openMessage({
-      content: d('exportMock'),
-      color: 'info',
-    })
+  const exportReport = async () => {
+    const file = await downloadDashboardLatestBookings({ maxResultCount: 10 })
+    if (!(file instanceof Blob)) {
+      return
+    }
+
+    const url = URL.createObjectURL(file)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'dashboard-latest-bookings.xlsx'
+    link.click()
+    URL.revokeObjectURL(url)
   }
 
   loadData('lastMonth')

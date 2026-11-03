@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import { dashboardBookingAnalysis } from '@/api/dashboard'
+import { dashboardBookingAnalysis, dashboardMonthlyVolume } from '@/api/dashboard'
 import { mapBookingListRow } from '@/composables/mapEbookingBooking'
 
 const CARD_KEYS = ['pendingSubmit', 'waitingApproval', 'pendingSi', 'rejected']
@@ -18,6 +18,19 @@ const EMPTY_ANALYSIS = {
   monthly_count: 0,
   booking_analysis: [],
   latest_bookings: [],
+}
+
+const EMPTY_MONTHLY_VOLUME = {
+  year: 0,
+  months: 0,
+  items: [],
+  peak_month: '',
+  peak_teu: 0,
+  average_monthly_teu: 0,
+  total_booking_count: 0,
+  total_volume_cbm: 0,
+  total_ytd_teu: 0,
+  total_ytd_volume_cbm: 0,
 }
 
 function asCount(value) {
@@ -74,6 +87,7 @@ function mapLatestBooking(item, index) {
 export function useDashboardData() {
   const loading = ref(true)
   const analysisData = ref({ ...EMPTY_ANALYSIS })
+  const monthlyVolume = ref({ ...EMPTY_MONTHLY_VOLUME })
 
   const cardCounts = computed(() => ({
     pendingSubmit: asCount(analysisData.value.draft_count),
@@ -114,11 +128,20 @@ export function useDashboardData() {
   const loadData = async (period = 'lastMonth') => {
     loading.value = true
     try {
-      const { success, data } = await dashboardBookingAnalysis({ period })
-      analysisData.value = success && data ? { ...EMPTY_ANALYSIS, ...data } : { ...EMPTY_ANALYSIS }
+      const [analysisResponse, monthlyResponse] = await Promise.all([
+        dashboardBookingAnalysis({ period }),
+        dashboardMonthlyVolume({ months: 12 }),
+      ])
+      analysisData.value = analysisResponse.success && analysisResponse.data
+        ? { ...EMPTY_ANALYSIS, ...analysisResponse.data }
+        : { ...EMPTY_ANALYSIS }
+      monthlyVolume.value = monthlyResponse.success && monthlyResponse.data
+        ? { ...EMPTY_MONTHLY_VOLUME, ...monthlyResponse.data }
+        : { ...EMPTY_MONTHLY_VOLUME }
     } catch (error) {
       console.log(error)
       analysisData.value = { ...EMPTY_ANALYSIS }
+      monthlyVolume.value = { ...EMPTY_MONTHLY_VOLUME }
     } finally {
       loading.value = false
     }
@@ -130,6 +153,7 @@ export function useDashboardData() {
     latestTransactions,
     periodCounts,
     analysis,
+    monthlyVolume,
     loadData,
     formatBookingNo,
     itemTimestamp,

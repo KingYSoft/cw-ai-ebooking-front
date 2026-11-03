@@ -316,10 +316,7 @@
   const activeStatusTitle = computed(() => String(inputData.value?.active_status ?? '').trim())
   const canSave = computed(() => inputData.value?.can_save === true)
   const canSubmit = computed(() => inputData.value?.can_submit === true)
-  const isStatusLocked = computed(() => {
-    const status = activeStatusTitle.value
-    return Boolean(status) && status !== 'Draft' && status !== 'Saved'
-  })
+  const isStatusLocked = computed(() => !canSubmit.value)
   const showShippingInstructionTab = computed(() => isBookingReleasedOrLater(activeStatusTitle.value))
   watch(showShippingInstructionTab, show => {
     if (!show && activedTab.value === 4) {
@@ -600,6 +597,11 @@
     pk: String(inputData.value?.pk || route.params.pk || '').trim(),
   })
 
+  const bookingSubmitPayload = () => ({
+    ...inputData.value,
+    ...bookingIdentity(),
+  })
+
   const canRunBookingAction = () => {
     if (!showBookingActionButtons.value || isBookingCancelled.value) {
       return false
@@ -661,7 +663,7 @@
     }
     try {
       cardLoading.value = true
-      const ok = await saveThenRun(payload => bookingSubmit(payload))
+      const ok = await saveThenRun(() => bookingSubmit(bookingSubmitPayload()))
       if (ok) {
         appStore.openMessage({
           content: editMessage('submitted'),
