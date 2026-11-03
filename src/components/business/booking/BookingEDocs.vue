@@ -72,6 +72,7 @@
         <FUpload
           v-if="showUpload"
           cols="c12m6"
+          :doc-types="uploadDocTypes"
           :job-number="inputData.bkg_consign_no"
           job-type="BKG"
           :max-files="1"
@@ -135,6 +136,19 @@
   import { useAppStore } from '@/stores/app'
 
   const { t, eDocs, editButton } = useBookingPageI18n()
+
+  const uploadDocTypes = [
+    { title: 'CIV', value: 'CIV', desc: 'Commercial Invoice' },
+    { title: 'CLS', value: 'CLS', desc: 'Container Liability Statement' },
+    { title: 'COM', value: 'COM', desc: 'Commercial Invoice' },
+    { title: 'COO', value: 'COO', desc: 'Certificate of Origin' },
+    { title: 'DGF', value: 'DGF', desc: 'Dangerous Goods Form' },
+    { title: 'FTA', value: 'FTA', desc: 'Free Trade Agreement' },
+    { title: 'FUM', value: 'FUM', desc: 'Fumigation Certificate' },
+    { title: 'PKD', value: 'PKD', desc: 'Packing Declaration' },
+    { title: 'PKL', value: 'PKL', desc: 'Packing List' },
+    { title: 'POR', value: 'POR', desc: 'Purchase Order' },
+  ]
 
   const inputData = defineModel('input-data', {
     type: Object,
