@@ -45,10 +45,20 @@
           class="doc-type-select"
           density="compact"
           hide-details
+          item-title="title"
+          item-value="value"
           :items="docTypes"
           :placeholder="t('$vuetify.custom.upload.fields.docType')"
           variant="outlined"
         >
+          <template #item="{ props: itemProps, item }">
+            <v-list-item
+              v-bind="itemProps"
+              :subtitle="item.raw?.desc || undefined"
+              :title="item.title"
+            />
+          </template>
+
           <template #prepend>
             <div class="text-caption text-end w-label">
               {{ t('$vuetify.custom.upload.fields.docType') }}:
