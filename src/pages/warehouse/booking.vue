@@ -208,8 +208,8 @@
       align: 'start',
       minWidth: '120px',
     },
-    { title: header('etd'), key: 'wso_etd', align: 'start', minWidth: '100px' },
-    { title: header('eta'), key: 'wso_eta', align: 'start', minWidth: '100px' },
+    { title: header('etd'), key: 'wso_etd', align: 'start', minWidth: '112px' },
+    { title: header('eta'), key: 'wso_eta', align: 'start', minWidth: '112px' },
     {
       title: header('grossWeight'),
       key: 'wso_actual_weight',

@@ -101,6 +101,7 @@
 
 <script setup>
   import FTableSettingDialog from '@/components/FTableSettingDialog.vue'
+  import { ensureDateColumnMinWidth } from '@/composables/ensureDateColumnMinWidth'
 
   const props = defineProps({
     title: {
@@ -169,7 +170,7 @@
     },
     itemHeight: {
       type: Number,
-      default: 32,
+      default: 48,
     },
     tableClass: {
       type: [String, Array, Object],
@@ -207,7 +208,7 @@
    * 计算最终传给 v-data-table 的 headers。
    */
   const computedHeaders = computed(() => {
-    return tableHeaders.value
+    return ensureDateColumnMinWidth(tableHeaders.value)
   })
 
   const computedTableClass = computed(() => {

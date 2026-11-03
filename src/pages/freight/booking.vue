@@ -153,14 +153,25 @@
         </v-menu>
       </template>
 
-      <template #item.booking_status="{ item }">
-        <v-chip
-          v-if="item.booking_status"
-          size="small"
-          v-bind="getBookingListStatusChipProps(item.booking_status)"
+      <template #item.bkg_consign_no="{ item }">
+        <button
+          v-if="item.bkg_consign_no"
+          class="booking-ref-link"
+          type="button"
+          @click.stop="openBookingDetail(item)"
         >
-          {{ displayBookingStatus(item.booking_status) }}
-        </v-chip>
+          {{ item.bkg_consign_no }}
+        </button>
+      </template>
+
+      <template #item.bkg_status="{ item }">
+        <span
+          v-if="item.bkg_status"
+          class="booking-status-badge"
+          :class="`booking-status-badge--${getBookingStatusBadgeTone(item.bkg_status)}`"
+        >
+          {{ displayBookingStatus(item.bkg_status) }}
+        </span>
       </template>
 
       <template #bottom>
@@ -231,7 +242,7 @@
   import {
     BOOKING_LIST_STATUS_OPTIONS,
     defaultBookingListStatusSelection,
-    getBookingListStatusChipProps,
+    getBookingStatusBadgeTone,
     statusesFromQuery,
   } from '@/constants/bookingListStatus'
   import { useAppStore } from '@/stores/app'
@@ -333,7 +344,7 @@
   const tblHeaders = computed(() => [
     { title: '', key: 'actions', align: 'center', sortable: false, width: '36px' },
     { title: tableHeader('bookingNo'), key: 'bkg_consign_no', align: 'start', minWidth: '140px' },
-    { title: tableHeader('status'), key: 'bkg_status', align: 'start', minWidth: '100px' },
+    { title: tableHeader('status'), key: 'bkg_status', align: 'start', minWidth: '140px' },
     {
       title: tableHeader('transMode'),
       key: 'bkg_transport_mode',
@@ -371,9 +382,9 @@
       align: 'start',
       minWidth: '100px',
     },
-    { title: tableHeader('crd'), key: 'bkg_cargo_ready', align: 'start', minWidth: '100px' },
-    { title: tableHeader('etd'), key: 'bkg_etd', align: 'start', minWidth: '100px' },
-    { title: tableHeader('eta'), key: 'bkg_eta', align: 'start', minWidth: '100px' },
+    { title: tableHeader('crd'), key: 'bkg_cargo_ready', align: 'start', minWidth: '112px' },
+    { title: tableHeader('etd'), key: 'bkg_etd', align: 'start', minWidth: '112px' },
+    { title: tableHeader('eta'), key: 'bkg_eta', align: 'start', minWidth: '112px' },
     {
       title: tableHeader('grossWeight'),
       key: 'bkg_actual_weight',
@@ -539,14 +550,21 @@
     }
   }
 
-  function onRowDblClick(event, { item }) {
-    if (event.target.closest('.v-selection-control, button, a, input, textarea, [role="button"]'))
+  function openBookingDetail(item) {
+    if (!item?.pk) {
       return
+    }
     router.push({
       name: 'booking_edit-pk',
       params: { pk: item.pk },
       query: { id: item.id, shipment_no: item.bkg_consign_no },
     })
+  }
+
+  function onRowDblClick(event, { item }) {
+    if (event.target.closest('.v-selection-control, button, a, input, textarea, [role="button"]'))
+      return
+    openBookingDetail(item)
   }
 
   queryData()
@@ -567,11 +585,65 @@
     letter-spacing: normal;
   }
 
+  .booking-ref-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #0e7490;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .booking-ref-link:hover {
+    text-decoration: underline;
+  }
+
+  .booking-status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .booking-status-badge--pending {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+  }
+
+  .booking-status-badge--approved {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+  }
+
+  .booking-status-badge--si {
+    background: #cffafe;
+    color: #155e75;
+    border: 1px solid #67e8f9;
+  }
+
+  .booking-status-badge--shipped {
+    background: #0f766e;
+    color: #fff;
+  }
+
+  .booking-status-badge--default {
+    background: #f1f5f9;
+    color: #334155;
+  }
+
   .table-layout {
     :deep(.table-filter) {
       .v-table__wrapper {
         th.v-data-table__th--sticky {
-          left: 72px;
+          left: 36px;
         }
         th:nth-child(1) {
           left: 0;

@@ -12,7 +12,7 @@
         <CompanyEditRightDrawer v-if="rightDrawerStore.drawerName === 'COMPANY_EDIT'" /> -->
       </v-navigation-drawer>
 
-      <v-app-bar border="b-thin" :elevation="0">
+      <v-app-bar color="surface" :elevation="0">
         <v-progress-linear
           absolute
           :active="appStore.appLoading"
@@ -321,7 +321,7 @@
       <v-navigation-drawer
         ref="refDrawer"
         :class="fluid ? 'nav-collapse' : ''"
-        color="primary"
+        color="nav"
         expand-on-hover
         :model-value="drawer"
         :rail="rail"
@@ -360,8 +360,9 @@
       <!-- color="surface" -->
       <v-main>
         <v-tabs
-          bg-color="primary"
-          class="border-b-thin border-e-thin"
+          bg-color="surface"
+          class="portal-tabs"
+          color="primary"
           density="compact"
           mandatory
           :model-value="route.name"

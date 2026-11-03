@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="dashboard-page pa-3" color="transparent">
+  <v-sheet class="dashboard-page pa-6" color="transparent">
     <v-progress-linear :active="loading" color="primary" height="2" indeterminate />
 
     <v-row class="dashboard-page__layout">

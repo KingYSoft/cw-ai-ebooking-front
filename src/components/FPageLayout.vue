@@ -22,10 +22,18 @@
     </template>
     <!-- filled content -->
     <template v-else>
-      <v-sheet :class="inner ? '' : 'pa-3'" color="transparent" :height="inner ? '' : contentHeight">
-        <v-card :disabled="cardLoading" height="100%" :loading="cardLoading" style="display: flex; flex-direction: column;">
+      <v-sheet :class="inner ? '' : 'pa-4'" color="transparent" :height="inner ? '' : contentHeight">
+        <v-card
+          border
+          :disabled="cardLoading"
+          elevation="0"
+          height="100%"
+          :loading="cardLoading"
+          rounded="lg"
+          style="display: flex; flex-direction: column;"
+        >
           <template #loader="{ isActive }">
-            <v-progress-linear :active="isActive" color="deep-purple" height="4" indeterminate />
+            <v-progress-linear :active="isActive" color="primary" height="4" indeterminate />
           </template>
 
           <slot name="filter" />

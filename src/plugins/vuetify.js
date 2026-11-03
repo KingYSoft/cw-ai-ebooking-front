@@ -34,30 +34,39 @@ const vuetify = createVuetify({
   defaults: {
     VBtn: {
       class: 'text-none',
+      rounded: 'lg',
     },
     VSelect: {
       autocomplete: 'off',
+      rounded: 'lg',
     },
     VAutocomplete: {
       autocomplete: 'off',
+      rounded: 'lg',
     },
     VCombobox: {
       autocomplete: 'off',
+      rounded: 'lg',
     },
     VTextField: {
       variant: 'outlined',
       color: 'primary',
       autocomplete: 'off',
+      rounded: 'lg',
     },
     VTextarea: {
       variant: 'outlined',
       color: 'primary',
       autocomplete: 'off',
+      rounded: 'lg',
     },
     VCard: {
-      elevation: 4,
+      elevation: 0,
       rounded: 'lg',
-      border: '0',
+      border: true,
+    },
+    VChip: {
+      rounded: 'lg',
     },
     VDataTable: {
       density: 'compact',
@@ -79,31 +88,36 @@ const vuetify = createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: '#2a5bd6', // '#04246a', // '#2a5bd6',  //'#8c57ff',
-          'primary-sec': '#04246a',
+          primary: '#0e7490',
+          'primary-darken-1': '#155e75',
+          'primary-sec': '#075985',
+          secondary: '#0f766e',
           surface: '#ffffff',
-          'on-surface': '#050505', // '#423b50',
-          background: '#f4f5fa',
-          // 'on-background': '#2e263d',
+          'on-surface': '#1e293b',
+          background: '#f1f5f9',
+          'on-background': '#1e293b',
           'date-picker-background': '#ffffff',
-          'on-date-picker-background': '#423b50',
-          'surface-light': '#EDE7F6',
-          'on-surface-light': '#423b50',
-          'text-input-color': '#050505',
-          'login-background': '#5B8C85',
-          'login-background-sec': '#002B31',
-          'fixed-table-tr-even': '#eaedf1',
+          'on-date-picker-background': '#1e293b',
+          'surface-light': '#f8fafc',
+          'on-surface-light': '#334155',
+          'text-input-color': '#1e293b',
+          'login-background': '#0e7490',
+          'login-background-sec': '#0b192e',
+          'fixed-table-tr-even': '#f8fafc',
+          nav: '#2a5bd6',
+          'on-nav': '#ffffff',
         },
         variables: {
-          'border-color': '5, 5, 5', // '33, 33, 33', // #212121
-          'ttt-border-color': '214, 220, 228', // #d6dce4
+          'border-color': '15, 23, 42',
+          'border-opacity': 0.12,
+          'ttt-border-color': '226, 232, 240',
         },
       },
       dark: {
         dark: true,
         colors: {
-          primary: '#9969ff', // '#a67cff', // '#9969ff',
-          'primary-sec': '#42358d', // '#695ac4', // '#42358d', // 菜单选中 和 页面标题栏背景色
+          primary: '#22d3ee',
+          'primary-sec': '#0e7490',
           surface: '#312d4b', // 卡片 背景色
           'on-surface': '#e7e3fc', // 卡片 文字颜色
           background: '#28243d', // 整体背景颜色
@@ -116,6 +130,8 @@ const vuetify = createVuetify({
           'login-background': '#5B8C85',
           'login-background-sec': '#002B31',
           'fixed-table-tr-even': '#3f3a5d',
+          nav: '#2a5bd6',
+          'on-nav': '#ffffff',
         },
         variables: {
           'border-color': '231, 227, 252', // '238, 238, 238', // #eeeeee

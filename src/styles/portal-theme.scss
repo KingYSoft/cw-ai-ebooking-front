@@ -1,0 +1,147 @@
+/** Portal visual theme aligned with the e-booking analytics dashboard.
+ * Left navigation drawer is intentionally excluded.
+ */
+
+:root {
+  --portal-radius-lg: 8px;
+  --portal-radius-xl: 12px;
+  --portal-border: #e2e8f0;
+  --portal-border-soft: rgb(226 232 240 / 0.9);
+  --portal-muted: #64748b;
+  --portal-heading: #0f172a;
+  --portal-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.v-application .v-app-bar {
+  background: #fff !important;
+  border-bottom: 1px solid var(--portal-border) !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.v-application .v-app-bar .v-app-bar-title {
+  color: var(--portal-heading);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.v-application .v-app-bar .v-btn {
+  border-radius: var(--portal-radius-lg);
+  color: var(--portal-muted);
+}
+
+.v-main {
+  background: rgb(var(--v-theme-background));
+}
+
+.v-main .v-divider {
+  border-color: var(--portal-border) !important;
+  opacity: 1;
+}
+
+.v-main,
+.v-overlay__content {
+  .v-btn {
+    border-radius: var(--portal-radius-lg);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .v-card {
+    border-color: var(--portal-border-soft) !important;
+    border-radius: var(--portal-radius-xl);
+    box-shadow: var(--portal-shadow);
+  }
+
+  .v-field {
+    border-radius: var(--portal-radius-lg);
+  }
+
+  .v-field--variant-outlined .v-field__outline {
+    --v-field-border-opacity: 1;
+    color: var(--portal-border);
+  }
+
+  .v-field--variant-outlined .v-field__outline__start,
+  .v-field--variant-outlined .v-field__outline__end,
+  .v-field--variant-outlined .v-field__outline__notch::before,
+  .v-field--variant-outlined .v-field__outline__notch::after {
+    border-color: var(--portal-border);
+  }
+
+  .v-field--focused.v-field--variant-outlined .v-field__outline,
+  .v-field--focused.v-field--variant-outlined .v-field__outline__start,
+  .v-field--focused.v-field--variant-outlined .v-field__outline__end,
+  .v-field--focused.v-field--variant-outlined .v-field__outline__notch::before,
+  .v-field--focused.v-field--variant-outlined .v-field__outline__notch::after {
+    color: rgb(var(--v-theme-primary));
+    border-color: rgb(var(--v-theme-primary));
+  }
+
+  .v-chip {
+    border-radius: var(--portal-radius-lg);
+    font-weight: 600;
+  }
+}
+
+.portal-tabs {
+  border-bottom: 1px solid var(--portal-border);
+  background: #fff !important;
+}
+
+.portal-tabs .v-tab {
+  color: var(--portal-muted);
+  font-weight: 600;
+}
+
+.portal-tabs .v-tab--selected {
+  color: rgb(var(--v-theme-primary));
+}
+
+.table-filter.v-table > .v-table__wrapper > table > thead > tr {
+  background: #f8fafc;
+}
+
+.table-filter.v-table > .v-table__wrapper > table > thead > tr > th {
+  color: var(--portal-muted) !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.table-filter.v-table > .v-table__wrapper > table > thead .v-data-table-header__content {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.table-filter.v-table > .v-table__wrapper > table > tbody > tr > td {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.table-filter.v-table > .v-table__wrapper {
+  border: 1px solid var(--portal-border);
+  border-radius: var(--portal-radius-lg);
+}
