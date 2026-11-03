@@ -1,7 +1,7 @@
 <template>
-  <v-list-group color="transparent" :fluid="fluid" :value="menuInfo.code">
+  <v-list-group class="portal-nav-group" color="transparent" :fluid="fluid" :value="menuInfo.code">
     <template #activator="{ props }">
-      <v-list-item v-bind="props" rounded="te-xl be-xl" :title="menuInfo.title">
+      <v-list-item v-bind="props" class="portal-nav-category" rounded="lg" :title="menuInfo.title">
         <template #prepend>
           <v-icon :icon="menuInfo.icon" size="20" />
         </template>

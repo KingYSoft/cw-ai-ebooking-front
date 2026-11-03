@@ -107,8 +107,8 @@ const vuetify = createVuetify({
           'login-background': '#0e7490',
           'login-background-sec': '#0b192e',
           'fixed-table-tr-even': '#f8fafc',
-          nav: '#2a5bd6',
-          'on-nav': '#ffffff',
+          nav: '#0b192e',
+          'on-nav': '#94a3b8',
         },
         variables: {
           'border-color': '15, 23, 42',
@@ -133,8 +133,8 @@ const vuetify = createVuetify({
           'login-background': '#5B8C85',
           'login-background-sec': '#002B31',
           'fixed-table-tr-even': '#3f3a5d',
-          nav: '#2a5bd6',
-          'on-nav': '#ffffff',
+          nav: '#0b192e',
+          'on-nav': '#94a3b8',
         },
         variables: {
           'border-color': '231, 227, 252', // '238, 238, 238', // #eeeeee
