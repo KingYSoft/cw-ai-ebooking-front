@@ -52,6 +52,8 @@ export function useFreightBookingForm() {
   const defaultData = () => ({
     id: 0,
     pk: '',
+    can_save: true,
+    can_submit: true,
     bkg_transport_mode: 'SEA',
     bkg_packing_mode: 'FCL',
     shipper: {},
@@ -142,6 +144,12 @@ export function useFreightBookingForm() {
       inputData.value.id = data.id ?? 0
       inputData.value.pk = data.pk
       inputData.value.bkg_consign_no = data.bkg_consign_no
+      if (typeof data.can_save === 'boolean') {
+        inputData.value.can_save = data.can_save
+      }
+      if (typeof data.can_submit === 'boolean') {
+        inputData.value.can_submit = data.can_submit
+      }
       markInputDataSaved()
       return true
     }
