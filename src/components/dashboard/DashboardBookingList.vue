@@ -133,7 +133,7 @@
       title: tableHeader('consigneeName'),
       key: 'consignee_name',
       align: 'start',
-      minWidth: '140px',
+      minWidth: '300px',
     },
     { title: tableHeader('crd'), key: 'bkg_cargo_ready', align: 'start', minWidth: '112px' },
     { title: tableHeader('etd'), key: 'bkg_etd', align: 'start', minWidth: '112px' },
