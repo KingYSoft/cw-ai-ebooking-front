@@ -4,20 +4,6 @@
       <section class="login-hero" :style="{ backgroundImage: heroBg }">
         <div class="login-hero__overlay" />
 
-        <div class="login-hero__top">
-          <div class="login-hero__brand">
-            <img alt="SJ Clemenger" class="login-hero__logo" :src="logoSrc" />
-          </div>
-
-          <div class="login-hero__status">
-            <span class="login-hero__pulse" />
-            <span>
-              {{ l('operational') }}
-              <em>{{ l('operationalStatus') }}</em>
-            </span>
-          </div>
-        </div>
-
         <div class="login-hero__center">
           <div class="login-hero__intro">
             <div class="login-hero__chip">
@@ -28,25 +14,22 @@
             <h1 class="login-hero__title">{{ l('heroTitle') }}</h1>
             <p class="login-hero__desc">{{ l('heroDesc') }}</p>
           </div>
+        </div>
 
-          <div class="login-hero__features">
-            <div v-for="item in features" :key="item.title" class="login-feature">
-              <div class="login-feature__icon">
-                <v-icon :color="item.iconColor" :icon="item.icon" size="16" />
-              </div>
-              <div class="login-feature__title">{{ item.title }}</div>
-              <p class="login-feature__desc">{{ item.desc }}</p>
+        <div class="login-hero__features">
+          <div v-for="item in features" :key="item.title" class="login-feature">
+            <div class="login-feature__icon">
+              <v-icon :color="item.iconColor" :icon="item.icon" size="16" />
             </div>
+            <div class="login-feature__title">{{ item.title }}</div>
+            <p class="login-feature__desc">{{ item.desc }}</p>
           </div>
         </div>
       </section>
 
       <section class="login-panel">
         <div class="login-panel__top">
-          <div class="login-panel__ssl">
-            <v-icon color="#0f2c59" icon="mdi-lock-outline" size="14" />
-            <span>{{ l('ssl') }}</span>
-          </div>
+          <img alt="SJ Clemenger" class="login-panel__logo" :src="logoSrc" />
 
           <div class="login-panel__lang">
             <v-icon color="#94a3b8" icon="mdi-earth" size="14" />
@@ -327,7 +310,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 0px 56px 40px;
+    padding: 0 56px 50px;
     color: #fff;
     overflow: hidden;
     background-size: cover;
@@ -342,75 +325,16 @@
     pointer-events: none;
   }
 
-  .login-hero__top,
   .login-hero__center {
     position: relative;
     z-index: 1;
-  }
-
-  .login-hero__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    min-height: 48px;
-    padding-bottom: 16px;
-  }
-
-  .login-hero__logo {
-    width: 200px;
-    max-width: 200px;
-    display: block;
-  }
-
-  .login-hero__status {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    border-radius: 999px;
-    background: rgb(15 44 89 / 0.65);
-    border: 1px solid rgb(255 255 255 / 0.25);
-    color: #e0f2fe;
-    font-size: 12px;
-    font-weight: 500;
-    backdrop-filter: blur(10px);
-  }
-
-  .login-hero__status em {
-    color: #6ee7b7;
-    font-style: normal;
-    font-weight: 600;
-  }
-
-  .login-hero__pulse {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #10b981;
-    animation: login-pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes login-pulse {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.4;
-      transform: scale(1.2);
-    }
-  }
-
-  .login-hero__center {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 32px;
     max-width: 672px;
-    padding: 48px 0;
+    padding: 48px 0 32px;
   }
 
   .login-hero__intro {
@@ -457,9 +381,13 @@
   }
 
   .login-hero__features {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
+    max-width: 672px;
+    margin-bottom: 0;
   }
 
   .login-feature {
@@ -504,7 +432,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px 56px;
+    padding: 20px 56px;
     background: #fff;
     border-left: 1px solid #e2e8f0;
   }
@@ -519,13 +447,10 @@
     border-bottom: 1px solid #f1f5f9;
   }
 
-  .login-panel__ssl {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #64748b;
-    font-size: 12px;
-    font-weight: 500;
+  .login-panel__logo {
+    width: 200px;
+    max-width: 200px;
+    display: block;
   }
 
   .login-panel__lang {
@@ -653,7 +578,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 16px;
+    margin-top: 32px;
   }
 
   .login-form__forgot {
@@ -684,7 +609,7 @@
   }
 
   .login-form__submit {
-    margin-top: 20px;
+    margin-top: 32px;
     height: 48px !important;
     background: #0f2c59 !important;
     color: #fff !important;
@@ -789,7 +714,7 @@
     .login-hero {
       flex: none;
       min-height: 520px;
-      padding: 32px;
+      padding: 32px 32px 50px;
     }
 
     .login-hero__title {
