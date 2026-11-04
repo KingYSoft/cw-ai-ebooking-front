@@ -440,7 +440,7 @@ export default {
           err: 'Container Count must be greater than 0.',
         },
         pac_package_count: {
-          err: 'Pieces must be greater than 0.',
+          err: 'No. of Package must be greater than 0.',
         },
         pac_pack_type: {
           err: 'Pack Type not null.',

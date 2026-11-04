@@ -111,7 +111,7 @@ export default {
       err: 'Container Count 必須大於 0。',
     },
     pac_package_count: {
-      err: 'Pieces 必須大於 0。',
+      err: 'No. of Package 必須大於 0。',
     },
     pac_pack_type: {
       err: 'Pack Type 不能為空。',
