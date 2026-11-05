@@ -111,7 +111,7 @@
               :query-extra="{ address_type: 'CONSIGNEE' }"
               :text-field-props="{
                 'min-width': '100%',
-                rules: inputDataRules.shipper_name,
+                rules: inputDataRules.consignee_name,
               }"
               virtual
               @click-clear="onClearAddr('CONSIGNEE')"
@@ -674,7 +674,6 @@
               v-model:date-value="inputData.bkg_etd"
               max="2099-12-31"
               min="2000-01-01"
-              :rules="inputDataRules.bkg_etd"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">{{ detailField('etd') }}:</div>
@@ -687,7 +686,6 @@
               v-model:date-value="inputData.bkg_eta"
               max="2099-12-31"
               min="2000-01-01"
-              :rules="inputDataRules.bkg_eta"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">{{ detailField('eta') }}:</div>
