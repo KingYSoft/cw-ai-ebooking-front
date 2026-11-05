@@ -77,7 +77,6 @@
           job-type="BKG"
           :max-files="1"
           :readonly="true"
-          show-ebooking-visible
           :upload-button-text="eDocs('uploadButtonText')"
           @clear="handleClear"
           @upload="handleUpload"
@@ -308,7 +307,7 @@
   const handleClear = () => undefined
 
   const handleUpload = async uploadData => {
-    const { files, docType, jobNumber, is_ebooking_visible } = uploadData
+    const { files, docType, jobNumber } = uploadData
 
     if (!files?.length) {
       appStore.openMessage({
@@ -333,7 +332,7 @@
       formData.append('related_key', inputData.value.pk)
       formData.append('file_type', docType)
       formData.append('ref_no', jobNumber || inputData.value.bkg_consign_no || inputData.value.pk)
-      formData.append('is_ebooking_visible', is_ebooking_visible ? '1' : '0')
+      formData.append('is_ebooking_visible', '1')
 
       const result = await edocSave(formData)
       if (result?.success) {
