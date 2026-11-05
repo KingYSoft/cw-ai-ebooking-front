@@ -1196,7 +1196,7 @@
         :height="150"
         hide-default-footer
         item-value="id"
-        :items="inputData.pac_list"
+        :items="containerRows"
         :items-per-page="-1"
       >
         <template #header.actions>
@@ -1245,6 +1245,7 @@
             color="primary"
             control-variant="hidden"
             density="compact"
+            :readonly="props.showSiRouteFields"
             hide-details
             :max="999999999"
             :min="0"
@@ -1872,6 +1873,12 @@
   )
 
   const showLooseTable = computed(() => props.showCargoFields && !showContainerTable.value)
+
+  const containerRows = computed(() =>
+    props.showSiRouteFields
+      ? (Array.isArray(inputData.value.si_pac_list) ? inputData.value.si_pac_list : [])
+      : (Array.isArray(inputData.value.pac_list) ? inputData.value.pac_list : []),
+  )
 
   const isAirTransport = computed(
     () => String(inputData.value.bkg_transport_mode ?? '').toUpperCase() === 'AIR',

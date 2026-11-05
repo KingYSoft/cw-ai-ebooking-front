@@ -12,11 +12,11 @@
           :addr-table-headers="addrTableHeaders"
           :input-data-rules="inputDataRules"
           :query-port-list="queryPortList"
-          @add-container="emit('add-container')"
+          @add-container="emit('add-container', false)"
           @on-clear-addr="onClearAddr"
           @on-select-addr="onSelectAddr"
           @query-port="queryPort"
-          @remove-container="emit('remove-container')"
+          @remove-container="emit('remove-container', $event, false)"
         />
       </fieldset>
     </div>
@@ -68,11 +68,11 @@
           :query-port-list="queryPortList"
           :show-cargo-fields="true"
           show-si-route-fields
-          @add-container="emit('add-container')"
+          @add-container="emit('add-container', true)"
           @on-clear-addr="onClearAddr"
           @on-select-addr="onSelectAddr"
           @query-port="queryPort"
-          @remove-container="emit('remove-container')"
+          @remove-container="emit('remove-container', $event, true)"
         />
       </fieldset>
     </div>

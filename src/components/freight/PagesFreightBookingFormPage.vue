@@ -105,8 +105,8 @@
           :actived-tab="activedTab"
           :lock-non-si-fields="isStatusLocked"
           :lock-si-fields="isSiSubmittedOrLater(activeStatusTitle)"
-          @add-container="addNewContainer"
-          @remove-container="removeNewContainer"
+          @add-container="addContainerForTab"
+          @remove-container="removeContainerForTab"
         />
       </v-form>
     </v-sheet>
@@ -379,6 +379,7 @@
       pickup: el.pickup || {}, // address
       delivery: el.delivery || {}, // address
       pac_list: el.pac_list || [],
+      si_pac_list: el.si_pac_list || el.pac_list || [],
       e_docs_list: el.e_docs_list || [],
       bkg_unit_of_weight: el.bkg_unit_of_weight || 'KG',
       bkg_unit_of_volume: el.bkg_unit_of_volume || 'M3',
@@ -522,11 +523,11 @@
 
   const isContainerRequired = () => true
 
-  const ensureContainerRows = () => {
+  const ensureContainerRows = (rows = inputData.value?.pac_list) => {
     if (!isContainerRequired()) {
       return true
     }
-    const rows = Array.isArray(inputData.value?.pac_list) ? inputData.value.pac_list : []
+    rows = Array.isArray(rows) ? rows : []
     if (rows.length > 0) {
       return true
     }
@@ -604,6 +605,14 @@
     ...bookingIdentity(),
   })
 
+  const addContainerForTab = isSi => {
+    addNewContainer(isSi ? inputData.value.si_pac_list : undefined)
+  }
+
+  const removeContainerForTab = (index, isSi) => {
+    removeNewContainer(index, isSi ? inputData.value.si_pac_list : undefined)
+  }
+
   const canRunBookingAction = () => {
     if (!showBookingActionButtons.value || isBookingCancelled.value) {
       return false
@@ -629,8 +638,8 @@
     }
   }
 
-  const saveThenRun = async run => {
-    if (!ensureContainerRows()) {
+  const saveThenRun = async (run, rows = inputData.value?.pac_list) => {
+    if (!ensureContainerRows(rows)) {
       return false
     }
     if (canSave.value) {
@@ -696,10 +705,12 @@
       cardLoading.value = true
       const ok = await saveThenRun(payload =>
         bookingSiSubmit({
+          ...bookingSubmitPayload(),
           ...payload,
-          pac_list: inputData.value.pac_list,
+          pac_list: inputData.value.si_pac_list,
           doc_data: inputData.value.doc_data,
         }),
+        inputData.value.si_pac_list,
       )
       if (ok) {
         appStore.openMessage({
