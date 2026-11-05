@@ -346,10 +346,10 @@ export default {
           err: 'Destination 不能为空。',
         },
         bkg_load_port: {
-          err: 'Load 不能为空。',
+          err: 'POL 不能为空。',
         },
         bkg_discharge_port: {
-          err: 'POD (Discharge) 不能为空。',
+          err: 'POD 不能为空。',
         },
         bkg_intended_vessel: {
           err: 'Vessel 不能为空。',

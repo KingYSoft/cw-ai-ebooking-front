@@ -810,6 +810,58 @@
                 <div class="text-caption text-end w-label-100">{{ detailField('po') }}:</div>
               </template>
             </v-text-field>
+
+            <v-autocomplete
+              v-if="!showSiRouteFields"
+              :id="`${fieldIdPrefix}@bkg_load_port`"
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
+              density="compact"
+              hide-details
+              item-title="rl_code"
+              item-value="rl_code"
+              :items="queryPortList"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              :model-value="inputData.bkg_load_port"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              return-object
+              :rules="inputDataRules.bkg_load_port"
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    queryPort(inputData.bkg_load_port)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.bkg_load_port = $event?.rl_code ?? null
+                  inputData.bkg_load_port_name = $event?.rl_port_name ?? null
+                }
+              "
+              @update:search="queryPort"
+            >
+              <template #item="scope">
+                <v-list-item
+                  v-bind="scope.props"
+                  :subtitle="scope.item.raw.rl_port_name"
+                  :title="scope.item.raw.rl_code"
+                />
+              </template>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('polLoad') }}<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-autocomplete>
           </div>
         </v-col>
 
@@ -1033,6 +1085,58 @@
                 </div>
               </template>
             </v-text-field>
+
+            <v-autocomplete
+              v-if="!showSiRouteFields"
+              :id="`${fieldIdPrefix}@bkg_discharge_port`"
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
+              density="compact"
+              hide-details
+              item-title="rl_code"
+              item-value="rl_code"
+              :items="queryPortList"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              :model-value="inputData.bkg_discharge_port"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              return-object
+              :rules="inputDataRules.bkg_discharge_port"
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    queryPort(inputData.bkg_discharge_port)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.bkg_discharge_port = $event?.rl_code ?? null
+                  inputData.bkg_discharge_port_name = $event?.rl_port_name ?? null
+                }
+              "
+              @update:search="queryPort"
+            >
+              <template #item="scope">
+                <v-list-item
+                  v-bind="scope.props"
+                  :subtitle="scope.item.raw.rl_port_name"
+                  :title="scope.item.raw.rl_code"
+                />
+              </template>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('podDischarge') }}<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-autocomplete>
           </div>
         </v-col>
 

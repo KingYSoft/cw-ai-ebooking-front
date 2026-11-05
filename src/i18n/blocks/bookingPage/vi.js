@@ -18,10 +18,10 @@ export default {
       err: 'Destination không được để trống.',
     },
     bkg_load_port: {
-      err: 'Load không được để trống.',
+      err: 'POL không được để trống.',
     },
     bkg_discharge_port: {
-      err: 'POD (Discharge) không được để trống.',
+      err: 'POD không được để trống.',
     },
     bkg_intended_vessel: {
       err: 'Vessel không được để trống.',
