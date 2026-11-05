@@ -111,7 +111,7 @@ export default {
       err: 'Container Count phải lớn hơn 0.',
     },
     pac_package_count: {
-      err: 'Pieces phải lớn hơn 0.',
+      err: 'No. of Package phải lớn hơn 0.',
     },
     pac_pack_type: {
       err: 'Pack Type không được để trống.',

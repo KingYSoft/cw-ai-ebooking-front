@@ -451,6 +451,8 @@
           if (rawOcrBooking) {
             try {
               applyBookingInput(JSON.parse(rawOcrBooking))
+              inputData.value.can_save = true
+              inputData.value.can_submit = true
             } catch (error) {
               console.log(error)
               await fillShipperFromSession()

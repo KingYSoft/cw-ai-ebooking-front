@@ -9,16 +9,30 @@
       </div>
 
       <div class="dashboard-page__controls">
-        <v-btn
-          class="dashboard-page__new"
-          color="primary"
-          prepend-icon="$plus"
-          size="small"
-          variant="flat"
-          @click="goNewBooking"
-        >
-          {{ d('newBooking') }}
-        </v-btn>
+        <v-menu open-on-hover>
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              class="dashboard-page__new"
+              color="primary"
+              prepend-icon="$plus"
+              size="small"
+              variant="flat"
+            >
+              {{ d('newBooking') }}
+            </v-btn>
+          </template>
+
+          <v-list
+            density="compact"
+            item-props
+            item-value="code"
+            :items="newMenuItems"
+            size="small"
+            slim
+            @click:select="handleNewMenuSelect"
+          />
+        </v-menu>
 
         <v-btn
           class="dashboard-page__export"
@@ -69,11 +83,12 @@
     </v-row>
 
     <DashboardBookingList :items="latestTransactions" :title="d('fullListTitle')" />
+    <OcrBookingDialog v-model="ocrDialogOpen" />
   </v-sheet>
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useLocale } from 'vuetify'
   import { downloadDashboardLatestBookings } from '@/api/dashboard'
@@ -81,6 +96,8 @@
   import DashboardBookingList from '@/components/dashboard/DashboardBookingList.vue'
   import DashboardMonthlyVolume from '@/components/dashboard/DashboardMonthlyVolume.vue'
   import DashboardStatCard from '@/components/dashboard/DashboardStatCard.vue'
+  import OcrBookingDialog from '@/components/freight/OcrBookingDialog.vue'
+  import { useBookingPageI18n } from '@/composables/useBookingPageI18n'
   import { useDashboardData } from '@/composables/useDashboardData'
   import { DASHBOARD_CARD_STATUS_MAP } from '@/constants/bookingListStatus'
 
@@ -102,9 +119,16 @@
 
   const { t } = useLocale()
   const router = useRouter()
+  const { menu } = useBookingPageI18n()
   const { loading, analysis, cardCounts, latestTransactions, monthlyVolume, loadData } = useDashboardData()
 
   const d = key => t(`$vuetify.custom.dashboardPage.${key}`)
+  const ocrDialogOpen = ref(false)
+  const newMenuItems = computed(() => [
+    { title: menu('newBooking'), prependIcon: 'mdi-text-box-edit-outline', code: 'new' },
+    { type: 'divider' },
+    { title: menu('ocrBooking'), prependIcon: 'mdi-file-upload', code: 'ocr' },
+  ])
 
   const kpiCards = computed(() => [
     {
@@ -132,8 +156,20 @@
     })
   }
 
-  const goNewBooking = () => {
-    router.push({ name: 'booking_new' })
+  const handleNewMenuSelect = e => {
+    switch (e.id) {
+      case 'new': {
+        router.push({ name: 'booking_new' })
+        return
+      }
+      case 'ocr': {
+        ocrDialogOpen.value = true
+        return
+      }
+      default: {
+        break
+      }
+    }
   }
 
   const monthlyMetrics = computed(() => [
