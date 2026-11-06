@@ -347,10 +347,10 @@ export default {
           err: 'Destination not null.',
         },
         bkg_load_port: {
-          err: 'Load not null.',
+          err: 'POL not null.',
         },
         bkg_discharge_port: {
-          err: 'POD (Discharge) not null.',
+          err: 'POD not null.',
         },
         bkg_intended_vessel: {
           err: 'Vessel not null.',

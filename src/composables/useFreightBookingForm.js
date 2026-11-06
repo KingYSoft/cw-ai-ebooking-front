@@ -156,15 +156,19 @@ export function useFreightBookingForm() {
     return false
   }
 
-  const addNewContainer = () => {
+  const addNewContainer = targetRows => {
     if (!inputData.value) {
       return
     }
-    if (!Array.isArray(inputData.value.pac_list)) {
-      inputData.value.pac_list = []
+    let rows = targetRows
+    if (!Array.isArray(rows)) {
+      if (!Array.isArray(inputData.value.pac_list)) {
+        inputData.value.pac_list = []
+      }
+      rows = inputData.value.pac_list
     }
     const remainderFields = getBookingPacRowRemainderFields(inputData.value)
-    inputData.value.pac_list.push({
+    rows.push({
       id: Date.now(),
       pac_container_count: 1,
       pac_pack_type: inputData.value.bkg_pack_type,
@@ -179,8 +183,9 @@ export function useFreightBookingForm() {
     })
   }
 
-  const removeNewContainer = index => {
-    inputData.value.pac_list.splice(index, 1)
+  const removeNewContainer = (index, targetRows) => {
+    const rows = Array.isArray(targetRows) ? targetRows : inputData.value.pac_list
+    rows.splice(index, 1)
   }
   return {
     inputData,

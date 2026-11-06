@@ -111,7 +111,7 @@
               :query-extra="{ address_type: 'CONSIGNEE' }"
               :text-field-props="{
                 'min-width': '100%',
-                rules: inputDataRules.shipper_name,
+                rules: inputDataRules.consignee_name,
               }"
               virtual
               @click-clear="onClearAddr('CONSIGNEE')"
@@ -674,7 +674,6 @@
               v-model:date-value="inputData.bkg_etd"
               max="2099-12-31"
               min="2000-01-01"
-              :rules="inputDataRules.bkg_etd"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">{{ detailField('etd') }}:</div>
@@ -687,7 +686,6 @@
               v-model:date-value="inputData.bkg_eta"
               max="2099-12-31"
               min="2000-01-01"
-              :rules="inputDataRules.bkg_eta"
             >
               <template #prepend>
                 <div class="text-caption text-end w-label-100">{{ detailField('eta') }}:</div>
@@ -812,6 +810,58 @@
                 <div class="text-caption text-end w-label-100">{{ detailField('po') }}:</div>
               </template>
             </v-text-field>
+
+            <v-autocomplete
+              v-if="!showSiRouteFields"
+              :id="`${fieldIdPrefix}@bkg_load_port`"
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
+              density="compact"
+              hide-details
+              item-title="rl_code"
+              item-value="rl_code"
+              :items="queryPortList"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              :model-value="inputData.bkg_load_port"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              return-object
+              :rules="inputDataRules.bkg_load_port"
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    queryPort(inputData.bkg_load_port)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.bkg_load_port = $event?.rl_code ?? null
+                  inputData.bkg_load_port_name = $event?.rl_port_name ?? null
+                }
+              "
+              @update:search="queryPort"
+            >
+              <template #item="scope">
+                <v-list-item
+                  v-bind="scope.props"
+                  :subtitle="scope.item.raw.rl_port_name"
+                  :title="scope.item.raw.rl_code"
+                />
+              </template>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('polLoad') }}<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-autocomplete>
           </div>
         </v-col>
 
@@ -1035,6 +1085,58 @@
                 </div>
               </template>
             </v-text-field>
+
+            <v-autocomplete
+              v-if="!showSiRouteFields"
+              :id="`${fieldIdPrefix}@bkg_discharge_port`"
+              auto-select-first
+              autocomplete="off"
+              clearable
+              color="primary"
+              density="compact"
+              hide-details
+              item-title="rl_code"
+              item-value="rl_code"
+              :items="queryPortList"
+              :menu-props="{
+                'max-width': '100%',
+              }"
+              min-width="100%"
+              :model-value="inputData.bkg_discharge_port"
+              no-data-text="$vuetify.custom.app.searchMore"
+              no-filter
+              return-object
+              :rules="inputDataRules.bkg_discharge_port"
+              variant="outlined"
+              @update:focused="
+                $event => {
+                  if ($event) {
+                    queryPort(inputData.bkg_discharge_port)
+                  }
+                }
+              "
+              @update:model-value="
+                $event => {
+                  inputData.bkg_discharge_port = $event?.rl_code ?? null
+                  inputData.bkg_discharge_port_name = $event?.rl_port_name ?? null
+                }
+              "
+              @update:search="queryPort"
+            >
+              <template #item="scope">
+                <v-list-item
+                  v-bind="scope.props"
+                  :subtitle="scope.item.raw.rl_port_name"
+                  :title="scope.item.raw.rl_code"
+                />
+              </template>
+
+              <template #prepend>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('podDischarge') }}<span class="text-red">*</span>:
+                </div>
+              </template>
+            </v-autocomplete>
           </div>
         </v-col>
 
@@ -1094,7 +1196,7 @@
         :height="150"
         hide-default-footer
         item-value="id"
-        :items="inputData.pac_list"
+        :items="containerRows"
         :items-per-page="-1"
       >
         <template #header.actions>
@@ -1143,6 +1245,7 @@
             color="primary"
             control-variant="hidden"
             density="compact"
+            :readonly="props.showSiRouteFields"
             hide-details
             :max="999999999"
             :min="0"
@@ -1770,6 +1873,12 @@
   )
 
   const showLooseTable = computed(() => props.showCargoFields && !showContainerTable.value)
+
+  const containerRows = computed(() =>
+    props.showSiRouteFields
+      ? (Array.isArray(inputData.value.si_pac_list) ? inputData.value.si_pac_list : [])
+      : (Array.isArray(inputData.value.pac_list) ? inputData.value.pac_list : []),
+  )
 
   const isAirTransport = computed(
     () => String(inputData.value.bkg_transport_mode ?? '').toUpperCase() === 'AIR',
