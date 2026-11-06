@@ -1193,7 +1193,7 @@
         disable-sort
         fixed-header
         :headers="containerHeaders"
-        :height="150"
+        :height="packingTableHeight"
         hide-default-footer
         item-value="id"
         :items="containerRows"
@@ -1459,7 +1459,7 @@
         disable-sort
         fixed-header
         :headers="looseHeaders"
-        :height="150"
+        :height="packingTableHeight"
         hide-default-footer
         item-value="id"
         :items="inputData.pac_list"
@@ -1880,6 +1880,11 @@
       : (Array.isArray(inputData.value.pac_list) ? inputData.value.pac_list : []),
   )
 
+  const packingTableHeight = computed(() => {
+    const rowCount = containerRows.value.length || 1
+    return Math.min(400, 48 + rowCount * 48 + 16)
+  })
+
   const isAirTransport = computed(
     () => String(inputData.value.bkg_transport_mode ?? '').toUpperCase() === 'AIR',
   )
@@ -2066,5 +2071,6 @@
 <style scoped>
   .booking-container-table :deep(.v-table__wrapper) {
     overflow-y: auto;
+    padding-bottom: 16px;
   }
 </style>
