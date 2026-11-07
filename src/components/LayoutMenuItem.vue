@@ -9,6 +9,7 @@
     <template #prepend>
       <v-icon :icon="menuInfo.icon" size="20" />
     </template>
+
     <template #append>
       <span class="portal-nav-dot" />
     </template>

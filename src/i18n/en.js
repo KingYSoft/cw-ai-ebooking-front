@@ -115,7 +115,7 @@ export default {
         password: 'Password is required.',
       },
       placeholder: {
-        email: "name{'@'}company.com",
+        email: 'Enter your email',
         password: 'Enter your password',
       },
       forgotPassword: 'Forgot password?',

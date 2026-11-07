@@ -455,6 +455,9 @@ export const useAppStore = defineStore('app', {
         isSIT() {
           return import.meta.env.VITE_APP_LOCATION === 'sit'
         },
+        isDemoLogiSofts() {
+          return import.meta.env.VITE_APP_LOCATION === 'demo_logisofts'
+        },
       }
     },
   },

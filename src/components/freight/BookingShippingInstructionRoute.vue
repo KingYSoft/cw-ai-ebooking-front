@@ -1,7 +1,7 @@
 <template>
   <div class="ref-form-pre mt-2">
     <v-row dense>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" md="3" sm="6">
         <div class="d-flex align-center ga-1 w-100">
           <div class="text-caption text-end w-label-100">{{ detailField('hblNo') }}:</div>
 
@@ -17,7 +17,7 @@
         </div>
       </v-col>
 
-      <v-col class="d-flex align-center" cols="12" sm="6" md="3">
+      <v-col class="d-flex align-center" cols="12" md="3" sm="6">
         <v-checkbox
           v-model="doc.shipper_load_and_count"
           color="primary"
@@ -37,7 +37,7 @@
     </v-row>
 
     <v-row dense>
-      <v-col v-for="port in portRows[0]" :key="port.codeKey" cols="12" sm="6" md="3">
+      <v-col v-for="port in portRows[0]" :key="port.codeKey" cols="12" md="3" sm="6">
         <div class="d-flex align-center ga-1 w-100">
           <div class="text-caption text-end w-label-100">
             {{ detailField(port.labelKey) }}<span class="text-red">*</span>:
@@ -64,7 +64,7 @@
         </div>
       </v-col>
 
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" md="3" sm="6">
         <div class="d-flex align-center ga-1 w-100">
           <div class="text-caption text-end w-label-110">
             {{ detailField('vessel') }}<span class="text-red">*</span>:
@@ -82,7 +82,7 @@
         </div>
       </v-col>
 
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" md="3" sm="6">
         <div class="d-flex align-center ga-1 w-100">
           <div class="text-caption text-end w-label-110">
             {{ detailField('etd') }}<span class="text-red">*</span>:
@@ -101,7 +101,7 @@
     </v-row>
 
     <v-row dense>
-      <v-col v-for="port in portRows[1]" :key="port.codeKey" cols="12" sm="6" md="3">
+      <v-col v-for="port in portRows[1]" :key="port.codeKey" cols="12" md="3" sm="6">
         <div class="d-flex align-center ga-1 w-100">
           <div class="text-caption text-end w-label-100">
             {{ detailField(port.labelKey) }}<span class="text-red">*</span>:
@@ -128,7 +128,7 @@
         </div>
       </v-col>
 
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" md="3" sm="6">
         <div class="d-flex align-center ga-1 w-100">
           <div class="text-caption text-end w-label-110">
             {{ detailField('voyage') }}<span class="text-red">*</span>:
@@ -146,7 +146,7 @@
         </div>
       </v-col>
 
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" md="3" sm="6">
         <div class="d-flex align-center ga-1 w-100">
           <div class="text-caption text-end w-label-110">
             {{ detailField('eta') }}<span class="text-red">*</span>:
@@ -204,7 +204,7 @@
         </div>
       </v-col>
 
-      <v-col cols="12" sm="4" md="2">
+      <v-col cols="12" md="2" sm="4">
         <v-text-field
           v-model="doc.no_of_package_desc"
           density="compact"
@@ -214,7 +214,7 @@
         />
       </v-col>
 
-      <v-col cols="12" sm="4" md="2">
+      <v-col cols="12" md="2" sm="4">
         <v-text-field
           v-model="doc.gross_weight_desc"
           density="compact"
@@ -224,7 +224,7 @@
         />
       </v-col>
 
-      <v-col cols="12" sm="4" md="2">
+      <v-col cols="12" md="2" sm="4">
         <v-text-field
           v-model="doc.cbm_desc"
           density="compact"

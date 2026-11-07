@@ -86,9 +86,9 @@
                 class="flex-1-1 status-filter-select"
                 density="compact"
                 hide-details
-                :items="statusOptions"
                 item-title="title"
                 item-value="value"
+                :items="statusOptions"
                 multiple
                 single-line
                 variant="outlined"
@@ -198,8 +198,8 @@
 
   import { bookingQueryPage } from '@/api/booking'
   import FPageLayout from '@/components/FPageLayout.vue'
-  import FTableLayout from '@/components/FTableLayout.vue'
   import OcrBookingDialog from '@/components/freight/OcrBookingDialog.vue'
+  import FTableLayout from '@/components/FTableLayout.vue'
   import PageFilterBar from '@/components/PageFilterBar.vue'
   import StatusBadge from '@/components/StatusBadge.vue'
   import {

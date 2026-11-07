@@ -21,6 +21,7 @@
             <div class="login-feature__icon">
               <v-icon :color="item.iconColor" :icon="item.icon" size="16" />
             </div>
+
             <div class="login-feature__title">{{ item.title }}</div>
             <p class="login-feature__desc">{{ item.desc }}</p>
           </div>
@@ -29,10 +30,17 @@
 
       <section class="login-panel">
         <div class="login-panel__top">
-          <img alt="SJ Clemenger" class="login-panel__logo" :src="logoSrc" />
+          <img
+            v-if="appStore.env.isDemoLogiSofts()"
+            class="login-panel__logo"
+            :src="logiSoftslogoSrc"
+          >
+
+          <img v-else alt="SJ Clemenger" class="login-panel__logo" :src="logoSrc">
 
           <div class="login-panel__lang">
             <v-icon color="#94a3b8" icon="mdi-earth" size="14" />
+
             <v-select
               class="login-panel__lang-field"
               density="compact"
@@ -54,12 +62,14 @@
               <span class="login-panel__access-dot" />
               {{ l('portalAccess') }}
             </div>
+
             <h2>{{ l('signInTitle') }}</h2>
             <p>{{ l('signInSubtitle') }}</p>
           </div>
 
           <v-form ref="refLoginForm" class="login-form" @submit.prevent="loginHandle">
             <label class="login-form__label">{{ l('label.email') }}</label>
+
             <v-text-field
               v-model="email"
               class="login-form__field"
@@ -76,6 +86,7 @@
               <label class="login-form__label">{{ l('label.password') }}</label>
               <a class="login-form__forgot" href="#" @click.prevent>{{ l('forgotPassword') }}</a>
             </div>
+
             <v-text-field
               v-model="pwd"
               :append-inner-icon="pwdVis ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
@@ -105,7 +116,12 @@
         </div>
 
         <div class="login-panel__footer">
-          <span>{{ l('copyright') }}</span>
+          <span>{{
+            appStore.env.isDemoLogiSofts()
+              ? '© 2026 LogiSofts Logistics Platform. All rights reserved.'
+              : l('copyright')
+          }}</span>
+
           <div class="login-panel__links">
             <button type="button" @click="supportOpen = true">{{ l('help') }}</button>
             <a href="/privacy" rel="noopener noreferrer" target="_blank">{{ l('p2') }}</a>
@@ -122,32 +138,33 @@
             <v-icon color="#0f2c59" icon="mdi-headset" size="18" />
             <span>{{ l('supportTitle') }}</span>
           </div>
+
           <v-btn icon="mdi-close" size="small" variant="text" @click="supportOpen = false" />
         </div>
+
         <v-card-text>
           <p class="login-support__intro">{{ l('supportIntro') }}</p>
+
           <div class="login-support__box">
             <div class="login-support__row">
               <span>{{ l('supportHotline') }}</span>
               <strong>{{ l('supportHotlineValue') }}</strong>
             </div>
+
             <div class="login-support__row">
               <span>{{ l('supportDesk') }}</span>
               <strong class="login-support__accent">{{ l('supportDeskValue') }}</strong>
             </div>
+
             <div class="login-support__row">
               <span>{{ l('supportHours') }}</span>
               <strong>{{ l('supportHoursValue') }}</strong>
             </div>
           </div>
         </v-card-text>
+
         <v-card-actions class="px-6 pb-5">
-          <v-btn
-            block
-            class="login-form__submit"
-            variant="flat"
-            @click="supportOpen = false"
-          >
+          <v-btn block class="login-form__submit" variant="flat" @click="supportOpen = false">
             {{ l('close') }}
           </v-btn>
         </v-card-actions>
@@ -165,6 +182,7 @@
   import { useLocale } from 'vuetify'
   import { login } from '@/api/login'
   import bgImg from '@/assets/images/login/bg.jpg'
+  import logiSoftslogoSrc from '@/assets/images/login/logisofts_logo.png'
   import logoSrc from '@/assets/images/login/logo.png'
   import { useAppStore } from '@/stores/app'
   import { clearAuthSession, setAuthSession } from '@/utils/authSession'

@@ -19,8 +19,8 @@
             item-value="key"
             :items="inputSearchData.field1.keyItems"
             :list-props="{ density: 'compact' }"
-            :menu-props="{ 'max-width': 'auto' }"
             max-width="120"
+            :menu-props="{ 'max-width': 'auto' }"
             min-width="120"
             no-filter
             variant="underlined"
@@ -36,8 +36,8 @@
             hide-details
             :items="inputSearchData.field1.opItems"
             :list-props="{ density: 'compact' }"
-            :menu-props="{ 'max-width': 'auto' }"
             max-width="120"
+            :menu-props="{ 'max-width': 'auto' }"
             min-width="120"
             no-filter
             variant="outlined"

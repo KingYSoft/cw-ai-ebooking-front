@@ -8,13 +8,23 @@
 
       <v-toolbar color="primary">
         <v-card-title class="text-h5">
-          {{ t('$vuetify.custom.app.title') }}
+          {{
+            appStore.env.isDemoLogiSofts()
+              ? 'LogiSofts Booking Portal'
+              : t('$vuetify.custom.app.title')
+          }}
         </v-card-title>
       </v-toolbar>
 
       <v-card-text>
         <v-sheet class="ma-auto my-0" color="transparent" max-width="200">
-          <v-img :lazy-src="logoSrc" :src="logoSrc" />
+          <v-img
+            v-if="appStore.env.isDemoLogiSofts()"
+            :lazy-src="logiSoftslogoSrc"
+            :src="logiSoftslogoSrc"
+          />
+
+          <v-img v-else :lazy-src="logoSrc" :src="logoSrc" />
         </v-sheet>
 
         <v-card-title class="px-0 pb-4 text-subtitle-1">
@@ -58,6 +68,7 @@
   import { ref, watch } from 'vue'
   import { useLocale } from 'vuetify'
   import { login } from '@/api/login'
+  import logiSoftslogoSrc from '@/assets/images/login/logisofts_logo.png'
   import logoSrc from '@/assets/images/login/logo.png'
   import { useAppStore } from '@/stores/app'
   import { clearAuthSession, setAuthSession } from '@/utils/authSession'

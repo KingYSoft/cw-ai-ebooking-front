@@ -1,5 +1,7 @@
 import * as signalR from '@microsoft/signalr'
 import { defineStore } from 'pinia'
+import { getAccessToken } from '@/utils/authSession'
+import { getFacadeLanguageCulture } from '@/utils/locale'
 import { useAppStore } from './app'
 
 export const useSignalrStore = defineStore('signalr', {
@@ -81,6 +83,13 @@ export const useSignalrStore = defineStore('signalr', {
           'Starting connection using ' + signalR.HttpTransportType[transport] + ' transport',
         )
         that.withUrlOptions.transport = transport
+        const lang = localStorage.getItem('lang') || ''
+        const cookieLangValue = getFacadeLanguageCulture(lang)
+        const token = getAccessToken()
+        that.withUrlOptions.headers = {
+          Authorization: `Bearer ${token}`,
+          'Facade-Language': `c=${cookieLangValue}|uic=${cookieLangValue}`,
+        }
         const connection = new signalR.HubConnectionBuilder()
           .withAutomaticReconnect({
             nextRetryDelayInMilliseconds: retryContext => {
@@ -109,9 +118,9 @@ export const useSignalrStore = defineStore('signalr', {
           .catch(error => {
             console.log(
               'Cannot start the connection using ' +
-              signalR.HttpTransportType[transport] +
-              ' transport. ' +
-              error.message,
+                signalR.HttpTransportType[transport] +
+                ' transport. ' +
+                error.message,
             )
             if (transport !== signalR.HttpTransportType.LongPolling) {
               return start(transport + 1)
