@@ -84,7 +84,12 @@
   <div>
     <v-footer class="portal-sidebar-footer px-4 py-3" color="transparent" height="auto">
       <div class="portal-sidebar-footer__text">
-        <span class="portal-sidebar-footer__title">{{ t('$vuetify.custom.app.title') }}</span>
+        <span class="portal-sidebar-footer__title">{{
+          appStore.env.isDemoLogiSofts()
+            ? 'LogiSofts Booking Portal'
+            : t('$vuetify.custom.app.title')
+        }}</span>
+
         <span>&copy; {{ new Date().getFullYear() }}</span>
       </div>
     </v-footer>
@@ -93,7 +98,10 @@
 
 <script setup>
   import { useLocale } from 'vuetify'
+  import { useAppStore } from '@/stores/app'
+
   const { t } = useLocale()
+  const appStore = useAppStore()
   defineOptions({
     name: 'AppFooter',
   })

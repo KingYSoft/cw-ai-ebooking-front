@@ -13,7 +13,14 @@
             <v-card-text>
               <div class="privacy-content">
                 <div class="mb-4 text-body-1">
-                  {{ t('$vuetify.custom.privacyPage.desc') }}
+                  {{
+                    appStore.env.isDemoLogiSofts()
+                      ? `${t('$vuetify.custom.privacyPage.desc')}`.replaceAll(
+                        'SJ Clemenger',
+                        'LogiSofts',
+                      )
+                      : t('$vuetify.custom.privacyPage.desc')
+                  }}
                 </div>
 
                 <div class="mb-4">
@@ -100,6 +107,9 @@
 
 <script setup>
   import { useLocale } from 'vuetify'
+  import { useAppStore } from '@/stores/app'
+
+  const appStore = useAppStore()
   defineOptions({
     name: 'PrivacyPolicy',
   })

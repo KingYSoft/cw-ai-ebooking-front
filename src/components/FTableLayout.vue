@@ -42,6 +42,7 @@
           <template #header.actions>
             <slot name="header-actions" />
           </template>
+
           <template
             v-for="header in autoStatusHeaders"
             :key="`status-${header.key}`"
@@ -87,6 +88,7 @@
           <template #header.actions>
             <slot name="header-actions" />
           </template>
+
           <template
             v-for="header in autoStatusHeaders"
             :key="`status-${header.key}`"

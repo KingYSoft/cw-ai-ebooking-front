@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="open" max-width="800" persistent @update:model-value="onClose">
+  <v-dialog max-width="800" :model-value="open" persistent @update:model-value="onClose">
     <v-card
       :disabled="loading"
       :loading="loading"

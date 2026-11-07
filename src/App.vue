@@ -23,7 +23,7 @@
 
   import { useAppStore } from '@/stores/app'
   import { useUserStore } from '@/stores/user'
-  import { getHtmlLang } from '@/utils/locale'
+  import { getFacadeLanguageCulture, getHtmlLang } from '@/utils/locale'
 
   const appStore = useAppStore()
   const userStore = useUserStore()
@@ -40,17 +40,24 @@
     if (localStorage.getItem('lang')) {
       const lang = localStorage.getItem('lang')
       current.value = lang
-      document.title = t('$vuetify.custom.app.title')
+      if (appStore.env.isPRD() || appStore.env.isSIT() || appStore.env.isUAT()) {
+        document.title = t('$vuetify.custom.app.title')
+      }
       document.documentElement.lang = getHtmlLang(lang)
       localStorage.setItem('lang', lang)
     } else {
       // 默认 en
       current.value = 'en'
-      document.title = t('$vuetify.custom.app.title')
+      if (appStore.env.isPRD() || appStore.env.isSIT() || appStore.env.isUAT()) {
+        document.title = t('$vuetify.custom.app.title')
+      }
       document.documentElement.lang = 'en'
       localStorage.setItem('lang', 'en')
     }
-    userStore.changeSetting('Abp.Localization.DefaultLanguageName', current.value)
+    userStore.changeSetting(
+      'Abp.Localization.DefaultLanguageName',
+      getFacadeLanguageCulture(current.value),
+    )
 
     // 设置主题
     const tTheme = localStorage.getItem('theme')

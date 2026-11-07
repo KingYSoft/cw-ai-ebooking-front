@@ -62,8 +62,8 @@
             item-value="key"
             :items="inputSearchData.field2.keyItems"
             :list-props="{ density: 'compact' }"
-            :menu-props="{ 'max-width': 'auto' }"
             max-width="120"
+            :menu-props="{ 'max-width': 'auto' }"
             min-width="120"
             no-data-text="$vuetify.custom.app.searchMore"
             no-filter

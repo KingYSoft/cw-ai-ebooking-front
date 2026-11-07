@@ -11,6 +11,7 @@
     "build:uat": "yarn type-check && yarn build-only --mode uat",
     "build:sit": "yarn type-check && yarn build-only --mode sit",
     "build:prd": "yarn type-check && yarn build-only --mode prd",
+    "build:demo_logisofts": "yarn type-check && yarn build-only --mode demo_logisofts",
     "type-check": "vue-tsc --noEmit",
     "vite:hook": "tsx scripts/vite-runner.js",
     "lint": "eslint . --fix --ignore-pattern \"src/components/DataTableFilter.vue\"",

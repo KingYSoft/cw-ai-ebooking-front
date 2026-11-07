@@ -27,7 +27,13 @@
         </template>
 
         <v-sheet color="transparent" width="90">
-          <v-img :lazy-src="logoSrc" :src="logoSrc" />
+          <v-img
+            v-if="appStore.env.isDemoLogiSofts()"
+            :lazy-src="logiSoftslogoSrc"
+            :src="logiSoftslogoSrc"
+          />
+
+          <v-img v-else :lazy-src="logoSrc" :src="logoSrc" />
         </v-sheet>
 
         <v-app-bar-title>
@@ -320,7 +326,11 @@
 
       <v-navigation-drawer
         ref="refDrawer"
-        :class="['portal-sidebar', sidebarCompact ? 'portal-sidebar--compact' : '', fluid ? 'nav-collapse' : '']"
+        :class="[
+          'portal-sidebar',
+          sidebarCompact ? 'portal-sidebar--compact' : '',
+          fluid ? 'nav-collapse' : '',
+        ]"
         color="nav"
         expand-on-hover
         :model-value="drawer"
@@ -477,6 +487,7 @@
   import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useDisplay, useLocale } from 'vuetify'
+  import logiSoftslogoSrc from '@/assets/images/login/logisofts_logo.png'
   import logoSrc from '@/assets/images/login/logo.png'
   import { useAppStore } from '@/stores/app'
   import { useRightDrawerStore } from '@/stores/right-drawer'
@@ -735,7 +746,7 @@
     ;(items || []).forEach(item => {
       if (item?.children?.length) {
         codes.push(item.code)
-        codes.push(...collectMenuGroupCodes(item.children))
+        // codes.push(...collectMenuGroupCodes(item.children))
       }
     })
     return codes
