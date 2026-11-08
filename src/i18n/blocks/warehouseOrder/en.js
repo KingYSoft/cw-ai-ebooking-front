@@ -73,8 +73,8 @@ export default {
   edit: {
     pageTitle: 'Warehouse Order',
     warehouseTitle: 'Warehouse',
-    newPageTitle: 'New Warehouse',
-    newTabTitle: 'New Warehouse',
+    newPageTitle: 'New Shipping Order',
+    newTabTitle: 'New Shipping Order',
     printTitle: 'Shipping Order',
     button: {
       edit: 'Request Unlock',

@@ -73,8 +73,8 @@ export default {
   edit: {
     pageTitle: '倉庫訂單',
     warehouseTitle: '倉庫',
-    newPageTitle: '新建倉庫訂單',
-    newTabTitle: '新建倉庫',
+    newPageTitle: '新建 Shipping Order',
+    newTabTitle: '新建 Shipping Order',
     printTitle: 'Shipping Order',
     button: {
       edit: '請求解鎖',
