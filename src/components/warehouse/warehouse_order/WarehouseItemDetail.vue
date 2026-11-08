@@ -259,17 +259,18 @@
           </div>
         </template>
 
-        <template #item.woi_pieces="{ item }">
-          <v-number-input
-            v-model="item.woi_pieces"
-            control-variant="hidden"
-            density="compact"
-            hide-details
-            :precision="WAREHOUSE_MEASURE_DECIMALS"
-            :rules="lineMeasureRules.woi_pieces"
-            variant="outlined"
-          />
-        </template>
+       <template #item.woi_pieces="{ item }">
+  <v-number-input
+    :model-value="item.woi_pieces"
+    control-variant="hidden"
+    density="compact"
+    hide-details
+    :precision="0"
+    :rules="lineMeasureRules.woi_pieces"
+    variant="outlined"
+    @update:model-value="value => (item.woi_pieces = normalizeInteger(value))"
+  />
+</template>
 
         <template #item.woi_is_palletization="{ item }">
           <v-checkbox-btn
@@ -670,6 +671,17 @@
     item.woi_hs_code = String(value ?? '').toUpperCase()
   }
 
+  // 增加整数转换方法
+const normalizeInteger = value => {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const number = Number(value)
+
+  return Number.isFinite(number) ? Math.trunc(number) : null
+}
+
   const lineMeasureRules = computed(() => ({
     woi_gross_wt: [measureRequiredRule(itemHeader('grossWeight'))],
     woi_net_wt: [measureRequiredRule(itemHeader('netWeight'))],
@@ -818,7 +830,7 @@
       net_weight: formatWarehouseMeasureNumber(sum('woi_net_wt')),
       volume: formatWarehouseMeasureNumber(sum('woi_volume')),
       package_count: formatWarehouseMeasureNumber(sum('woi_outer_pack'), 0),
-      pieces: formatWarehouseMeasureNumber(sum('woi_pieces')),
+      pieces: formatWarehouseMeasureNumber(sum('woi_pieces'), 0),
     }
   })
 

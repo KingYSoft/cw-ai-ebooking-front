@@ -35,6 +35,7 @@ export default {
     orderNo: '訂單號',
     soNumber: 'SO 編號',
     containerNumber: '櫃號',
+    carrierSoNumber: '船公司號碼',
     soRelease: 'So Release',
     marketId: '市場組',
     deliveryMode: '交付方式',
