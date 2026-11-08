@@ -218,7 +218,7 @@ export default {
       booking: 'Booking',
 
       warehouse: 'Warehouse',
-      warehouse_booking: 'Booking',
+      warehouse_booking: 'Shipping Order',
 
       po_management: 'PO Management',
       po_details: 'PO Details',

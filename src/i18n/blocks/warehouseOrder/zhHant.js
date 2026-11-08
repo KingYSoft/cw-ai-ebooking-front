@@ -1,7 +1,7 @@
 export default {
   list: {
     new: '新建',
-    pageTitle: '倉庫訂單',
+    pageTitle: 'Shipping Order',
   },
   import: {
     action: '匯入',

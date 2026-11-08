@@ -1,7 +1,7 @@
 export default {
   list: {
     new: 'New',
-    pageTitle: 'Warehouse Orders',
+    pageTitle: 'Shipping Order',
   },
   import: {
     action: 'Import',

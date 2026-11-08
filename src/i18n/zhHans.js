@@ -217,7 +217,7 @@ export default {
       booking: '订舱',
 
       warehouse: '仓库',
-      warehouse_booking: '订舱',
+      warehouse_booking: '发货订单',
 
       po_management: 'PO 管理',
       po_details: 'PO 明细',

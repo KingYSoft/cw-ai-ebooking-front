@@ -1,7 +1,7 @@
 export default {
   list: {
     new: '新建',
-    pageTitle: '仓库订单',
+    pageTitle: '发货订单',
   },
   import: {
     action: '导入',

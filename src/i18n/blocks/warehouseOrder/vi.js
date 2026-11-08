@@ -1,7 +1,7 @@
 export default {
   list: {
     new: 'Mới',
-    pageTitle: 'Đơn kho',
+    pageTitle: 'Shipping Order',
   },
   import: {
     action: 'Import',
