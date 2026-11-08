@@ -1,7 +1,7 @@
 export default {
   list: {
     new: '新建',
-    pageTitle: '仓库订单',
+    pageTitle: '发货订单',
   },
   import: {
     action: '导入',
@@ -73,8 +73,8 @@ export default {
   edit: {
     pageTitle: '仓库订单',
     warehouseTitle: '仓库',
-    newPageTitle: '新建仓库订单',
-    newTabTitle: '新建仓库',
+    newPageTitle: '新建发货订单',
+    newTabTitle: '新建发货订单',
     printTitle: '发货订单',
     button: {
       edit: '请求解锁',

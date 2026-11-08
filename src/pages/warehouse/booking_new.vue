@@ -57,7 +57,7 @@
       keepAlive: false,
       requiresAuth: true,
       isLayout: true,
-      tabTitle: 'New Warehouse',
+      tabTitle: 'New Shipping Order',
     },
   })
 

@@ -1,7 +1,7 @@
 export default {
   list: {
     new: 'Mới',
-    pageTitle: 'Đơn kho',
+    pageTitle: 'Shipping Order',
   },
   import: {
     action: 'Import',
@@ -73,8 +73,8 @@ export default {
   edit: {
     pageTitle: 'Đơn kho',
     warehouseTitle: 'Kho',
-    newPageTitle: 'Tạo đơn kho mới',
-    newTabTitle: 'Kho mới',
+    newPageTitle: 'New Shipping Order',
+    newTabTitle: 'New Shipping Order',
     printTitle: 'Shipping Order',
     button: {
       edit: 'Yêu cầu mở khóa',

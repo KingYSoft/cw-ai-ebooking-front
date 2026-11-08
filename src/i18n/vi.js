@@ -218,7 +218,7 @@ export default {
       booking: 'Đặt chỗ',
 
       warehouse: 'Kho',
-      warehouse_booking: 'Đặt chỗ',
+      warehouse_booking: 'Shipping Order',
 
       po_management: 'Quản lý PO',
       po_details: 'Chi tiết PO',
