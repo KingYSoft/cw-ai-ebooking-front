@@ -35,6 +35,7 @@ export default {
     orderNo: 'Order No.',
     soNumber: 'SO No.',
     containerNumber: 'Container Number',
+    carrierSoNumber:'Carrier SO Number',
     soRelease: 'So Release',
     marketId: 'Market Group',
     deliveryMode: 'Delivery Mode',

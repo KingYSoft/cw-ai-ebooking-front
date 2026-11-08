@@ -179,7 +179,7 @@
       minWidth: '220px',
     },
     {
-      title: header('containerNumber'),
+      title: header('carrierSoNumber'),
       key: 'wso_so_number',
       align: 'start',
       minWidth: '180px',
