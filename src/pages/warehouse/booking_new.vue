@@ -185,7 +185,7 @@
 
   const initNewBookingPage = async () => {
     await queryData()
-    if (applyRecognizePrefill(route)) {
+    if (await applyRecognizePrefill(route)) {
       markInputDataSaved()
     }
   }

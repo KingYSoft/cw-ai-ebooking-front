@@ -1,7 +1,13 @@
 import { ref } from 'vue'
 import { useLocale } from 'vuetify'
+import { getWhsMarket, getWhsMarketOptions, getWhsMarketPlantOptions } from '@/api/whs-market'
 import { whsOrderDetail } from '@/api/whs-order'
-import { mapWhsOrderDetailToForm, saveWhsOrderFromForm } from '@/composables/mapWhsOrderDetail'
+import {
+  mapWhsMarketPartyToAddress,
+  mapWhsOrderDetailToForm,
+  resolveWhsMarketNotifySameAsConsignee,
+  saveWhsOrderFromForm,
+} from '@/composables/mapWhsOrderDetail'
 import { useUnsavedInputDataGuard } from '@/composables/useUnsavedInputDataGuard'
 import { useAppStore } from '@/stores/app'
 
@@ -145,7 +151,85 @@ function buildRecognizePrefillForm(mapped) {
   return buildWhsOrderFormFromMapped(mapped, { clearIdentity: true })
 }
 
-export function applyRecognizePrefillToInputData(inputDataRef, route) {
+function resolvePlantIdFromOption(opt) {
+  return String(opt?.plant_id ?? opt?.PlantId ?? opt?.plantId ?? '').trim()
+}
+
+function resolveMarketNameFromOption(opt) {
+  return String(opt?.market_group ?? opt?.market ?? opt?.Market ?? '').trim()
+}
+
+async function resolveRecognizeMarketPk(form) {
+  const existing = String(form?.wso_market_pk ?? form?.market?.pk ?? '').trim()
+  if (existing) {
+    return existing
+  }
+
+  const marketName = String(form?.market?.market ?? form?.wso_market ?? '').trim()
+  const plantId = String(form?.market?.plant_id ?? form?.wso_plant_id ?? '').trim()
+  if (!marketName || !plantId) {
+    return ''
+  }
+
+  try {
+    const { data } = await getWhsMarketPlantOptions({ query: marketName })
+    const list = Array.isArray(data) ? data : []
+    const group =
+      list.find(item => resolveMarketNameFromOption(item) === marketName) ??
+      (list.length === 1 ? list[0] : null)
+    const plants = Array.isArray(group?.plant_options) ? group.plant_options : []
+    const matchedPlant = plants.find(opt => resolvePlantIdFromOption(opt) === plantId)
+    const plantPk = String(matchedPlant?.pk ?? '').trim()
+    if (plantPk) {
+      return plantPk
+    }
+
+    const { data: optData } = await getWhsMarketOptions({ query: marketName })
+    const optList = Array.isArray(optData) ? optData : []
+    const matchedOption = optList.find(opt => {
+      const optionPlantId = resolvePlantIdFromOption(opt)
+      const optionMarket = String(opt?.market ?? opt?.Market ?? '').trim()
+      return optionPlantId === plantId && (!optionMarket || optionMarket === marketName)
+    })
+    return String(matchedOption?.pk ?? '').trim()
+  } catch (error) {
+    console.error('resolveRecognizeMarketPk failed:', error)
+    return ''
+  }
+}
+
+async function applyRecognizeMarketParties(form) {
+  const marketPk = await resolveRecognizeMarketPk(form)
+  if (!marketPk || !form) {
+    return
+  }
+  form.wso_market_pk = marketPk
+  if (form.market && typeof form.market === 'object') {
+    form.market.pk = marketPk
+  }
+  try {
+    const { data } = await getWhsMarket(marketPk)
+    if (!data) {
+      return
+    }
+    form.consignee_code = data.consignee_code ?? ''
+    form.notify_party_code = data.notify_party_code ?? ''
+    form.consignee = mapWhsMarketPartyToAddress(data.consignee, 'CONSIGNEE')
+    const notifyParty = data.notify ?? data.notify_party
+    form.notify_party = mapWhsMarketPartyToAddress(notifyParty, 'NOTIFY_PARTY')
+    form.notify_party_same_as_consignee = resolveWhsMarketNotifySameAsConsignee(notifyParty)
+    if (form.notify_party_same_as_consignee === 'Y') {
+      const name = String(form.notify_party?.add_address_name ?? '').trim()
+      if (!name) {
+        form.notify_party = { add_address_name: 'SAME AS CONSIGNEE' }
+      }
+    }
+  } catch (error) {
+    console.error('applyRecognizeMarketParties failed:', error)
+  }
+}
+
+export async function applyRecognizePrefillToInputData(inputDataRef, route) {
   if (route?.query?.source !== 'recognize') {
     return false
   }
@@ -154,6 +238,7 @@ export function applyRecognizePrefillToInputData(inputDataRef, route) {
   if (!rawRecognize) {
     return false
   }
+  sessionStorage.removeItem(WHS_ORDER_RECOGNIZE_STORAGE_KEY)
 
   try {
     const parsed = JSON.parse(rawRecognize)
@@ -164,12 +249,11 @@ export function applyRecognizePrefillToInputData(inputDataRef, route) {
     inputDataRef.value = buildRecognizePrefillForm(mapped)
     inputDataRef.value.shipper = loginShipper
     applyDefaultDeliveryModeFromWarehouse(inputDataRef.value)
+    await applyRecognizeMarketParties(inputDataRef.value)
     return true
   } catch (error) {
     console.error('Failed to parse recognize warehouse order data:', error)
     return false
-  } finally {
-    sessionStorage.removeItem(WHS_ORDER_RECOGNIZE_STORAGE_KEY)
   }
 }
 
