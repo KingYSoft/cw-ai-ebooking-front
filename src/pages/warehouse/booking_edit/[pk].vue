@@ -44,18 +44,6 @@
             {{ editButton('edit') }}
           </v-btn>
 
-          <v-btn
-            v-if="showEnterEditButton"
-            color="primary"
-            :disabled="cardLoading"
-            prepend-icon="mdi-pencil"
-            size="small"
-            variant="flat"
-            @click.stop="onEnterEditMode"
-          >
-            {{ editButton('enterEdit') }}
-          </v-btn>
-
           <v-menu>
             <template #activator="{ props: menuProps }">
               <v-btn
@@ -261,7 +249,6 @@
   const bookingEmptyVis = ref(false)
   const submitConfirmVis = ref(false)
   const unlockLoading = ref(false)
-  const isEditMode = ref(false)
   const { pdfTitle, pdfUrl, pdfDiaVis, closePdfPreview, onPrintWhsOrder } = useWhsOrderPrint()
 
   const queryData = async pk => {
@@ -294,9 +281,13 @@
   const isDiOrder = computed(
     () => String(inputData.value?.wso_trade_type ?? '').trim().toUpperCase() === 'DI',
   )
-  const isEditing = computed(
-    () => isEditMode.value && isOrderedStatus.value && isDraftStatus.value,
-  )
+
+  // Draft + Ordered 状态下，默认允许进入编辑状态
+const isEditing = computed(
+  () => isOrderedStatus.value && isDraftStatus.value,
+)
+
+
   const editLockGuard = useEditLockGuard({
     businessType: 'warehouse_order',
     pk: computed(() => (isEditing.value ? route.params.pk?.toString() || '' : '')),
@@ -311,31 +302,17 @@
       !isEditing.value &&
       !unlockLoading.value,
   )
-  const showEnterEditButton = computed(
-    () => isDraftStatus.value && isOrderedStatus.value && !isEditing.value,
-  )
+
   const showPrintButton = computed(
     () => isOrderSubmitted.value || isPendingApproveStatus.value,
   )
-  const showToolbarActions = computed(
-    () =>
-      showPrintButton.value ||
-      showRequestUnlockButton.value ||
-      showEnterEditButton.value ||
-      (isEditing.value && (activedTab.value === 1 || activedTab.value === 2)),
-  )
 
-  const onEnterEditMode = async () => {
-    if (!showEnterEditButton.value) {
-      return
-    }
-
-    isEditMode.value = true
-    const acquired = await editLockGuard.acquireLock()
-    if (!acquired) {
-      isEditMode.value = false
-    }
-  }
+const showToolbarActions = computed(
+  () =>
+    showPrintButton.value ||
+    showRequestUnlockButton.value ||
+    (isEditing.value && (activedTab.value === 1 || activedTab.value === 2)),
+)
 
   const onRequestUnlock = async () => {
     if (!showRequestUnlockButton.value) {

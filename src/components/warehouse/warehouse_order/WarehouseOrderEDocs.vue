@@ -91,7 +91,7 @@
 <script setup>
   import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from 'vue'
   import { useLocale } from 'vuetify'
-  import { whsEdocSave, whsEdocSearch,whsEdocgetSearch } from '@/api/edoc'
+  import { whsEdocSave, whsEdocSearch } from '@/api/edoc'
   import { downloadFile, FILE_DOCUMENT_SOURCE, previewFile } from '@/api/files'
   import FPdfPreview from '@/components/FPdfPreview.vue'
   import FTableLayout from '@/components/FTableLayout.vue'
@@ -187,7 +187,7 @@
     }
 
     try {
-      const response = await whsEdocgetSearch({
+      const response = await whsEdocSearch({
         related_key: String(inputData.value.pk),
       })
       if (response?.success) {
