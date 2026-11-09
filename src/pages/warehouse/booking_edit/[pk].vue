@@ -56,16 +56,42 @@
             {{ editButton('enterEdit') }}
           </v-btn>
 
-          <v-btn
-            v-if="showPrintButton"
-            color="secondary"
-            :disabled="cardLoading"
-            size="small"
-            variant="flat"
-            @click.stop="onPrintHandle"
-          >
-            {{ editButton('print') }}
-          </v-btn>
+          <v-menu>
+            <template #activator="{ props: menuProps }">
+              <v-btn
+                v-if="showPrintButton"
+                v-bind="menuProps"
+                append-icon="mdi-menu-down"
+                color="secondary"
+                :disabled="cardLoading"
+                size="small"
+                variant="flat"
+              >
+                {{ editButton('print') }}
+              </v-btn>
+            </template>
+
+            <v-list density="compact" nav>
+              <v-list-item
+                title="Shipping Order"
+                @click="onPrintHandle('PDF_WHS_000001')"
+              />
+              <v-list-item
+                title="SI FORM"
+                @click="onPrintHandle('PDF_WHS_000002')"
+              />
+              <v-list-item
+                v-if="isOrderReceived"
+                title="CR FORM"
+                @click="onPrintHandle('PDF_WHS_000003')"
+              />
+              <v-list-item
+                v-if="isDiOrder"
+                title="DI FORM"
+                @click="onPrintHandle('PDF_WHS_000004')"
+              />
+            </v-list>
+          </v-menu>
 
           <v-btn
             v-if="isEditing && (activedTab === 1 || activedTab === 2)"
@@ -265,6 +291,9 @@
   const isPendingApproveStatus = computed(() => ebookingStatus.value === 'Pending Approve')
   const isDraftStatus = computed(() => ebookingStatus.value === 'Draft')
   const isOrderReceived = computed(() => resolveShipmentStatus() === 'received')
+  const isDiOrder = computed(
+    () => String(inputData.value?.wso_trade_type ?? '').trim().toUpperCase() === 'DI',
+  )
   const isEditing = computed(
     () => isEditMode.value && isOrderedStatus.value && isDraftStatus.value,
   )
@@ -338,10 +367,10 @@
     }
   }
 
-  const onPrintHandle = async () => {
+  const onPrintHandle = async templateCode => {
     try {
       cardLoading.value = true
-      await onPrintWhsOrder(inputData.value)
+      await onPrintWhsOrder(inputData.value, templateCode)
     } finally {
       cardLoading.value = false
     }
