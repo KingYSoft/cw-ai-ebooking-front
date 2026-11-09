@@ -21,15 +21,7 @@ export const edocSave = params =>
 /** Warehouse Order eDoc 列表 */
 export const whsEdocSearch = params =>
   service({
-    url: '/edoc/search',
-    method: 'post',
-    data: params,
-  })
-
-/** Warehouse Order eDoc 列表 */
-export const whsEdocgetSearch = params =>
-  service({
-    url: '/edoc/search',
+    url: '/edoc/whs-search',
     method: 'get',
     params,
   })
@@ -37,7 +29,7 @@ export const whsEdocgetSearch = params =>
 /** Warehouse Order eDoc 上传 */
 export const whsEdocSave = params =>
   service({
-    url: '/edoc/save',
+    url: '/edoc/whs-save',
     method: 'post',
     data: params,
     headers: {

@@ -1584,6 +1584,32 @@
     return items
   }
 
+  // 详情回显：确保已保存的 Plant ID 存在于下拉选项中
+const ensurePlantIdOptionVisible = (plantId, marketName = '') => {
+  const pid = String(plantId ?? '').trim()
+
+  if (!pid) {
+    return
+  }
+
+  if (plantIdOptionItems.value.some(item => item.value === pid)) {
+    return
+  }
+
+  plantIdOptionItems.value = [
+    ...plantIdOptionItems.value,
+    {
+      title: pid,
+      value: pid,
+      raw: {
+        pk: inputData.value?.wso_market_pk ?? '',
+        market: marketName,
+        plant_id: pid,
+      },
+    },
+  ]
+}
+
   const uniqueMarketNames = computed(() => {
     const seen = new Set()
     const names = []
@@ -1735,35 +1761,61 @@
     }
   }
 
-  const loadPlantIdOptions = async marketName => {
-    const name = String(marketName ?? '').trim()
-    if (!name) {
-      plantIdOptionItems.value = []
-      return
-    }
+const loadPlantIdOptions = async marketName => {
+  const name = String(marketName ?? '').trim()
 
-    plantIdOptionsLoading.value = true
-    try {
-      const { data } = await getWhsMarketPlantOptions({ query: name })
-      const list = Array.isArray(data) ? data : []
-      const group =
-        list.find(item => resolveGroupName(item) === name) ?? (list.length === 1 ? list[0] : null)
-      plantIdOptionItems.value = buildPlantIdOptionItems(group?.plant_options ?? [], '', {
-        matchMarket: false,
-      })
-      if (plantIdOptionItems.value.length === 0) {
-        const { data: optData } = await getWhsMarketOptions({ query: name })
-        const optList = Array.isArray(optData) ? optData : []
-        marketOptions.value = mergeMarketOptions(marketOptions.value, optList)
-        plantIdOptionItems.value = buildPlantIdOptionItems(optList, name, { matchMarket: false })
-      }
-    } catch (error) {
-      console.error('loadPlantIdOptions failed:', error)
-      plantIdOptionItems.value = buildPlantIdOptionItems(marketOptions.value, name)
-    } finally {
-      plantIdOptionsLoading.value = false
-    }
+  if (!name) {
+    plantIdOptionItems.value = []
+    return
   }
+
+  plantIdOptionsLoading.value = true
+
+  try {
+    const { data } = await getWhsMarketPlantOptions({ query: name })
+    const list = Array.isArray(data) ? data : []
+
+    const group =
+      list.find(item => resolveGroupName(item) === name) ??
+      (list.length === 1 ? list[0] : null)
+
+    plantIdOptionItems.value = buildPlantIdOptionItems(
+      group?.plant_options ?? [],
+      '',
+      {
+        matchMarket: false,
+      },
+    )
+
+    if (plantIdOptionItems.value.length === 0) {
+      const { data: optData } = await getWhsMarketOptions({ query: name })
+      const optList = Array.isArray(optData) ? optData : []
+
+      marketOptions.value = mergeMarketOptions(
+        marketOptions.value,
+        optList,
+      )
+
+      plantIdOptionItems.value = buildPlantIdOptionItems(
+        optList,
+        name,
+        { matchMarket: false },
+      )
+    }
+  } catch (error) {
+    console.error('loadPlantIdOptions failed:', error)
+
+    plantIdOptionItems.value = buildPlantIdOptionItems(
+      marketOptions.value,
+      name,
+    )
+  } finally {
+    // 关键：保留当前订单已经保存的 Plant ID
+    ensurePlantIdOptionVisible(selectedPlantId.value, name)
+
+    plantIdOptionsLoading.value = false
+  }
+}
 
   const onOrderMarketNameChange = marketName => {
     if (!inputData.value) {
@@ -1838,29 +1890,77 @@
     }
   }
 
-  const reconcileMarketSelection = async () => {
-    if (!inputData.value) {
-      return
-    }
-    const current = normalizeWhsMarketObject(inputData.value.market)
-    if (!current?.market) {
-      plantIdOptionItems.value = []
-      return
-    }
-    await loadPlantIdOptions(current.market)
-    if (current.plant_id) {
-      const matched = findPlantOption(current.plant_id) ?? findMarketOption(current.market, current.plant_id)
-      if (matched) {
-        syncMarketDerivedFields(inputData.value, {
-          ...matched,
-          market: current.market,
-          plant_id: current.plant_id,
-        })
-        return
-      }
-    }
-    ensureMarketOptionVisible()
+const reconcileMarketSelection = async () => {
+  if (!inputData.value) {
+    return
   }
+
+  // 兼容 market 对象和独立字段
+  const current = normalizeWhsMarketObject({
+    ...(inputData.value.market ?? {}),
+    market: selectedMarketName.value,
+    plant_id: selectedPlantId.value,
+    pk: inputData.value.wso_market_pk ?? inputData.value.market?.pk ?? '',
+  })
+
+  const marketName = current?.market ?? ''
+  const plantId = current?.plant_id ?? ''
+
+  if (!marketName) {
+    // 没有 Market Group，但已有 Plant ID 时，仍然保留显示值
+    plantIdOptionItems.value = plantId
+      ? [{
+          title: plantId,
+          value: plantId,
+          raw: {
+            pk: current?.pk ?? '',
+            market: '',
+            plant_id: plantId,
+          },
+        }]
+      : []
+
+    return
+  }
+
+  await loadPlantIdOptions(marketName)
+
+  if (plantId) {
+    // 优先匹配真实接口选项
+    let matched =
+      findPlantOption(plantId) ??
+      findMarketOption(marketName, plantId)
+
+    // 历史 Plant ID 不在接口选项中时，补充一个回显选项
+    if (!plantIdOptionItems.value.some(item => item.value === plantId)) {
+      plantIdOptionItems.value.push({
+        title: plantId,
+        value: plantId,
+        raw: matched ?? {
+          pk: current.pk ?? '',
+          market: marketName,
+          plant_id: plantId,
+        },
+      })
+    }
+
+    matched = findPlantOption(plantId) ?? matched
+
+    syncMarketDerivedFields(inputData.value, {
+      ...(matched ?? {}),
+      market: marketName,
+      plant_id: plantId,
+    })
+
+    if (matched?.pk) {
+      setWhsOrderMarketPk(matched.pk)
+    }
+
+    return
+  }
+
+  ensureMarketOptionVisible()
+}
 
   const loadMarketOptions = async () => {
     try {
