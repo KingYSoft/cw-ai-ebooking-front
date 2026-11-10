@@ -10,15 +10,9 @@ function isWhsDraft(inputData) {
 }
 
 export function resolveWhsConsignNo({ route, inputData } = {}) {
-  if (isWhsDraft(inputData)) {
-    const tempNo = String(inputData?.wso_temp_number ?? '').trim()
-    if (tempNo) {
-      return tempNo
-    }
-  }
-
   return String(
     inputData?.wso_consign_no ??
+    inputData?.wso_temp_number ??
     inputData?.bkg_consign_no ??
     route?.query?.shipment_no ??
     '',

@@ -204,7 +204,7 @@
     { title: header('destination'), key: 'wso_destination', align: 'start', minWidth: '90px' },
     {
       title: header('targetDelivery'),
-      key: 'wso_delivery_due_date',
+      key: 'wso_est_delivery',
       align: 'start',
       minWidth: '120px',
     },
@@ -264,7 +264,20 @@
     await onPrintWhsOrder(item)
   }
 
-  const mapWhsOrderRow = (item, index) => mapWhsOrderListRow(item, index)
+ const mapWhsOrderRow = (item, index) => {
+  const row = mapWhsOrderListRow(item, index)
+
+  // Carrier SO 存在时，使用 Carrier SO 的 Origin / Destination
+  if (item?.carrier_so) {
+    row.wso_origin =
+      item.carrier_so.port_of_load ?? row.wso_origin
+
+    row.wso_destination =
+      item.carrier_so.final_destination ?? row.wso_destination
+  }
+
+  return row
+}
 
   const queryData = async () => {
     cardLoading.value = true
