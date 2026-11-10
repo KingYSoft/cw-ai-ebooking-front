@@ -32,6 +32,12 @@ export default {
       reason: 'Lý do',
       reasonRequired: 'Vui lòng nhập lý do deactive.',
     },
+    pacMismatch: {
+      title: 'Tiếp tục lưu',
+      message: 'Gross Weight, CBM hoặc số kiện không khớp với chi tiết đóng gói.',
+      yes: 'Có',
+      no: 'Không',
+    },
   },
   message: {
     submitted: 'Booking đã được gửi.',

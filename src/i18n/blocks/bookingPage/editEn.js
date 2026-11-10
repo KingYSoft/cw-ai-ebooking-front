@@ -32,6 +32,12 @@ export default {
       reason: 'Reason',
       reasonRequired: 'Reason is required.',
     },
+    pacMismatch: {
+      title: 'Continue to save',
+      message: 'Gross Weight, CBM or No. of Package mismatch to packing detail.',
+      yes: 'Yes',
+      no: 'No',
+    },
   },
   message: {
     submitted: 'Booking submitted.',

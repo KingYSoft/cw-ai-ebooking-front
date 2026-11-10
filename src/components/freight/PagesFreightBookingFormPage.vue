@@ -237,6 +237,26 @@
       </template>
     </v-card>
   </v-dialog>
+
+  <v-dialog v-model="pacMismatchConfirmVis" max-width="460" persistent>
+    <v-card :title="editDialog('pacMismatch', 'title')">
+      <v-card-text class="pb-2">
+        {{ editDialog('pacMismatch', 'message') }}
+      </v-card-text>
+
+      <template #actions>
+        <v-spacer />
+
+        <v-btn variant="text" @click="cancelPacMismatchSave">
+          {{ editDialog('pacMismatch', 'no') }}
+        </v-btn>
+
+        <v-btn color="primary" variant="flat" @click="confirmPacMismatchSave">
+          {{ editDialog('pacMismatch', 'yes') }}
+        </v-btn>
+      </template>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -258,6 +278,7 @@
   import { useFreightBookingForm } from '@/composables/useFreightBookingForm'
   import { isBookingReleasedOrLater, isSiSubmittedOrLater } from '@/constants/bookingFreightSteps'
   import { useAppStore } from '@/stores/app'
+  import { isBookingHeaderPacMismatch } from '@/utils/pacListSummary'
 
   defineOptions({
     name: 'PagesFreightBookingFormPage',
@@ -305,6 +326,7 @@
   const cancelConfirmVis = ref(false)
   const cancelReasonVis = ref(false)
   const cancelReason = ref('')
+  const pacMismatchConfirmVis = ref(false)
   const cancelReasonRules = [v => Boolean(String(v ?? '').trim()) || editDialog('cancelReason', 'reasonRequired')]
 
   const freightStatus = computed(() =>
@@ -548,7 +570,24 @@
       handleValidationErrors(errors)
       return false
     }
+    if (isBookingHeaderPacMismatch(inputData.value)) {
+      if (pacMismatchConfirmVis.value) {
+        pacMismatchConfirmVis.value = false
+      } else {
+        activedTab.value = 1
+        pacMismatchConfirmVis.value = true
+        return false
+      }
+    }
     return bookingSaveHandle({ showMessage })
+  }
+
+  const cancelPacMismatchSave = () => {
+    pacMismatchConfirmVis.value = false
+  }
+
+  const confirmPacMismatchSave = async () => {
+    await onSaveHandle()
   }
 
   const onSaveHandle = async () => {
