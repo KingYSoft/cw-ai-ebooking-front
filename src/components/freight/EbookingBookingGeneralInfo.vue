@@ -1071,23 +1071,31 @@
 
             <FTextInput
               v-if="!showSiRouteFields"
+              :id="`${fieldIdPrefix}@bkg_goods_description`"
               v-model:text-value="inputData.bkg_goods_description"
               min-width="100%"
+              :rules="inputDataRules.bkg_goods_description"
               :textarea-props="{ label: detailField('goodDesc') }"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('goodDesc') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('goodDesc') }}<span v-if="isLclPacking" class="text-red">*</span>:
+                </div>
               </template>
             </FTextInput>
 
             <FTextInput
               v-if="!showSiRouteFields"
+              :id="`${fieldIdPrefix}@bkg_marks_nos`"
               v-model:text-value="inputData.bkg_marks_nos"
               min-width="100%"
+              :rules="inputDataRules.bkg_marks_nos"
               :textarea-props="{ label: detailField('marksNos') }"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('marksNos') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('marksNos') }}<span v-if="isLclPacking" class="text-red">*</span>:
+                </div>
               </template>
             </FTextInput>
 
@@ -1130,11 +1138,14 @@
               density="compact"
               hide-details
               min-width="100%"
+              :rules="inputDataRules.bkg_po_number"
               type="input"
               variant="outlined"
             >
               <template #prepend>
-                <div class="text-caption text-end w-label-100">{{ detailField('po') }}:</div>
+                <div class="text-caption text-end w-label-100">
+                  {{ detailField('po') }}<span v-if="isFobInco" class="text-red">*</span>:
+                </div>
               </template>
             </v-text-field>
           </div>
@@ -1873,6 +1884,14 @@
   )
 
   const showLooseTable = computed(() => props.showCargoFields && !showContainerTable.value)
+
+  const isFobInco = computed(
+    () => String(inputData.value?.bkg_inco ?? '').trim().toUpperCase() === 'FOB',
+  )
+
+  const isLclPacking = computed(
+    () => String(inputData.value?.bkg_packing_mode ?? '').trim().toUpperCase() === 'LCL',
+  )
 
   const containerRows = computed(() =>
     props.showSiRouteFields
