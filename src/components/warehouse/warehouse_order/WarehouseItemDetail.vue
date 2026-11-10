@@ -1,5 +1,5 @@
 <template>
-  <div :inert="readonly">
+  <div >
     <v-card-text class="py-2">
       <v-btn
         v-if="!readonly"
@@ -29,7 +29,8 @@
       </v-btn>
     </v-card-text>
 
-    <v-form :ref="setRef" class="ref-form-pre" color="background">
+    <!-- <v-form :ref="setRef" class="ref-form-pre" color="background"> -->
+      <v-form :ref="setRef" :readonly="readonly" class="ref-form-pre" color="background">
       <v-card-text class="py-2">
         <v-text-field
           id="2@container_rows_required"
