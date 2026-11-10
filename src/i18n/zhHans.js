@@ -423,6 +423,9 @@ export default {
         bkg_commodity: {
           err: 'Commodity 不能为空。',
         },
+        bkg_po_number: {
+          err: 'PO 不能为空。',
+        },
         bkg_goods_description: {
           err: 'Good Desc. 不能为空。',
         },

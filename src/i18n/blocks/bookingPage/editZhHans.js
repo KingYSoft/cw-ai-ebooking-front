@@ -32,6 +32,12 @@ export default {
       reason: '原因',
       reasonRequired: '请填写停用原因。',
     },
+    pacMismatch: {
+      title: '继续保存',
+      message: '毛重、体积或件数与装箱明细不一致。',
+      yes: '是',
+      no: '否',
+    },
   },
   message: {
     submitted: '订舱已提交。',

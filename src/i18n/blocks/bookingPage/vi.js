@@ -95,6 +95,9 @@ export default {
     bkg_commodity: {
       err: 'Commodity không được để trống.',
     },
+    bkg_po_number: {
+      err: 'PO không được để trống.',
+    },
     bkg_goods_description: {
       err: 'Good Desc. không được để trống.',
     },

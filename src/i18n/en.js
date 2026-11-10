@@ -424,6 +424,9 @@ export default {
         bkg_commodity: {
           err: 'Commodity not null.',
         },
+        bkg_po_number: {
+          err: 'PO not null.',
+        },
         bkg_goods_description: {
           err: 'Good Desc. not null.',
         },

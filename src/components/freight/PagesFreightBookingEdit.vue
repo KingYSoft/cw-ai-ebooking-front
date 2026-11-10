@@ -557,22 +557,37 @@
         }
       },
     ],
+    bkg_po_number: [
+      value => {
+        if (String(inputData.value.bkg_inco ?? '').trim().toUpperCase() !== 'FOB') {
+          return true
+        }
+        if (String(value ?? '').trim()) {
+          return true
+        }
+        return t('$vuetify.custom.bookingPage.form.bkg_po_number.err')
+      },
+    ],
     bkg_goods_description: [
       value => {
-        if (value) {
+        if (String(inputData.value.bkg_packing_mode ?? '').trim().toUpperCase() !== 'LCL') {
           return true
-        } else {
-          return t('$vuetify.custom.bookingPage.form.bkg_goods_description.err')
         }
+        if (String(value ?? '').trim()) {
+          return true
+        }
+        return t('$vuetify.custom.bookingPage.form.bkg_goods_description.err')
       },
     ],
     bkg_marks_nos: [
       value => {
-        if (value) {
+        if (String(inputData.value.bkg_packing_mode ?? '').trim().toUpperCase() !== 'LCL') {
           return true
-        } else {
-          return t('$vuetify.custom.bookingPage.form.bkg_marks_nos.err')
         }
+        if (String(value ?? '').trim()) {
+          return true
+        }
+        return t('$vuetify.custom.bookingPage.form.bkg_marks_nos.err')
       },
     ],
     pac_container_type: [
