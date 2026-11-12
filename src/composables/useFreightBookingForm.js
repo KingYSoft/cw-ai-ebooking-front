@@ -25,10 +25,10 @@ const BOOKING_PAC_REMAINDER_FIELDS = [
   { header: 'bkg_actual_volume', row: 'pac_actual_volume', digits: 5 },
 ]
 
-const getBookingPacRowRemainderFields = inputData => {
-  const rows = inputData?.pac_list ?? []
+const getBookingPacRowRemainderFields = (inputData, rows) => {
+  const list = Array.isArray(rows) ? rows : (inputData?.pac_list ?? [])
   return BOOKING_PAC_REMAINDER_FIELDS.reduce((fields, { header, row, digits }) => {
-    const total = rows.reduce((sum, item) => sum.plus(toDecimal(item?.[row])), new Decimal(0))
+    const total = list.reduce((sum, item) => sum.plus(toDecimal(item?.[row])), new Decimal(0))
     const remainder = toDecimal(inputData?.[header]).minus(total)
     const safeRemainder = remainder.isNegative() ? new Decimal(0) : remainder
     fields[row] = safeRemainder.toDecimalPlaces(digits, Decimal.ROUND_HALF_UP).toNumber()
@@ -167,7 +167,7 @@ export function useFreightBookingForm() {
       }
       rows = inputData.value.pac_list
     }
-    const remainderFields = getBookingPacRowRemainderFields(inputData.value)
+    const remainderFields = getBookingPacRowRemainderFields(inputData.value, rows)
     rows.push({
       id: Date.now(),
       pac_container_count: 1,
