@@ -561,6 +561,36 @@
     return false
   }
 
+  const siMismatchBypass = ref(false)
+  const siMismatchResume = ref(null)
+  const pacMismatchSource = ref('')
+
+  const ensureSiPackingValid = () => {
+    if (!showShippingInstructionTab.value) {
+      return true
+    }
+    const rows = Array.isArray(inputData.value?.si_pac_list) ? inputData.value.si_pac_list : []
+    if (rows.length === 0) {
+      activedTab.value = 4
+      appStore.openMessage({
+        content: t('$vuetify.custom.bookingPage.form.pac_list.err'),
+        color: 'error',
+      })
+      return false
+    }
+    if (!isBookingHeaderPacMismatch({ ...inputData.value, pac_list: rows })) {
+      return true
+    }
+    if (siMismatchBypass.value) {
+      siMismatchBypass.value = false
+      return true
+    }
+    activedTab.value = 4
+    pacMismatchSource.value = 'si'
+    pacMismatchConfirmVis.value = true
+    return false
+  }
+
   const persistBooking = async ({ showMessage = true } = {}) => {
     if (!ensureContainerRows()) {
       return false
@@ -575,18 +605,36 @@
         pacMismatchConfirmVis.value = false
       } else {
         activedTab.value = 1
+        pacMismatchSource.value = 'booking'
         pacMismatchConfirmVis.value = true
         return false
       }
+    }
+    if (!ensureSiPackingValid()) {
+      return false
     }
     return bookingSaveHandle({ showMessage })
   }
 
   const cancelPacMismatchSave = () => {
     pacMismatchConfirmVis.value = false
+    siMismatchBypass.value = false
+    siMismatchResume.value = null
+    pacMismatchSource.value = ''
   }
 
   const confirmPacMismatchSave = async () => {
+    const resume = siMismatchResume.value
+    siMismatchResume.value = null
+    if (pacMismatchSource.value === 'si') {
+      siMismatchBypass.value = true
+      pacMismatchSource.value = ''
+      pacMismatchConfirmVis.value = false
+      if (typeof resume === 'function') {
+        await resume()
+        return
+      }
+    }
     await onSaveHandle()
   }
 
@@ -680,6 +728,13 @@
   const saveThenRun = async (run, rows = inputData.value?.pac_list) => {
     if (!ensureContainerRows(rows)) {
       return false
+    }
+    if (showShippingInstructionTab.value) {
+      siMismatchResume.value = () => saveThenRun(run, rows)
+      if (!ensureSiPackingValid()) {
+        return false
+      }
+      siMismatchResume.value = null
     }
     if (canSave.value) {
       const saved = await bookingSaveHandle({ showMessage: false })
