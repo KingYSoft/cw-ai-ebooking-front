@@ -445,8 +445,8 @@
             </v-autocomplete>
 
             <v-number-input
-              :id="`${fieldIdPrefix}@bkg_actual_weight`"
-              v-model="inputData.bkg_actual_weight"
+              :id="`${fieldIdPrefix}@${cf('bkg_actual_weight')}`"
+              v-model="cargoData[cf('bkg_actual_weight')]"
               class="hide-step"
               color="primary"
               control-variant="hidden"
@@ -470,7 +470,7 @@
 
               <template #append>
                 <v-select
-                  v-model="inputData.bkg_unit_of_weight"
+                  v-model="cargoData[cf('bkg_unit_of_weight')]"
                   auto-select-first
                   autocomplete="off"
                   color="primary"
@@ -490,8 +490,8 @@
             </v-number-input>
 
             <v-number-input
-              :id="`${fieldIdPrefix}@bkg_actual_volume`"
-              v-model="inputData.bkg_actual_volume"
+              :id="`${fieldIdPrefix}@${cf('bkg_actual_volume')}`"
+              v-model="cargoData[cf('bkg_actual_volume')]"
               class="hide-step"
               color="primary"
               control-variant="hidden"
@@ -515,7 +515,7 @@
 
               <template #append>
                 <v-select
-                  v-model="inputData.bkg_unit_of_volume"
+                  v-model="cargoData[cf('bkg_unit_of_volume')]"
                   auto-select-first
                   autocomplete="off"
                   color="primary"
@@ -535,7 +535,7 @@
             </v-number-input>
 
             <v-number-input
-              v-model="inputData.bkg_volume_weight"
+              v-model="cargoData[cf('bkg_volume_weight')]"
               class="hide-step"
               color="primary"
               control-variant="hidden"
@@ -557,7 +557,7 @@
 
               <template #append>
                 <v-select
-                  v-model="inputData.bkg_volume_weight_unit"
+                  v-model="cargoData[cf('bkg_volume_weight_unit')]"
                   auto-select-first
                   autocomplete="off"
                   color="primary"
@@ -577,7 +577,7 @@
             </v-number-input>
 
             <v-number-input
-              v-model="inputData.bkg_actual_chargeable"
+              v-model="cargoData[cf('bkg_actual_chargeable')]"
               class="hide-step"
               color="primary"
               control-variant="hidden"
@@ -599,7 +599,7 @@
 
               <template #append>
                 <v-select
-                  v-model="inputData.bkg_actual_chargeable_unit"
+                  v-model="cargoData[cf('bkg_actual_chargeable_unit')]"
                   auto-select-first
                   autocomplete="off"
                   color="primary"
@@ -620,8 +620,8 @@
 
             <div class="d-flex align-center ga-0 w-100">
               <v-number-input
-                :id="`${fieldIdPrefix}@bkg_total_package_count`"
-                v-model="inputData.bkg_total_package_count"
+                :id="`${fieldIdPrefix}@${cf('bkg_total_package_count')}`"
+                v-model="cargoData[cf('bkg_total_package_count')]"
                 class="hide-step flex-1-1"
                 color="primary"
                 control-variant="hidden"
@@ -643,7 +643,7 @@
               </v-number-input>
 
               <FRemoteTableMenu
-                v-model="inputData.bkg_pack_type"
+                v-model="cargoData[cf('bkg_pack_type')]"
                 display-key="code"
                 :fetch-method="fetchPackageTypes"
                 :headers="packageTypeTableHeaders"
@@ -659,7 +659,12 @@
                 virtual
                 @row-select="
                   row =>
-                    assignPackageTypeFromRow(row, inputData, 'bkg_pack_type', 'bkg_pack_type_desc')
+                    assignPackageTypeFromRow(
+                      row,
+                      cargoData,
+                      cf('bkg_pack_type'),
+                      cf('bkg_pack_type_desc'),
+                    )
                 "
               />
             </div>
@@ -693,8 +698,8 @@
             </FDatePicker>
 
             <FDatePicker
-              :id="`${fieldIdPrefix}@bkg_cargo_ready`"
-              v-model:date-value="inputData.bkg_cargo_ready"
+              :id="`${fieldIdPrefix}@${cf('bkg_cargo_ready')}`"
+              v-model:date-value="cargoData[cf('bkg_cargo_ready')]"
               max="2099-12-31"
               min="2000-01-01"
               :rules="inputDataRules.bkg_cargo_ready"
@@ -707,8 +712,8 @@
             </FDatePicker>
 
             <v-select
-              :id="`${fieldIdPrefix}@bkg_release_type`"
-              v-model="inputData.bkg_release_type"
+              :id="`${fieldIdPrefix}@${cf('bkg_release_type')}`"
+              v-model="cargoData[cf('bkg_release_type')]"
               auto-select-first
               autocomplete="off"
               density="compact"
@@ -732,8 +737,8 @@
             </v-select>
 
             <v-select
-              :id="`${fieldIdPrefix}@bkg_service_level`"
-              v-model="inputData.bkg_service_level"
+              :id="`${fieldIdPrefix}@${cf('bkg_service_level')}`"
+              v-model="cargoData[cf('bkg_service_level')]"
               auto-select-first
               autocomplete="off"
               density="compact"
@@ -757,8 +762,8 @@
             </v-select>
 
             <v-select
-              :id="`${fieldIdPrefix}@bkg_delivery_mode`"
-              v-model="inputData.bkg_delivery_mode"
+              :id="`${fieldIdPrefix}@${cf('bkg_delivery_mode')}`"
+              v-model="cargoData[cf('bkg_delivery_mode')]"
               auto-select-first
               autocomplete="off"
               density="compact"
@@ -780,7 +785,7 @@
             </v-select>
 
             <v-text-field
-              v-model="inputData.bkg_commodity"
+              v-model="cargoData[cf('bkg_commodity')]"
               color="primary"
               density="compact"
               hide-details
@@ -905,8 +910,8 @@
         <v-col :cols="cargoColCols">
           <div class="d-flex align-start flex-column flex-wrap ga-1">
             <v-select
-              :id="`${fieldIdPrefix}@bkg_inco`"
-              v-model="inputData.bkg_inco"
+              :id="`${fieldIdPrefix}@${cf('bkg_inco')}`"
+              v-model="cargoData[cf('bkg_inco')]"
               auto-select-first
               autocomplete="off"
               class="flex-1-1"
@@ -932,8 +937,8 @@
             </v-select>
 
             <v-select
-              :id="`${fieldIdPrefix}@bkg_freight_terms`"
-              v-model="inputData.bkg_freight_terms"
+              :id="`${fieldIdPrefix}@${cf('bkg_freight_terms')}`"
+              v-model="cargoData[cf('bkg_freight_terms')]"
               auto-select-first
               autocomplete="off"
               density="compact"
@@ -958,8 +963,8 @@
             </v-select>
 
             <v-number-input
-              :id="`${fieldIdPrefix}@bkg_goods_value`"
-              v-model="inputData.bkg_goods_value"
+              :id="`${fieldIdPrefix}@${cf('bkg_goods_value')}`"
+              v-model="cargoData[cf('bkg_goods_value')]"
               class="hide-step"
               color="primary"
               density="compact"
@@ -974,13 +979,13 @@
               variant="outlined"
               @update:model-value="
                 () => {
-                  if (inputData.bkg_goods_value === null) {
-                    inputData.bkg_goods_value_currency = null
+                  if (cargoData[cf('bkg_goods_value')] === null) {
+                    cargoData[cf('bkg_goods_value_currency')] = null
                   } else {
-                    if (inputData.bkg_goods_value_currency) {
+                    if (cargoData[cf('bkg_goods_value_currency')]) {
                       //
                     } else {
-                      inputData.bkg_goods_value_currency = 'USD'
+                      cargoData[cf('bkg_goods_value_currency')] = 'USD'
                     }
                   }
                 }
@@ -994,8 +999,8 @@
 
               <template #append>
                 <v-select
-                  :id="`${fieldIdPrefix}@bkg_goods_value_currency`"
-                  v-model="inputData.bkg_goods_value_currency"
+                  :id="`${fieldIdPrefix}@${cf('bkg_goods_value_currency')}`"
+                  v-model="cargoData[cf('bkg_goods_value_currency')]"
                   auto-select-first
                   autocomplete="off"
                   color="primary"
@@ -1015,8 +1020,8 @@
             </v-number-input>
 
             <v-number-input
-              :id="`${fieldIdPrefix}@bkg_insurance_value`"
-              v-model="inputData.bkg_insurance_value"
+              :id="`${fieldIdPrefix}@${cf('bkg_insurance_value')}`"
+              v-model="cargoData[cf('bkg_insurance_value')]"
               class="hide-step"
               color="primary"
               density="compact"
@@ -1031,13 +1036,13 @@
               variant="outlined"
               @update:model-value="
                 () => {
-                  if (inputData.bkg_insurance_value === null) {
-                    inputData.bkg_insurance_currency = null
+                  if (cargoData[cf('bkg_insurance_value')] === null) {
+                    cargoData[cf('bkg_insurance_currency')] = null
                   } else {
-                    if (inputData.bkg_insurance_currency) {
+                    if (cargoData[cf('bkg_insurance_currency')]) {
                       //
                     } else {
-                      inputData.bkg_insurance_currency = 'USD'
+                      cargoData[cf('bkg_insurance_currency')] = 'USD'
                     }
                   }
                 }
@@ -1049,8 +1054,8 @@
 
               <template #append>
                 <v-select
-                  :id="`${fieldIdPrefix}@bkg_insurance_currency`"
-                  v-model="inputData.bkg_insurance_currency"
+                  :id="`${fieldIdPrefix}@${cf('bkg_insurance_currency')}`"
+                  v-model="cargoData[cf('bkg_insurance_currency')]"
                   auto-select-first
                   autocomplete="off"
                   color="primary"
@@ -1100,7 +1105,7 @@
             </FTextInput>
 
             <v-text-field
-              v-model="inputData.bkg_booking_reference"
+              v-model="cargoData[cf('bkg_booking_reference')]"
               color="primary"
               density="compact"
               hide-details
@@ -1116,7 +1121,7 @@
             </v-text-field>
 
             <v-text-field
-              v-model="inputData.bkg_additional_terms"
+              v-model="cargoData[cf('bkg_additional_terms')]"
               color="primary"
               density="compact"
               hide-details
@@ -1132,8 +1137,8 @@
             </v-text-field>
 
             <v-text-field
-              :id="`${fieldIdPrefix}@bkg_po_number`"
-              v-model="inputData.bkg_po_number"
+              :id="`${fieldIdPrefix}@${cf('bkg_po_number')}`"
+              v-model="cargoData[cf('bkg_po_number')]"
               color="primary"
               density="compact"
               hide-details
@@ -1820,6 +1825,18 @@
 
   const inputData = defineModel('input-data', { type: Object, required: true })
 
+  const cf = bkgKey => (props.showSiRouteFields ? `doc_${bkgKey.slice(4)}` : bkgKey)
+
+  const cargoData = computed(() => {
+    if (!props.showSiRouteFields) {
+      return inputData.value
+    }
+    if (!inputData.value.doc_data || typeof inputData.value.doc_data !== 'object') {
+      inputData.value.doc_data = {}
+    }
+    return inputData.value.doc_data
+  })
+
   const emit = defineEmits([
     'add-container',
     'remove-container',
@@ -1886,7 +1903,7 @@
   const showLooseTable = computed(() => props.showCargoFields && !showContainerTable.value)
 
   const isFobInco = computed(
-    () => String(inputData.value?.bkg_inco ?? '').trim().toUpperCase() === 'FOB',
+    () => String(cargoData.value?.[cf('bkg_inco')] ?? '').trim().toUpperCase() === 'FOB',
   )
 
   const isLclPacking = computed(
@@ -2023,25 +2040,28 @@
     // 避免在 inputData 未完全初始化时调用，防止递归更新
     if (!inputData.value) return
 
-    const cbm_d = new Decimal(inputData.value.bkg_actual_volume ?? 0)
+    const data = cargoData.value
+    const cbm_d = new Decimal(data?.[cf('bkg_actual_volume')] ?? 0)
     const cbm = cbm_d.isNaN() ? new Decimal(0) : cbm_d
     const vol_weight = cbm.times(new Decimal('166.67'))
     const vw = vol_weight.toNumber()
     const newVolumeWeight = vw === 0 ? 0 : vw
+    const volumeWeightKey = cf('bkg_volume_weight')
 
     // 只在值真正改变时才更新，避免触发不必要的响应式更新
-    if (inputData.value.bkg_volume_weight !== newVolumeWeight) {
-      inputData.value.bkg_volume_weight = newVolumeWeight
+    if (data[volumeWeightKey] !== newVolumeWeight) {
+      data[volumeWeightKey] = newVolumeWeight
     }
 
-    const gw_d = new Decimal(inputData.value.bkg_actual_weight ?? 0)
+    const gw_d = new Decimal(data?.[cf('bkg_actual_weight')] ?? 0)
     const gw = gw_d.isNaN() ? new Decimal(0) : gw_d
     const cg = gw.lessThan(vol_weight) ? vol_weight.toNumber() : gw.toNumber()
     const newChargeableWeight = cg === 0 ? 0 : cg
+    const chargeableKey = cf('bkg_actual_chargeable')
 
     // 只在值真正改变时才更新，避免触发不必要的响应式更新
-    if (inputData.value.bkg_actual_chargeable !== newChargeableWeight) {
-      inputData.value.bkg_actual_chargeable = newChargeableWeight
+    if (data[chargeableKey] !== newChargeableWeight) {
+      data[chargeableKey] = newChargeableWeight
     }
   }
 

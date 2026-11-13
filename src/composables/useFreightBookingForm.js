@@ -167,18 +167,32 @@ export function useFreightBookingForm() {
       }
       rows = inputData.value.pac_list
     }
-    const remainderFields = getBookingPacRowRemainderFields(inputData.value, rows)
+    const isSi = rows === inputData.value.si_pac_list
+    const doc =
+      isSi && inputData.value.doc_data && typeof inputData.value.doc_data === 'object'
+        ? inputData.value.doc_data
+        : null
+    const remainderSource = doc
+      ? {
+          ...inputData.value,
+          bkg_total_package_count: doc.doc_total_package_count,
+          bkg_actual_weight: doc.doc_actual_weight,
+          bkg_actual_volume: doc.doc_actual_volume,
+        }
+      : inputData.value
+    const remainderFields = getBookingPacRowRemainderFields(remainderSource, rows)
     rows.push({
       id: Date.now(),
       pac_container_count: 1,
-      pac_pack_type: inputData.value.bkg_pack_type,
-      pac_weight_unit: inputData.value.bkg_unit_of_weight,
-      pac_actual_volume_uom: inputData.value.bkg_unit_of_volume,
-      pac_volume_weight: inputData.value.bkg_volume_weight,
-      pac_volume_weight_unit: inputData.value.bkg_volume_weight_unit,
-      pac_chargeable_weight: inputData.value.bkg_actual_chargeable,
-      pac_chargeable_weight_unit: inputData.value.bkg_actual_chargeable_unit,
-      pac_pack_type_desc: inputData.value.bkg_pack_type_desc,
+      pac_pack_type: doc?.doc_pack_type ?? inputData.value.bkg_pack_type,
+      pac_weight_unit: doc?.doc_unit_of_weight ?? inputData.value.bkg_unit_of_weight,
+      pac_actual_volume_uom: doc?.doc_unit_of_volume ?? inputData.value.bkg_unit_of_volume,
+      pac_volume_weight: doc?.doc_volume_weight ?? inputData.value.bkg_volume_weight,
+      pac_volume_weight_unit: doc?.doc_volume_weight_unit ?? inputData.value.bkg_volume_weight_unit,
+      pac_chargeable_weight: doc?.doc_actual_chargeable ?? inputData.value.bkg_actual_chargeable,
+      pac_chargeable_weight_unit:
+        doc?.doc_actual_chargeable_unit ?? inputData.value.bkg_actual_chargeable_unit,
+      pac_pack_type_desc: doc?.doc_pack_type_desc ?? inputData.value.bkg_pack_type_desc,
       ...remainderFields,
     })
   }
