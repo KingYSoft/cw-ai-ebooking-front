@@ -93,7 +93,7 @@
   const { addrTable } = useBookingPageI18n()
   const appStore = useAppStore()
 
-  defineProps({
+  const props = defineProps({
     activedTab: { type: Number, default: 1 },
     lockNonSiFields: { type: Boolean, default: false },
     lockSiFields: { type: Boolean, default: false },
@@ -559,7 +559,11 @@
     ],
     bkg_po_number: [
       value => {
-        if (String(inputData.value.bkg_inco ?? '').trim().toUpperCase() !== 'FOB') {
+        const inco =
+          props.activedTab === 4
+            ? inputData.value.doc_data?.doc_inco
+            : inputData.value.bkg_inco
+        if (String(inco ?? '').trim().toUpperCase() !== 'FOB') {
           return true
         }
         if (String(value ?? '').trim()) {

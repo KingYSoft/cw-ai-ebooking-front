@@ -578,7 +578,22 @@
       })
       return false
     }
-    if (!isBookingHeaderPacMismatch({ ...inputData.value, pac_list: rows })) {
+    const doc = inputData.value.doc_data && typeof inputData.value.doc_data === 'object'
+      ? inputData.value.doc_data
+      : {}
+    if (
+      !isBookingHeaderPacMismatch({
+        ...inputData.value,
+        pac_list: rows,
+        bkg_actual_weight: doc.doc_actual_weight,
+        bkg_unit_of_weight: doc.doc_unit_of_weight,
+        bkg_actual_volume: doc.doc_actual_volume,
+        bkg_unit_of_volume: doc.doc_unit_of_volume,
+        bkg_total_package_count: doc.doc_total_package_count,
+        bkg_pack_type: doc.doc_pack_type,
+        bkg_pack_type_desc: doc.doc_pack_type_desc,
+      })
+    ) {
       return true
     }
     if (siMismatchBypass.value) {
