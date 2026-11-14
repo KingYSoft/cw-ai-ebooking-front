@@ -64,15 +64,18 @@
                 title="Shipping Order"
                 @click="onPrintHandle('PDF_WHS_000001')"
               />
+
               <v-list-item
                 title="SI FORM"
                 @click="onPrintHandle('PDF_WHS_000002')"
               />
+
               <v-list-item
                 v-if="isOrderReceived"
                 title="CR FORM"
                 @click="onPrintHandle('PDF_WHS_000003')"
               />
+
               <v-list-item
                 v-if="isDiOrder"
                 title="DI FORM"
@@ -286,7 +289,6 @@
 const isEditing = computed(
   () => isOrderedStatus.value && isDraftStatus.value,
 )
-
 
   const editLockGuard = useEditLockGuard({
     businessType: 'warehouse_order',

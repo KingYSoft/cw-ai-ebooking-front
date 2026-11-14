@@ -1897,7 +1897,7 @@ const reconcileMarketSelection = async () => {
 
   // 兼容 market 对象和独立字段
   const current = normalizeWhsMarketObject({
-    ...(inputData.value.market ?? {}),
+    ...inputData.value.market,
     market: selectedMarketName.value,
     plant_id: selectedPlantId.value,
     pk: inputData.value.wso_market_pk ?? inputData.value.market?.pk ?? '',
@@ -1947,7 +1947,7 @@ const reconcileMarketSelection = async () => {
     matched = findPlantOption(plantId) ?? matched
 
     syncMarketDerivedFields(inputData.value, {
-      ...(matched ?? {}),
+      ...matched,
       market: marketName,
       plant_id: plantId,
     })

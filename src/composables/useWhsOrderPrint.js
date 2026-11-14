@@ -13,15 +13,19 @@ const WHS_PRINT_TEMPLATE_CODES = {
 
 const getPdfTitle = (templateCode, defaultTitle) => {
   switch (templateCode) {
-    case WHS_PRINT_TEMPLATE_CODES.SI:
+    case WHS_PRINT_TEMPLATE_CODES.SI: {
       return 'SI FORM'
-    case WHS_PRINT_TEMPLATE_CODES.CR:
+    }
+    case WHS_PRINT_TEMPLATE_CODES.CR: {
       return 'CR FORM'
-    case WHS_PRINT_TEMPLATE_CODES.DI:
+    }
+    case WHS_PRINT_TEMPLATE_CODES.DI: {
       return 'DI FORM'
-    case WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER:
-    default:
+    }
+    // case WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER:
+    default: {
       return defaultTitle
+    }
   }
 }
 
@@ -71,7 +75,10 @@ export function useWhsOrderPrint() {
     return null
   }
 
-  const generateWhsOrderPdf = async (order, templateCode = WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER) => {
+  const generateWhsOrderPdf = async (
+    order,
+    templateCode = WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER,
+  ) => {
     const businessId = order?.id
     const businessPk = String(order?.pk ?? '').trim()
     if (!businessId || !businessPk) {
@@ -127,15 +134,9 @@ export function useWhsOrderPrint() {
     }
   }
 
-  const onPrintWhsOrder = async (
-    order,
-    templateCode = WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER,
-  ) => {
+  const onPrintWhsOrder = async (order, templateCode = WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER) => {
     // 原 Shipping Order 保留 Carrier SO 校验；SI / CR / DI 不增加此限制。
-    if (
-      templateCode === WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER &&
-      !hasCarrierSoNumber(order)
-    ) {
+    if (templateCode === WHS_PRINT_TEMPLATE_CODES.SHIPPING_ORDER && !hasCarrierSoNumber(order)) {
       appStore.openMessage({
         content: editMessage('carrierSoRequiredForPrint'),
         color: 'warning',

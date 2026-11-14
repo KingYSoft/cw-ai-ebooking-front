@@ -1832,7 +1832,7 @@
       return inputData.value
     }
     if (!inputData.value.doc_data || typeof inputData.value.doc_data !== 'object') {
-      inputData.value.doc_data = {}
+      return {}
     }
     return inputData.value.doc_data
   })
@@ -1903,17 +1903,27 @@
   const showLooseTable = computed(() => props.showCargoFields && !showContainerTable.value)
 
   const isFobInco = computed(
-    () => String(cargoData.value?.[cf('bkg_inco')] ?? '').trim().toUpperCase() === 'FOB',
+    () =>
+      String(cargoData.value?.[cf('bkg_inco')] ?? '')
+        .trim()
+        .toUpperCase() === 'FOB',
   )
 
   const isLclPacking = computed(
-    () => String(inputData.value?.bkg_packing_mode ?? '').trim().toUpperCase() === 'LCL',
+    () =>
+      String(inputData.value?.bkg_packing_mode ?? '')
+        .trim()
+        .toUpperCase() === 'LCL',
   )
 
   const containerRows = computed(() =>
     props.showSiRouteFields
-      ? (Array.isArray(inputData.value.si_pac_list) ? inputData.value.si_pac_list : [])
-      : (Array.isArray(inputData.value.pac_list) ? inputData.value.pac_list : []),
+      ? Array.isArray(inputData.value.si_pac_list)
+        ? inputData.value.si_pac_list
+        : []
+      : Array.isArray(inputData.value.pac_list)
+        ? inputData.value.pac_list
+        : [],
   )
 
   const packingTableHeight = computed(() => {

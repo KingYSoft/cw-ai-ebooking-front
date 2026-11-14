@@ -31,6 +31,10 @@ export const useSignalrStore = defineStore('signalr', {
         url += (url.indexOf('?') === -1 ? '?' : '&') + qs
         this.qs = qs
       }
+      const lang = localStorage.getItem('lang') || ''
+      const cookieLangValue = getFacadeLanguageCulture(lang)
+      url += (url.indexOf('?') === -1 ? '?' : '&') + `facade_language=${cookieLangValue}`
+
       const that = this
       this.startConnection(url, this.configureConnection)
         .then(connection => {

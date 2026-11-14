@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <v-card-text class="py-2">
       <v-btn
         v-if="!readonly"
@@ -30,7 +30,7 @@
     </v-card-text>
 
     <!-- <v-form :ref="setRef" class="ref-form-pre" color="background"> -->
-      <v-form :ref="setRef" :readonly="readonly" class="ref-form-pre" color="background">
+    <v-form :ref="setRef" class="ref-form-pre" color="background" :readonly="readonly">
       <v-card-text class="py-2">
         <v-text-field
           id="2@container_rows_required"
@@ -260,18 +260,18 @@
           </div>
         </template>
 
-       <template #item.woi_pieces="{ item }">
-  <v-number-input
-    :model-value="item.woi_pieces"
-    control-variant="hidden"
-    density="compact"
-    hide-details
-    :precision="0"
-    :rules="lineMeasureRules.woi_pieces"
-    variant="outlined"
-    @update:model-value="value => (item.woi_pieces = normalizeInteger(value))"
-  />
-</template>
+        <template #item.woi_pieces="{ item }">
+          <v-number-input
+            control-variant="hidden"
+            density="compact"
+            hide-details
+            :model-value="item.woi_pieces"
+            :precision="0"
+            :rules="lineMeasureRules.woi_pieces"
+            variant="outlined"
+            @update:model-value="value => (item.woi_pieces = normalizeInteger(value))"
+          />
+        </template>
 
         <template #item.woi_is_palletization="{ item }">
           <v-checkbox-btn
