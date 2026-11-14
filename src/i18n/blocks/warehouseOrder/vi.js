@@ -35,7 +35,7 @@ export default {
     orderNo: 'Số đơn',
     soNumber: 'Số SO',
     containerNumber: 'Số container',
-    carrierSoNumber:'Số SO của hãng vận chuyển',
+    carrierSoNumber: 'Số SO của hãng vận chuyển',
     soRelease: 'So Release',
     marketId: 'Market Group',
     deliveryMode: 'Phương thức giao hàng',

@@ -45,6 +45,7 @@ config_arr.push({
     'unicorn/no-this-outside-of-class': 'off',
     'unicorn/better-dom-traversing': 'off',
     'unicorn/prefer-includes-over-repeated-comparisons': 'off',
+    'no-unused-vars': 'off',
   },
 })
 // console.log(config_arr)
