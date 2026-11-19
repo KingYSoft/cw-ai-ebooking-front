@@ -212,6 +212,7 @@ export default {
     },
     menuPage: {
       dashboard: '仪表盘',
+      email: '邮件',
 
       freight: '货运',
       booking: '订舱',
@@ -232,6 +233,18 @@ export default {
       system_party_role: '参与方角色',
       system_security: '权限',
       system_logs: '日志',
+    },
+    emailPage: {
+      title: '邮件',
+      detailTitle: '邮件详情',
+      sender: '发件人',
+      subject: '主题',
+      date: '日期',
+      size: '大小',
+      startDate: '开始日期',
+      endDate: '结束日期',
+      search: '查询',
+      reset: '重置',
     },
     dashboardPage,
     poPage: {

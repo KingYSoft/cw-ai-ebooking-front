@@ -213,6 +213,7 @@ export default {
     },
     menuPage: {
       dashboard: 'Bảng điều khiển',
+      email: 'Email',
 
       freight: 'Vận tải',
       booking: 'Đặt chỗ',
@@ -233,6 +234,18 @@ export default {
       system_party_role: 'Vai trò các bên',
       system_security: 'Bảo mật',
       system_logs: 'Nhật ký',
+    },
+    emailPage: {
+      title: 'Email',
+      detailTitle: 'Chi tiết email',
+      sender: 'Người gửi',
+      subject: 'Chủ đề',
+      date: 'Ngày',
+      size: 'Kích thước',
+      startDate: 'Từ ngày',
+      endDate: 'Đến ngày',
+      search: 'Tìm kiếm',
+      reset: 'Đặt lại',
     },
     dashboardPage,
     poPage: {

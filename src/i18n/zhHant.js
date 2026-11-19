@@ -212,6 +212,7 @@ export default {
     },
     menuPage: {
       dashboard: '儀表板',
+      email: '郵件',
 
       freight: '貨運',
       booking: '訂艙',
@@ -232,6 +233,18 @@ export default {
       system_party_role: '參與方角色',
       system_security: '安全性',
       system_logs: '記錄',
+    },
+    emailPage: {
+      title: '郵件',
+      detailTitle: '郵件詳情',
+      sender: '寄件者',
+      subject: '主旨',
+      date: '日期',
+      size: '大小',
+      startDate: '開始日期',
+      endDate: '結束日期',
+      search: '查詢',
+      reset: '重設',
     },
     dashboardPage,
     poPage: {

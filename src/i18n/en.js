@@ -213,6 +213,7 @@ export default {
     },
     menuPage: {
       dashboard: 'Dashboard',
+      email: 'Email',
 
       freight: 'Freight',
       booking: 'Booking',
@@ -233,6 +234,18 @@ export default {
       system_party_role: 'Party Roles',
       system_security: 'Security',
       system_logs: 'Logs',
+    },
+    emailPage: {
+      title: 'Email',
+      detailTitle: 'Email Details',
+      sender: 'Sender',
+      subject: 'Subject',
+      date: 'Date',
+      size: 'Size',
+      startDate: 'Start Date',
+      endDate: 'End Date',
+      search: 'Search',
+      reset: 'Reset',
     },
     dashboardPage,
     poPage: {

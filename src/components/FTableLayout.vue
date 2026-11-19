@@ -31,6 +31,7 @@
           :show-select="showSelect"
           :striped="striped"
           :style="{ minHeight: maxHeight + 'px', maxHeight: maxHeight + 'px', overflowY: 'auto' }"
+          @click:row="handleRowClick"
           @dblclick:row="handleRowDblClick"
           @update:model-value="emit('update:modelValue', $event)"
         >
@@ -75,6 +76,7 @@
           :server-items-length="serverItemsLength"
           :show-select="showSelect"
           :striped="striped"
+          @click:row="handleRowClick"
           @dblclick:row="handleRowDblClick"
           @update:items-per-page="emit('update:items-per-page', $event)"
           @update:model-value="emit('update:modelValue', $event)"
@@ -202,6 +204,7 @@
 
   const emit = defineEmits([
     'update:modelValue',
+    'row-click',
     'row-dblclick',
     'update:headers',
     'update:page',
@@ -265,6 +268,15 @@
     }
 
     emit('row-dblclick', event, scope)
+  }
+
+  const handleRowClick = (event, scope) => {
+    if (event && typeof event === 'object' && event.item) {
+      emit('row-click', null, { item: event.item })
+      return
+    }
+
+    emit('row-click', event, scope)
   }
 
   /**
